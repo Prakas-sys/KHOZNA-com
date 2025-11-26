@@ -4,7 +4,7 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
 export default function KYCModal({ isOpen, onClose, onSuccess }) {
-    const { user } = useAuth();
+    const { user, refreshProfile } = useAuth();
     const [step, setStep] = useState(1); // 1: Upload, 2: Phone, 3: Pending
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -73,7 +73,14 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
 
             setStep(2);
         } catch (err) {
-            setError(err.message || 'Failed to upload citizenship');
+            console.error('KYC Upload Error:', err);
+
+            // Provide helpful error message for missing bucket
+            if (err.message && err.message.includes('Bucket not found')) {
+                setError('Storage bucket not configured. Please contact support or check SUPABASE_SETUP.md');
+            } else {
+                setError(err.message || 'Failed to upload citizenship');
+            }
         } finally {
             setLoading(false);
         }
@@ -137,13 +144,27 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                 throw new Error('Invalid OTP');
             }
 
-            // Mark as submitted (pending admin approval)
+            // Mark as approved (Auto-approval for MVP)
             const { error: updateError } = await supabase
                 .from('kyc_verifications')
-                .update({ status: 'pending' })
+                .update({
+                    status: 'approved',
+                    verified_at: new Date().toISOString()
+                })
                 .eq('user_id', user.id);
 
             if (updateError) throw updateError;
+
+            // Update profile verification status
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .update({ is_verified: true })
+                .eq('id', user.id);
+
+            if (profileError) throw profileError;
+
+            // Refresh user profile to update UI
+            await refreshProfile();
 
             setStep(4); // Success/Pending state
         } catch (err) {
@@ -353,9 +374,9 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                             <div className="w-20 h-20 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <CheckCircle size={40} />
                             </div>
-                            <h3 className="text-xl font-bold text-gray-900 mb-2">Verification Submitted!</h3>
+                            <h3 className="text-xl font-bold text-gray-900 mb-2">Verification Successful!</h3>
                             <p className="text-gray-600 mb-6">
-                                Your documents are under review. We'll notify you once approved (usually within 24 hours).
+                                Your identity has been verified. You can now post properties.
                             </p>
                             <button
                                 onClick={onClose}

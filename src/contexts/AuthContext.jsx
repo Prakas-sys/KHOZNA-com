@@ -9,22 +9,23 @@ export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchProfile = async (userId) => {
-            try {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('*')
-                    .eq('id', userId)
-                    .single();
+    const fetchProfile = async (userId) => {
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('*')
+                .eq('id', userId)
+                .single();
 
-                if (!error && data) {
-                    setUser(prev => ({ ...prev, ...data }));
-                }
-            } catch (error) {
-                console.error('Error fetching profile:', error);
+            if (!error && data) {
+                setUser(prev => ({ ...prev, ...data }));
             }
-        };
+        } catch (error) {
+            console.error('Error fetching profile:', error);
+        }
+    };
+
+    useEffect(() => {
 
         // Check active sessions and sets the user
         supabase.auth.getSession().then(({ data: { session } }) => {
@@ -77,11 +78,18 @@ export const AuthProvider = ({ children }) => {
         if (error) throw error;
     };
 
+    const refreshProfile = async () => {
+        if (user) {
+            await fetchProfile(user.id);
+        }
+    };
+
     const value = {
         signUp,
         signIn,
         signOut,
         user,
+        refreshProfile,
     };
 
     return (
