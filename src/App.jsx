@@ -441,6 +441,8 @@ function RentEaseAppContent() {
     const ProfileView = () => {
         const [editMode, setEditMode] = useState(false);
         const [profileName, setProfileName] = useState(user?.user_metadata?.full_name || '');
+        const [kycData, setKycData] = useState(null);
+        const [loadingKyc, setLoadingKyc] = useState(true);
 
         useEffect(() => {
             if (user) {
@@ -454,9 +456,43 @@ function RentEaseAppContent() {
 
                     if (!error) setUserListings(data || []);
                 };
+
+                // Fetch KYC data
+                const fetchKycData = async () => {
+                    setLoadingKyc(true);
+                    const { data, error } = await supabase
+                        .from('kyc_verifications')
+                        .select('*')
+                        .eq('user_id', user.id)
+                        .single();
+
+                    if (!error && data) setKycData(data);
+                    setLoadingKyc(false);
+                };
+
                 fetchUserListings();
+                fetchKycData();
             }
         }, [user]);
+
+        const handleRequestEdit = async () => {
+            try {
+                const { error } = await supabase
+                    .from('notifications')
+                    .insert({
+                        user_id: user.id,
+                        title: 'KYC Edit Request',
+                        message: `User ${user.email} has requested to edit their KYC documents.`,
+                        type: 'info'
+                    });
+
+                if (!error) {
+                    alert('Edit request sent! Admin will review your request.');
+                }
+            } catch (err) {
+                console.error('Error sending edit request:', err);
+            }
+        };
 
         const handleUpdateProfile = async () => {
             try {
@@ -537,6 +573,62 @@ function RentEaseAppContent() {
                         </div>
                     </div>
                 </div>
+
+                {/* KYC Documents Section */}
+                {kycData && (
+                    <div className="px-4 py-6 bg-white mb-4">
+                        <h3 className="text-lg font-bold text-gray-900 mb-4">KYC Verification</h3>
+                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
+                            <div className="flex items-center gap-2 text-green-700">
+                                <Shield size={20} />
+                                <span className="font-semibold">Verified Account</span>
+                            </div>
+                            <p className="text-sm text-green-600 mt-1">Status: {kycData.status}</p>
+                        </div>
+
+                        {/* Citizenship Images */}
+                        <div className="grid grid-cols-2 gap-3 mb-4">
+                            <div>
+                                <p className="text-sm font-semibold text-gray-700 mb-2">Front Side</p>
+                                <img
+                                    src={kycData.citizenship_photo_url}
+                                    alt="Citizenship Front"
+                                    className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                                />
+                            </div>
+                            <div>
+                                <p className="text-sm font-semibold text-gray-700 mb-2">Back Side</p>
+                                <img
+                                    src={kycData.citizenship_photo_back_url}
+                                    alt="Citizenship Back"
+                                    className="w-full h-32 object-cover rounded-lg border border-gray-200"
+                                />
+                            </div>
+                        </div>
+
+                        {/* Details */}
+                        <div className="space-y-2 mb-4">
+                            <div className="flex justify-between py-2 border-b">
+                                <span className="text-gray-600">Citizenship No.</span>
+                                <span className="font-semibold">{kycData.citizenship_number}</span>
+                            </div>
+                            <div className="flex justify-between py-2 border-b">
+                                <span className="text-gray-600">Phone Number</span>
+                                <span className="font-semibold">{kycData.phone_number}</span>
+                            </div>
+                        </div>
+
+                        <button
+                            onClick={handleRequestEdit}
+                            className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
+                        >
+                            Request Edit
+                        </button>
+                        <p className="text-xs text-gray-500 text-center mt-2">
+                            To edit your KYC documents, send a request to admin
+                        </p>
+                    </div>
+                )}
 
                 {/* User's Listings */}
                 <div className="px-4 py-6">

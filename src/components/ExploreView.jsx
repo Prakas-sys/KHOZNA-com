@@ -1,8 +1,9 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import {
     Search, MapPin, SlidersHorizontal, Building, HomeIcon, Building2, Briefcase,
     UserCircle2, BellDot, LogOut, Heart, Star, Map as MapIcon, List
 } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { NEPAL_LOCATIONS } from '../data/locations';
@@ -41,6 +42,40 @@ const ExploreView = ({
 }) => {
     const [showMap, setShowMap] = useState(false);
     const [showAutocomplete, setShowAutocomplete] = useState(false);
+    const [showNotifications, setShowNotifications] = useState(false);
+    const [notifications, setNotifications] = useState([]);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    // Fetch notifications
+    useEffect(() => {
+        if (user) {
+            fetchNotifications();
+        }
+    }, [user]);
+
+    const fetchNotifications = async () => {
+        if (!user) return;
+        const { data, error } = await supabase
+            .from('notifications')
+            .select('*')
+            .eq('user_id', user.id)
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+        if (!error && data) {
+            setNotifications(data);
+            setUnreadCount(data.filter(n => !n.is_read).length);
+        }
+    };
+
+    const markAsRead = async (notificationId) => {
+        await supabase
+            .from('notifications')
+            .update({ is_read: true })
+            .eq('id', notificationId);
+
+        fetchNotifications();
+    };
 
     const propertyTypes = [
         { id: 'all', label: 'All', icon: Building },
@@ -108,10 +143,57 @@ const ExploreView = ({
                         </>
                     )}
                 </div>
-                <div className="flex items-center gap-2">
-                    <button className="p-2 hover:bg-gray-100 rounded-full relative">
+                <div className="flex items-center gap-2 relative">
+                    <button
+                        onClick={() => setShowNotifications(!showNotifications)}
+                        className="p-2 hover:bg-gray-100 rounded-full relative"
+                    >
                         <BellDot size={24} className="text-gray-700" />
+                        {unreadCount > 0 && (
+                            <span className="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white text-xs font-bold rounded-full flex items-center justify-center">
+                                {unreadCount}
+                            </span>
+                        )}
                     </button>
+
+                    {/* Notifications Dropdown */}
+                    {showNotifications && (
+                        <div className="absolute top-14 right-0 w-80 bg-white rounded-xl shadow-2xl border border-gray-200 z-50 max-h-96 overflow-y-auto">
+                            <div className="p-4 border-b bg-gray-50">
+                                <h3 className="font-bold text-gray-900">Notifications</h3>
+                            </div>
+                            {notifications.length === 0 ? (
+                                <div className="p-8 text-center text-gray-500">
+                                    <BellDot size={48} className="mx-auto mb-2 text-gray-300" />
+                                    <p>No notifications</p>
+                                </div>
+                            ) : (
+                                <div className="divide-y">
+                                    {notifications.map(notif => (
+                                        <div
+                                            key={notif.id}
+                                            onClick={() => markAsRead(notif.id)}
+                                            className={`p-4 hover:bg-gray-50 cursor-pointer ${!notif.is_read ? 'bg-blue-50' : ''
+                                                }`}
+                                        >
+                                            <div className="flex items-start gap-3">
+                                                <div className="flex-1">
+                                                    <p className="font-semibold text-sm text-gray-900">{notif.title}</p>
+                                                    <p className="text-xs text-gray-600 mt-1">{notif.message}</p>
+                                                    <p className="text-xs text-gray-400 mt-2">
+                                                        {new Date(notif.created_at).toLocaleDateString()}
+                                                    </p>
+                                                </div>
+                                                {!notif.is_read && (
+                                                    <div className="w-2 h-2 bg-red-500 rounded-full mt-1"></div>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
 
