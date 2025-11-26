@@ -158,7 +158,15 @@ function RentEaseAppContent() {
             setLoadingListings(true);
             const { data, error } = await supabase
                 .from('listings')
-                .select('*')
+                .select(`
+                    *,
+                    profiles!listings_user_id_fkey (
+                        full_name
+                    ),
+                    kyc_verifications!kyc_verifications_user_id_fkey (
+                        phone_number
+                    )
+                `)
                 .order('created_at', { ascending: false });
 
             if (error) throw error;
@@ -330,6 +338,31 @@ function RentEaseAppContent() {
                                     </div>
                                 ))}
                             </div>
+                        </div>
+
+                        {/* Host Profile Section */}
+                        <div className="mb-6 bg-white border border-gray-200 rounded-xl p-5">
+                            <h3 className="font-semibold text-lg mb-4">Contact Host</h3>
+                            <div className="flex items-center gap-4 mb-4">
+                                <div className="w-14 h-14 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white text-xl font-bold">
+                                    {(selectedListing.profiles?.full_name || 'H')[0].toUpperCase()}
+                                </div>
+                                <div className="flex-1">
+                                    <p className="font-semibold text-gray-900">
+                                        {selectedListing.profiles?.full_name || 'Property Owner'}
+                                    </p>
+                                    <p className="text-sm text-gray-500">Verified Host</p>
+                                </div>
+                            </div>
+                            {selectedListing.kyc_verifications?.phone_number && (
+                                <a
+                                    href={`tel:${selectedListing.kyc_verifications.phone_number}`}
+                                    className="flex items-center justify-center gap-2 w-full bg-sky-500 text-white py-3 rounded-xl font-semibold hover:bg-sky-600 transition-colors"
+                                >
+                                    <Phone size={20} />
+                                    {selectedListing.kyc_verifications.phone_number}
+                                </a>
+                            )}
                         </div>
 
                         <div className="bg-gray-50 rounded-xl p-6">
