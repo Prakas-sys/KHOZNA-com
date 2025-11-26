@@ -13,7 +13,9 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     const [citizenshipPreview, setCitizenshipPreview] = useState('');
     const [citizenshipNumber, setCitizenshipNumber] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
+    const [phoneNumber, setPhoneNumber] = useState('');
     const [otp, setOtp] = useState('');
+    const [resendCooldown, setResendCooldown] = useState(0);
 
     if (!isOpen) return null;
 
@@ -96,26 +98,55 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
         setError('');
 
         try {
-            // Generate OTP (in production, use SMS service)
-            const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-
-            // Update KYC with phone number
-            const { error: updateError } = await supabase
-                .from('kyc_verifications')
-                .update({
-                    phone_number: phoneNumber,
-                    otp_code: generatedOtp,
-                    otp_expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString()
-                })
-                .eq('user_id', user.id);
-
-            if (updateError) throw updateError;
-
-            // In production, send SMS here
-            alert(`OTP sent to ${phoneNumber}: ${generatedOtp}`);
+            await sendOtp(phoneNumber);
             setStep(3);
         } catch (err) {
             setError(err.message || 'Failed to send OTP');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const sendOtp = async (phone) => {
+        // Generate OTP (in production, use SMS service)
+        const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+
+        // Update KYC with phone number
+        const { error: updateError } = await supabase
+            .from('kyc_verifications')
+            .update({
+                phone_number: phone,
+                otp_code: generatedOtp,
+                otp_expires_at: new Date(Date.now() + 10 * 60 * 1000).toISOString()
+            })
+            .eq('user_id', user.id);
+
+        if (updateError) throw updateError;
+
+        // In production, send SMS here
+        alert(`OTP sent to ${phone}: ${generatedOtp}`);
+
+        // Start cooldown
+        setResendCooldown(30);
+        const timer = setInterval(() => {
+            setResendCooldown((prev) => {
+                if (prev <= 1) {
+                    clearInterval(timer);
+                    return 0;
+                }
+                return prev - 1;
+            });
+        }, 1000);
+    };
+
+    const handleResendOtp = async () => {
+        if (resendCooldown > 0) return;
+        setLoading(true);
+        setError('');
+        try {
+            await sendOtp(phoneNumber);
+        } catch (err) {
+            setError(err.message || 'Failed to resend OTP');
         } finally {
             setLoading(false);
         }
@@ -354,7 +385,7 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                             <button
                                 onClick={handleOtpVerify}
                                 disabled={loading}
-                                className="w-full bg-gradient-to-r from-sky-500 to-sky-600 text-white py-3 rounded-xl font-bold hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-500/30 disabled:opacity-50 flex items-center justify-center gap-2"
+                                className="w-full bg-gradient-to-r from-sky-500 to-sky-600 text-white py-3 rounded-xl font-bold hover:from-sky-600 hover:to-sky-700 transition-all shadow-lg shadow-sky-500/30 disabled:opacity-50 flex items-center justify-center gap-2 mb-3"
                             >
                                 {loading ? (
                                     <>
@@ -364,6 +395,16 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                                 ) : (
                                     'Verify OTP'
                                 )}
+                            </button>
+
+                            <button
+                                onClick={handleResendOtp}
+                                disabled={loading || resendCooldown > 0}
+                                className="w-full text-sky-600 font-semibold text-sm hover:underline disabled:text-gray-400 disabled:no-underline"
+                            >
+                                {resendCooldown > 0
+                                    ? `Resend OTP in ${resendCooldown}s`
+                                    : 'Resend OTP'}
                             </button>
                         </div>
                     )}
