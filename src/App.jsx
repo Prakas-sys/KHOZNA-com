@@ -5,11 +5,13 @@ import {
     CheckCircle, User, Menu, Globe, DollarSign, Calendar,
     Home, Film, PlusCircle, Send, Sparkles, X, BellDot,
     SlidersHorizontal, Building, Building2, HomeIcon, Briefcase, UserCircle2, LogOut,
-    Edit, Trash2, MessageCircle, ChevronRight, Play, Pause
+    Edit, Trash2, MessageCircle, ChevronRight, Play, Pause, Shield, Flag
 } from 'lucide-react';
 import { useAuth, AuthProvider } from './contexts/AuthContext';
 import AuthModal from './components/AuthModal';
 import CreateListingModal from './components/CreateListingModal';
+import KYCModal from './components/KYCModal';
+import ReportModal from './components/ReportModal';
 import { supabase } from './lib/supabase';
 
 // --- API Configuration ---
@@ -133,6 +135,8 @@ function RentEaseAppContent() {
     const [authMode, setAuthMode] = useState('login');
 
     const [showCreateModal, setShowCreateModal] = useState(false);
+    const [showKYCModal, setShowKYCModal] = useState(false);
+    const [showReportModal, setShowReportModal] = useState(false);
     const [listings, setListings] = useState([]);
     const [userListings, setUserListings] = useState([]);
     const [currentReelIndex, setCurrentReelIndex] = useState(0);
@@ -203,12 +207,18 @@ function RentEaseAppContent() {
     };
 
     const handlePostProperty = () => {
-        if (user) {
-            setShowCreateModal(true);
-        } else {
+        if (!user) {
             setAuthMode('signup');
             setShowAuthModal(true);
+            return;
         }
+
+        if (!user.is_verified) {
+            setShowKYCModal(true);
+            return;
+        }
+
+        setShowCreateModal(true);
     };
 
     const handleGenerateItinerary = async () => {
@@ -455,6 +465,13 @@ function RentEaseAppContent() {
                         <ChevronLeft size={24} />
                     </button>
                     <div className="flex gap-2">
+                        <button
+                            onClick={() => setShowReportModal(true)}
+                            className="p-2 hover:bg-gray-100 rounded-full text-red-500"
+                            title="Report Listing"
+                        >
+                            <Flag size={20} />
+                        </button>
                         <button
                             onClick={(e) => toggleFavorite(e, selectedListing.id)}
                             className="p-2 hover:bg-gray-100 rounded-full"
@@ -1013,6 +1030,21 @@ function RentEaseAppContent() {
                     fetchListings();
                     alert('Property posted successfully!');
                 }}
+            />
+
+            <KYCModal
+                isOpen={showKYCModal}
+                onClose={() => setShowKYCModal(false)}
+                onSuccess={() => {
+                    setShowKYCModal(false);
+                    setShowCreateModal(true);
+                }}
+            />
+
+            <ReportModal
+                isOpen={showReportModal}
+                onClose={() => setShowReportModal(false)}
+                listing={selectedListing}
             />
         </div>
     );
