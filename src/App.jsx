@@ -12,6 +12,7 @@ import AuthModal from './components/AuthModal';
 import CreateListingModal from './components/CreateListingModal';
 import KYCModal from './components/KYCModal';
 import ReportModal from './components/ReportModal';
+import ExploreView from './components/ExploreView';
 import { supabase } from './lib/supabase';
 
 // --- API Configuration ---
@@ -252,208 +253,8 @@ function RentEaseAppContent() {
 
     // --- Sub-Views ---
 
-    const ExploreView = () => (
-        <div className="min-h-screen bg-gray-50 pb-24">
-            {/* User Profile Header */}
-            <div className="bg-white px-4 py-4 flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    {user ? (
-                        <>
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white shadow-lg">
-                                <UserCircle2 size={28} strokeWidth={2} />
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Hello 👋</p>
-                                <p className="font-bold text-gray-900">{user.user_metadata?.full_name || user.email}</p>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                                <UserCircle2 size={28} strokeWidth={2} className="text-gray-400" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Hello 👋</p>
-                                <button
-                                    onClick={() => {
-                                        setAuthMode('login');
-                                        setShowAuthModal(true);
-                                    }}
-                                    className="font-bold text-sky-500 hover:text-sky-600"
-                                >
-                                    Sign In
-                                </button>
-                            </div>
-                        </>
-                    )}
-                </div>
-                <div className="flex items-center gap-2">
-                    <button className="p-2 hover:bg-gray-100 rounded-full relative">
-                        <BellDot size={24} className="text-gray-700" />
-                    </button>
-                    {user && (
-                        <button
-                            onClick={() => signOut()}
-                            className="p-2 hover:bg-gray-100 rounded-full"
-                            title="Sign Out"
-                        >
-                            <LogOut size={20} className="text-gray-700" />
-                        </button>
-                    )}
-                </div>
-            </div>
+    // ExploreView is now imported
 
-            {/* Search Bar */}
-            <div className="px-4 py-4 bg-white">
-                <div className="flex gap-2">
-                    <div className="flex-1 bg-sky-500 rounded-xl px-4 py-3 flex items-center gap-3 shadow-lg">
-                        <Search size={20} className="text-white" />
-                        <input
-                            type="text"
-                            placeholder="Search Location"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            className="flex-1 bg-transparent text-white placeholder-white/80 outline-none"
-                        />
-                        <MapPin size={20} className="text-white" />
-                    </div>
-                    <button className="bg-sky-500 p-3 rounded-xl shadow-lg hover:bg-sky-600 transition-colors">
-                        <SlidersHorizontal size={24} className="text-white" />
-                    </button>
-                </div>
-            </div>
-
-            {/* Property Type Filters */}
-            <div className="px-4 py-4 bg-white">
-                <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
-                    {propertyTypes.map(type => (
-                        <button
-                            key={type.id}
-                            onClick={() => setSelectedPropertyType(type.id)}
-                            className={`flex flex-col items-center gap-2 px-4 py-3 rounded-xl min-w-[80px] transition-all ${selectedPropertyType === type.id
-                                ? 'bg-sky-500 text-white shadow-lg'
-                                : 'bg-white border border-gray-200 text-gray-600'
-                                }`}
-                        >
-                            <type.icon size={24} />
-                            <span className="text-xs font-medium whitespace-nowrap">{type.label}</span>
-                        </button>
-                    ))}
-                </div>
-            </div>
-
-            {/* Promotional Banner */}
-            <div className="px-4 py-4">
-                <div className="bg-gradient-to-br from-sky-400 to-sky-600 rounded-2xl p-6 shadow-xl">
-                    <h3 className="text-white text-xl font-bold mb-2">
-                        Post your Property for <span className="italic">Free</span>
-                    </h3>
-                    <button
-                        onClick={handlePostProperty}
-                        className="bg-white text-sky-600 px-6 py-2 rounded-full font-semibold text-sm mt-3 hover:bg-gray-50 transition-all"
-                    >
-                        Post Now
-                    </button>
-                </div>
-            </div>
-
-            {/* Listing Controls */}
-            <div className="px-4 py-3 flex items-center justify-between">
-                <div className="flex gap-2">
-                    <button
-                        onClick={() => setListingType('rent')}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${listingType === 'rent'
-                            ? 'bg-sky-500 text-white'
-                            : 'bg-gray-200 text-gray-600'
-                            }`}
-                    >
-                        For Rent
-                    </button>
-                    <button
-                        onClick={() => setListingType('sale')}
-                        className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${listingType === 'sale'
-                            ? 'bg-sky-500 text-white'
-                            : 'bg-gray-200 text-gray-600'
-                            }`}
-                    >
-                        For Sale
-                    </button>
-                </div>
-                <button className="flex items-center gap-2 px-4 py-2 bg-gray-200 rounded-full text-sm font-medium text-gray-700 hover:bg-gray-300 transition-colors">
-                    <SlidersHorizontal size={16} />
-                    Sort
-                </button>
-            </div>
-
-            {/* Featured Listings */}
-            <div className="px-4 py-3">
-                <div className="flex items-center justify-between mb-4">
-                    <h2 className="text-lg font-bold text-gray-900">Featured Listings</h2>
-                    <button className="text-sky-500 text-sm font-medium flex items-center gap-1">
-                        See All →
-                    </button>
-                </div>
-
-                {loadingListings ? (
-                    <div className="flex justify-center py-12">
-                        <div className="w-8 h-8 border-4 border-sky-200 border-t-sky-600 rounded-full animate-spin"></div>
-                    </div>
-                ) : filteredListings.length > 0 ? (
-                    <div className="grid grid-cols-2 gap-4">
-                        {filteredListings.map(listing => (
-                            <div
-                                key={listing.id}
-                                onClick={() => handleCardClick(listing)}
-                                className="bg-white rounded-xl overflow-hidden shadow-md active:scale-95 transition-transform"
-                            >
-                                <div className="relative aspect-[4/3]">
-                                    <img
-                                        src={listing.image_url || listing.image} // Fallback for old mock data structure if needed
-                                        alt={listing.title}
-                                        className="w-full h-full object-cover"
-                                    />
-                                    <button
-                                        onClick={(e) => toggleFavorite(e, listing.id)}
-                                        className="absolute top-2 right-2 p-1.5 rounded-full bg-white/90 backdrop-blur-sm"
-                                    >
-                                        <Heart
-                                            size={16}
-                                            className={favorites.includes(listing.id) ? "fill-sky-500 text-sky-500" : "text-gray-700"}
-                                        />
-                                    </button>
-                                </div>
-                                <div className="p-3">
-                                    <p className="text-xs text-gray-500 mb-1 truncate">{listing.title}</p>
-                                    <h3 className="font-bold text-gray-900 text-sm mb-2 truncate">{listing.location}</h3>
-                                    <div className="flex items-center justify-between">
-                                        <span className="text-sky-600 font-bold text-sm">₹{listing.price.toLocaleString()}</span>
-                                        <div className="flex items-center gap-1">
-                                            <Star size={12} className="fill-yellow-400 text-yellow-400" />
-                                            <span className="text-xs text-gray-600">{listing.rating || 'New'}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                ) : (
-                    <div className="text-center py-12 bg-white rounded-xl">
-                        <Search size={48} className="text-gray-300 mx-auto mb-3" />
-                        <p className="text-gray-500">No properties found</p>
-                        <button
-                            onClick={() => {
-                                setSearchQuery('');
-                                setSelectedPropertyType('all');
-                            }}
-                            className="mt-3 text-sky-500 text-sm font-medium"
-                        >
-                            Clear filters
-                        </button>
-                    </div>
-                )}
-            </div>
-        </div>
-    );
 
     const DetailsView = () => {
         if (!selectedListing) return null;
@@ -963,7 +764,26 @@ function RentEaseAppContent() {
 
     return (
         <div className="min-h-screen bg-gray-50">
-            {view === 'explore' && <ExploreView />}
+            {view === 'explore' && (
+                <ExploreView
+                    user={user}
+                    signOut={signOut}
+                    setAuthMode={setAuthMode}
+                    setShowAuthModal={setShowAuthModal}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    selectedPropertyType={selectedPropertyType}
+                    setSelectedPropertyType={setSelectedPropertyType}
+                    listingType={listingType}
+                    setListingType={setListingType}
+                    listings={listings}
+                    loadingListings={loadingListings}
+                    handlePostProperty={handlePostProperty}
+                    handleCardClick={handleCardClick}
+                    favorites={favorites}
+                    toggleFavorite={toggleFavorite}
+                />
+            )}
             {view === 'details' && <DetailsView />}
             {view === 'profile' && <ProfileView />}
             {view === 'reels' && <ReelsView />}
