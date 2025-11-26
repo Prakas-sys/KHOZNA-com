@@ -575,7 +575,7 @@ function RentEaseAppContent() {
                 </div>
 
                 {/* KYC Documents Section */}
-                {kycData && (
+                {kycData ? (
                     <div className="px-4 py-6 bg-white mb-4">
                         <h3 className="text-lg font-bold text-gray-900 mb-4">KYC Verification</h3>
                         <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
@@ -627,6 +627,22 @@ function RentEaseAppContent() {
                         <p className="text-xs text-gray-500 text-center mt-2">
                             To edit your KYC documents, send a request to admin
                         </p>
+                    </div>
+                ) : !loadingKyc && (
+                    <div className="px-4 py-6 bg-white mb-4">
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+                            <Shield size={48} className="text-yellow-600 mx-auto mb-3" />
+                            <h3 className="text-lg font-bold text-gray-900 mb-2">KYC Verification Required</h3>
+                            <p className="text-sm text-gray-600 mb-4">
+                                Complete your KYC verification to post properties and build trust with renters.
+                            </p>
+                            <button
+                                onClick={() => setShowKYCModal(true)}
+                                className="bg-sky-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-sky-600 transition-colors"
+                            >
+                                Submit KYC Documents
+                            </button>
+                        </div>
                     </div>
                 )}
 
