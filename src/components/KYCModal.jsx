@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { X, Upload, Phone, CheckCircle, Shield, AlertCircle, Loader2 } from 'lucide-react';
+import { X, Upload, Phone, CheckCircle, Shield, AlertCircle, Loader2, ChevronLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -9,49 +9,64 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
-    const [citizenshipFile, setCitizenshipFile] = useState(null);
-    const [citizenshipPreview, setCitizenshipPreview] = useState('');
+    const [citizenshipFileFront, setCitizenshipFileFront] = useState(null);
+    const [citizenshipFileBack, setCitizenshipFileBack] = useState(null);
+    const [citizenshipPreviewFront, setCitizenshipPreviewFront] = useState('');
+    const [citizenshipPreviewBack, setCitizenshipPreviewBack] = useState('');
     const [citizenshipNumber, setCitizenshipNumber] = useState('');
-    const [phoneNumber, setPhoneNumber] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [otp, setOtp] = useState('');
     const [resendCooldown, setResendCooldown] = useState(0);
 
     if (!isOpen) return null;
 
-    const handleFileChange = (e) => {
+    const handleFileChange = (e, side) => {
         const file = e.target.files[0];
         if (file) {
             if (file.size > 5 * 1024 * 1024) {
                 setError('File size must be less than 5MB');
                 return;
             }
-            setCitizenshipFile(file);
-            setCitizenshipPreview(URL.createObjectURL(file));
+            if (side === 'front') {
+                setCitizenshipFileFront(file);
+                setCitizenshipPreviewFront(URL.createObjectURL(file));
+            } else {
+                setCitizenshipFileBack(file);
+                setCitizenshipPreviewBack(URL.createObjectURL(file));
+            }
             setError('');
         }
     };
 
     const uploadCitizenship = async () => {
-        const fileExt = citizenshipFile.name.split('.').pop();
-        const fileName = `${user.id}/citizenship.${fileExt}`;
-
-        const { error: uploadError } = await supabase.storage
+        // Upload front
+        const frontExt = citizenshipFileFront.name.split('.').pop();
+        const frontFileName = `${user.id}/citizenship-front.${frontExt}`;
+        const { error: frontError } = await supabase.storage
             .from('kyc-documents')
-            .upload(fileName, citizenshipFile, { upsert: true });
-
-        if (uploadError) throw uploadError;
-
-        const { data } = supabase.storage
+            .upload(frontFileName, citizenshipFileFront, { upsert: true });
+        if (frontError) throw frontError;
+        const { data: frontData } = supabase.storage
             .from('kyc-documents')
-            .getPublicUrl(fileName);
+            .getPublicUrl(frontFileName);
 
-        return data.publicUrl;
+        // Upload back
+        const backExt = citizenshipFileBack.name.split('.').pop();
+        const backFileName = `${user.id}/citizenship-back.${backExt}`;
+        const { error: backError } = await supabase.storage
+            .from('kyc-documents')
+            .upload(backFileName, citizenshipFileBack, { upsert: true });
+        if (backError) throw backError;
+        const { data: backData } = supabase.storage
+            .from('kyc-documents')
+            .getPublicUrl(backFileName);
+
+        return { frontUrl: frontData.publicUrl, backUrl: backData.publicUrl };
     };
 
     const handleStep1Submit = async () => {
-        if (!citizenshipFile || !citizenshipNumber) {
-            setError('Please upload citizenship and enter number');
+        if (!citizenshipFileFront || !citizenshipFileBack || !citizenshipNumber) {
+            setError('Please upload both sides of citizenship and enter number');
             return;
         }
 
@@ -59,14 +74,15 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
         setError('');
 
         try {
-            const photoUrl = await uploadCitizenship();
+            const { frontUrl, backUrl } = await uploadCitizenship();
 
             // Save to KYC table
             const { error: kycError } = await supabase
                 .from('kyc_verifications')
                 .upsert({
                     user_id: user.id,
-                    citizenship_photo_url: photoUrl,
+                    citizenship_photo_url: frontUrl,
+                    citizenship_photo_back_url: backUrl,
                     citizenship_number: citizenshipNumber,
                     status: 'pending'
                 });
@@ -243,25 +259,52 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                     {/* Step 1: Upload Citizenship */}
                     {step === 1 && (
                         <div className="space-y-4">
+                            {/* Front Side */}
                             <div>
                                 <label className="block text-sm font-semibold text-gray-700 mb-2">
-                                    नागरिकता प्रमाणपत्र (Citizenship Certificate)
+                                    Citizenship - Front Side
                                 </label>
-                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-6 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
+                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
                                     <input
                                         type="file"
                                         accept="image/*"
-                                        onChange={handleFileChange}
+                                        onChange={(e) => handleFileChange(e, 'front')}
                                         className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
                                     />
-                                    {citizenshipPreview ? (
-                                        <img src={citizenshipPreview} alt="Preview" className="w-full h-48 object-contain rounded-lg" />
+                                    {citizenshipPreviewFront ? (
+                                        <img src={citizenshipPreviewFront} alt="Front" className="w-full h-32 object-contain rounded-lg" />
                                     ) : (
                                         <div className="flex flex-col items-center">
-                                            <div className="w-16 h-16 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mb-3">
-                                                <Upload size={28} />
+                                            <div className="w-12 h-12 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mb-2">
+                                                <Upload size={20} />
                                             </div>
-                                            <p className="text-sm font-medium text-gray-900">Upload Citizenship Photo</p>
+                                            <p className="text-xs font-medium text-gray-900">Upload Front Side</p>
+                                            <p className="text-xs text-gray-500 mt-1">PNG, JPG (max. 5MB)</p>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+
+                            {/* Back Side */}
+                            <div>
+                                <label className="block text-sm font-semibold text-gray-700 mb-2">
+                                    Citizenship - Back Side
+                                </label>
+                                <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        onChange={(e) => handleFileChange(e, 'back')}
+                                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                    />
+                                    {citizenshipPreviewBack ? (
+                                        <img src={citizenshipPreviewBack} alt="Back" className="w-full h-32 object-contain rounded-lg" />
+                                    ) : (
+                                        <div className="flex flex-col items-center">
+                                            <div className="w-12 h-12 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mb-2">
+                                                <Upload size={20} />
+                                            </div>
+                                            <p className="text-xs font-medium text-gray-900">Upload Back Side</p>
                                             <p className="text-xs text-gray-500 mt-1">PNG, JPG (max. 5MB)</p>
                                         </div>
                                     )}
@@ -308,6 +351,13 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                     {/* Step 2: Phone Verification */}
                     {step === 2 && (
                         <div className="space-y-4">
+                            <button
+                                onClick={() => setStep(1)}
+                                className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 mb-2"
+                            >
+                                <ChevronLeft size={16} />
+                                Back
+                            </button>
                             <div className="text-center mb-4">
                                 <div className="w-16 h-16 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mx-auto mb-3">
                                     <Phone size={28} />
@@ -356,6 +406,13 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                     {/* Step 3: OTP Verification */}
                     {step === 3 && (
                         <div className="space-y-4">
+                            <button
+                                onClick={() => setStep(2)}
+                                className="flex items-center gap-1 text-sm text-gray-600 hover:text-gray-900 mb-2"
+                            >
+                                <ChevronLeft size={16} />
+                                Back
+                            </button>
                             <div className="text-center mb-4">
                                 <div className="w-16 h-16 bg-sky-100 text-sky-600 rounded-full flex items-center justify-center mx-auto mb-3">
                                     <Phone size={28} />

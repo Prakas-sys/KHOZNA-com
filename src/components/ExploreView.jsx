@@ -112,15 +112,6 @@ const ExploreView = ({
                     <button className="p-2 hover:bg-gray-100 rounded-full relative">
                         <BellDot size={24} className="text-gray-700" />
                     </button>
-                    {user && (
-                        <button
-                            onClick={() => signOut()}
-                            className="p-2 hover:bg-gray-100 rounded-full"
-                            title="Sign Out"
-                        >
-                            <LogOut size={20} className="text-gray-700" />
-                        </button>
-                    )}
                 </div>
             </div>
 

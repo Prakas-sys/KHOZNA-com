@@ -459,13 +459,6 @@ function RentEaseAppContent() {
                 <div className="bg-gradient-to-br from-sky-400 to-sky-600 px-4 py-8 text-white">
                     <div className="flex items-center justify-between mb-6">
                         <h1 className="text-2xl font-bold">Profile</h1>
-                        <button
-                            onClick={() => signOut()}
-                            className="flex items-center gap-2 px-4 py-2 bg-white/20 rounded-lg hover:bg-white/30 transition-colors"
-                        >
-                            <LogOut size={18} />
-                            Logout
-                        </button>
                     </div>
 
                     <div className="flex items-center gap-4">
