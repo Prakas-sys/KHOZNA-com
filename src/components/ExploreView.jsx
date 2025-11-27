@@ -7,6 +7,7 @@ import { supabase } from '../lib/supabase';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { NEPAL_LOCATIONS } from '../data/locations';
+import KhoznaLogo from './KhoznaLogo';
 
 // Fix Leaflet marker icon issue
 import L from 'leaflet';
@@ -110,43 +111,19 @@ const ExploreView = ({
 
     return (
         <div className="min-h-screen bg-gray-50 pb-24">
-            {/* User Profile Header */}
-            <div className="bg-white px-4 py-4 flex items-center justify-between sticky top-0 z-20 shadow-sm">
-                <div className="flex items-center gap-3">
-                    {user ? (
-                        <>
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white shadow-lg">
-                                <UserCircle2 size={28} strokeWidth={2} />
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Hello 👋</p>
-                                <p className="font-bold text-gray-900">{user.user_metadata?.full_name || user.email}</p>
-                            </div>
-                        </>
-                    ) : (
-                        <>
-                            <div className="w-12 h-12 rounded-full bg-gray-200 flex items-center justify-center">
-                                <UserCircle2 size={28} strokeWidth={2} className="text-gray-400" />
-                            </div>
-                            <div>
-                                <p className="text-sm text-gray-500">Hello 👋</p>
-                                <button
-                                    onClick={() => {
-                                        setAuthMode('login');
-                                        setShowAuthModal(true);
-                                    }}
-                                    className="font-bold text-sky-500 hover:text-sky-600"
-                                >
-                                    Sign In
-                                </button>
-                            </div>
-                        </>
-                    )}
+            {/* Brand Header - Like Airbnb */}
+            <div className="bg-white px-4 py-4 flex items-center justify-between sticky top-0 z-20 shadow-sm border-b border-gray-100">
+                {/* Logo and Brand Name */}
+                <div className="flex items-center gap-2">
+                    <KhoznaLogo size={32} color="#2CB0EF" />
+                    <h1 className="text-xl font-bold text-sky-600">KHOZNA</h1>
                 </div>
-                <div className="flex items-center gap-2 relative">
+
+                {/* Notification and User Menu */}
+                <div className="flex items-center gap-3 relative">
                     <button
                         onClick={() => setShowNotifications(!showNotifications)}
-                        className="p-2 hover:bg-gray-100 rounded-full relative"
+                        className="p-2 hover:bg-gray-100 rounded-full relative transition-colors"
                     >
                         <BellDot size={24} className="text-gray-700" />
                         {unreadCount > 0 && (

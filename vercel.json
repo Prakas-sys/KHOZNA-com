@@ -1,6 +1,21 @@
 {
+    "buildCommand": "npm run build",
+    "outputDirectory": "dist",
+    "devCommand": "npm run dev",
+    "installCommand": "npm install",
+    "framework": "vite",
     "env": {
-        "VITE_SUPABASE_URL": "https://hvcdptpuvlrigreenhxg.supabase.co",
-        "VITE_SUPABASE_ANON_KEY": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imh2Y2RwdHB1dmxyaWdyZWVuaHhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjQwMDYzNjYsImV4cCI6MjA3OTU4MjM2Nn0.id-3YlQSK-XFa6W4qO_XCaPGBOsFj6oiQYKnoSTNgbg"
+        "VITE_SUPABASE_URL": "@vite_supabase_url",
+        "VITE_SUPABASE_ANON_KEY": "@vite_supabase_anon_key",
+        "VITE_GEMINI_API_KEY": "@vite_gemini_api_key",
+        "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key",
+        "EMAIL_USER": "@email_user",
+        "EMAIL_PASSWORD": "@email_password",
+        "ADMIN_EMAIL": "@admin_email"
+    },
+    "git": {
+        "deploymentEnabled": {
+            "main": true
+        }
     }
 }

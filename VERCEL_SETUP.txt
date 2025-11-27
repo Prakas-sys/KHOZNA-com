@@ -1,0 +1,50 @@
+📱 VERCEL ENVIRONMENT VARIABLES -=== VERCEL DEPLOYMENT SETUP ===
+
+Follow these steps to deploy your KHOZNA.com app to Vercel with all required environment variables.
+
+STEP 1: Go to Vercel Dashboard
+-------------------------------
+1. Open https://vercel.com/dashboard
+2. Log in with your account
+3. Find and click on your "KHOZNA-com" project
+
+STEP 2: Add Environment Variables
+----------------------------------
+1. Click on "Settings" tab
+2. Click on "Environment Variables" in the left sidebar
+3. Add the following variables one by one:
+
+Variable Name: SUPABASE_SERVICE_ROLE_KEY
+Value: [Get this from your Supabase Dashboard > Settings > API > service_role key (secret)]
+
+Variable Name: EMAIL_USER
+Value: [Your Gmail address, e.g., yourname@gmail.com]
+
+Variable Name: EMAIL_PASSWORD
+Value: dhqescxznmmmbqhx
+Note: This is your Gmail App Password (spaces removed)
+
+Variable Name: ADMIN_EMAIL
+Value: [Email where you want to receive KYC edit requests - likely same as EMAIL_USER]
+
+STEP 3: Redeploy
+----------------
+1. Go to "Deployments" tab
+2. Find the most recent deployment
+3. Click the three dots (•••) on the right side
+4. Click "Redeploy"
+5. Confirm the redeployment
+
+STEP 4: Verify
+--------------
+1. Wait for deployment to complete (usually 1-2 minutes)
+2. Click "Visit" to open your live site
+3. Test the following:
+   - Login/Signup works
+   - Profile section loads correctly
+   - KYC submission works (if not verified)
+   - Property posting works (if KYC verified)
+
+DONE! Your app is now live with all features working.
+
+═══════════════════════════════════════════════════════════

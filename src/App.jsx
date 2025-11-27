@@ -5,7 +5,7 @@ import {
     CheckCircle, User, Menu, Globe, DollarSign, Calendar,
     Home, Film, PlusCircle, Send, Sparkles, X, BellDot,
     SlidersHorizontal, Building, Building2, HomeIcon, Briefcase, UserCircle2, LogOut,
-    Edit, Trash2, MessageCircle, ChevronRight, Play, Pause, Shield, Flag
+    Edit, Trash2, MessageCircle, ChevronRight, Play, Pause, Shield, Flag, Phone
 } from 'lucide-react';
 import { useAuth, AuthProvider } from './contexts/AuthContext';
 import AuthModal from './components/AuthModal';
@@ -13,6 +13,7 @@ import CreateListingModal from './components/CreateListingModal';
 import KYCModal from './components/KYCModal';
 import ReportModal from './components/ReportModal';
 import ExploreView from './components/ExploreView';
+import KhoznaLogo from './components/KhoznaLogo';
 import { supabase } from './lib/supabase';
 
 // --- API Configuration ---
@@ -152,27 +153,67 @@ function RentEaseAppContent() {
         { id: 'office', label: 'Office', icon: Briefcase },
     ];
 
+
+
     // Fetch listings from Supabase
     const fetchListings = async () => {
         try {
             setLoadingListings(true);
-            const { data, error } = await supabase
+            console.log('🔄 Fetching listings from Supabase...');
+
+            const { data: listingsData, error: listingsError } = await supabase
                 .from('listings')
-                .select(`
-                    *,
-                    profiles!listings_user_id_fkey (
-                        full_name
-                    ),
-                    kyc_verifications!kyc_verifications_user_id_fkey (
-                        phone_number
-                    )
-                `)
+                .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
-            setListings(data || []);
+            if (listingsError) throw listingsError;
+
+            if (!listingsData || listingsData.length === 0) {
+                setListings([]);
+                return;
+            }
+
+            // Extract unique user IDs
+            const userIds = [...new Set(listingsData.map(l => l.user_id))];
+
+            // Batch fetch profiles
+            const { data: profilesData, error: profilesError } = await supabase
+                .from('profiles')
+                .select('id, full_name')
+                .in('id', userIds);
+
+            if (profilesError) console.warn('Error fetching profiles:', profilesError);
+
+            // Batch fetch KYC
+            const { data: kycData, error: kycError } = await supabase
+                .from('kyc_verifications')
+                .select('user_id, phone_number')
+                .in('user_id', userIds);
+
+            if (kycError) console.warn('Error fetching KYC:', kycError);
+
+            // Create lookup maps
+            const profilesMap = (profilesData || []).reduce((acc, p) => ({ ...acc, [p.id]: p }), {});
+
+            // Handle potential duplicate KYC records by taking the first one found for each user
+            const kycMap = (kycData || []).reduce((acc, k) => {
+                if (!acc[k.user_id]) acc[k.user_id] = k;
+                return acc;
+            }, {});
+
+            // Merge data
+            const enrichedData = listingsData.map(listing => ({
+                ...listing,
+                profiles: profilesMap[listing.user_id] || { full_name: 'Unknown User' },
+                kyc_verifications: kycMap[listing.user_id] || null
+            }));
+
+            setListings(enrichedData);
+            console.log('✅ Listings fetched & enriched:', enrichedData.length);
+
         } catch (err) {
-            console.error('Error fetching listings:', err);
+            console.error('❌ Error fetching listings:', err);
+            setListings([]);
         } finally {
             setLoadingListings(false);
         }
@@ -448,26 +489,49 @@ function RentEaseAppContent() {
             if (user) {
                 // Fetch user's listings
                 const fetchUserListings = async () => {
-                    const { data, error } = await supabase
-                        .from('listings')
-                        .select('*')
-                        .eq('user_id', user.id)
-                        .order('created_at', { ascending: false });
+                    try {
+                        const { data, error } = await supabase
+                            .from('listings')
+                            .select('*')
+                            .eq('user_id', user.id)
+                            .order('created_at', { ascending: false });
 
-                    if (!error) setUserListings(data || []);
+                        if (error) {
+                            console.error('Error fetching user listings:', error.message);
+                            setUserListings([]);
+                        } else {
+                            setUserListings(data || []);
+                        }
+                    } catch (err) {
+                        console.error('Exception fetching user listings:', err);
+                        setUserListings([]);
+                    }
                 };
 
                 // Fetch KYC data
                 const fetchKycData = async () => {
                     setLoadingKyc(true);
-                    const { data, error } = await supabase
-                        .from('kyc_verifications')
-                        .select('*')
-                        .eq('user_id', user.id)
-                        .single();
+                    try {
+                        const { data, error } = await supabase
+                            .from('kyc_verifications')
+                            .select('*')
+                            .eq('user_id', user.id);
 
-                    if (!error && data) setKycData(data);
-                    setLoadingKyc(false);
+                        if (error) {
+                            console.warn('Error fetching KYC data:', error.message);
+                            setKycData(null);
+                        } else if (data && data.length > 0) {
+                            const sorted = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                            setKycData(sorted[0]);
+                        } else {
+                            setKycData(null);
+                        }
+                    } catch (err) {
+                        console.error('Exception fetching KYC data:', err);
+                        setKycData(null);
+                    } finally {
+                        setLoadingKyc(false);
+                    }
                 };
 
                 fetchUserListings();
@@ -477,20 +541,38 @@ function RentEaseAppContent() {
 
         const handleRequestEdit = async () => {
             try {
-                const { error } = await supabase
-                    .from('notifications')
-                    .insert({
-                        user_id: user.id,
-                        title: 'KYC Edit Request',
-                        message: `User ${user.email} has requested to edit their KYC documents.`,
-                        type: 'info'
-                    });
+                // Send email to admin
+                const response = await fetch('/api/send-edit-request', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        userId: user.id,
+                        email: user.email,
+                        fullName: user?.user_metadata?.full_name,
+                        citizenshipNo: kycData?.citizenship_number,
+                        requestType: 'kyc_edit'
+                    })
+                });
 
-                if (!error) {
-                    alert('Edit request sent! Admin will review your request.');
+                if (response.ok) {
+                    // Also create notification in database
+                    await supabase
+                        .from('notifications')
+                        .insert({
+                            user_id: user.id,
+                            title: 'KYC Edit Request Sent',
+                            message: 'Your edit request has been sent to the admin. You will be notified once reviewed.',
+                            type: 'info',
+                            read: false
+                        });
+
+                    alert('✅ Edit request sent! Admin will review and contact you via email.');
+                } else {
+                    alert('❌ Failed to send request. Please try again.');
                 }
             } catch (err) {
                 console.error('Error sending edit request:', err);
+                alert('❌ Error sending request. Please try again later.');
             }
         };
 
@@ -524,10 +606,15 @@ function RentEaseAppContent() {
 
         return (
             <div className="min-h-screen bg-gray-50 pb-24">
-                {/* Header */}
+                {/* Header with Logo */}
                 <div className="bg-gradient-to-br from-sky-400 to-sky-600 px-4 py-8 text-white">
                     <div className="flex items-center justify-between mb-6">
-                        <h1 className="text-2xl font-bold">Profile</h1>
+                        {/* Logo and Brand Name */}
+                        <div className="flex items-center gap-3">
+                            {/* Brand Logo */}
+                            <KhoznaLogo size={40} color="#0284C7" />
+                            <h1 className="text-2xl font-bold">KHOZNA</h1>
+                        </div>
                     </div>
 
                     <div className="flex items-center gap-4">
@@ -574,74 +661,198 @@ function RentEaseAppContent() {
                     </div>
                 </div>
 
+                {/* Become a Host Card */}
+                <div className="px-4 py-4">
+                    <div className="bg-white rounded-xl p-6 flex gap-4">
+                        <div className="text-4xl flex-shrink-0">👨‍💼</div>
+                        <div className="flex-1">
+                            <h3 className="font-bold text-gray-900 mb-1">Become a host</h3>
+                            <p className="text-sm text-gray-600">It's easy to start hosting and earn extra income.</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Menu Items */}
+                <div className="px-4 py-2 space-y-1">
+                    <button className="w-full flex items-center justify-between p-4 text-gray-700 hover:bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <span className="text-xl">⚙️</span>
+                            <span className="font-medium">Account settings</span>
+                        </div>
+                        <ChevronRight size={20} className="text-gray-400" />
+                    </button>
+                    <button className="w-full flex items-center justify-between p-4 text-gray-700 hover:bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <span className="text-xl">❓</span>
+                            <span className="font-medium">Get help</span>
+                        </div>
+                        <ChevronRight size={20} className="text-gray-400" />
+                    </button>
+                    <button className="w-full flex items-center justify-between p-4 text-gray-700 hover:bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <span className="text-xl">👤</span>
+                            <span className="font-medium">View profile</span>
+                        </div>
+                        <ChevronRight size={20} className="text-gray-400" />
+                    </button>
+                    <button className="w-full flex items-center justify-between p-4 text-gray-700 hover:bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <span className="text-xl">🔒</span>
+                            <span className="font-medium">Privacy</span>
+                        </div>
+                        <ChevronRight size={20} className="text-gray-400" />
+                    </button>
+                </div>
+
+                {/* Divider */}
+                <div className="border-b border-gray-200 my-4"></div>
+
+                {/* More Menu Items */}
+                <div className="px-4 py-2 space-y-1">
+                    <button className="w-full flex items-center justify-between p-4 text-gray-700 hover:bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <span className="text-xl">👥</span>
+                            <span className="font-medium">Refer a host</span>
+                        </div>
+                        <ChevronRight size={20} className="text-gray-400" />
+                    </button>
+                    <button className="w-full flex items-center justify-between p-4 text-gray-700 hover:bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <span className="text-xl">🤝</span>
+                            <span className="font-medium">Find a co-host</span>
+                        </div>
+                        <ChevronRight size={20} className="text-gray-400" />
+                    </button>
+                    <button className="w-full flex items-center justify-between p-4 text-gray-700 hover:bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <span className="text-xl">📋</span>
+                            <span className="font-medium">Legal</span>
+                        </div>
+                        <ChevronRight size={20} className="text-gray-400" />
+                    </button>
+                    <button className="w-full flex items-center justify-between p-4 text-gray-700 hover:bg-gray-50 rounded-lg">
+                        <div className="flex items-center gap-3">
+                            <span className="text-xl">📱</span>
+                            <span className="font-medium">Logout</span>
+                        </div>
+                        <ChevronRight size={20} className="text-gray-400" />
+                    </button>
+                </div>
+
                 {/* KYC Documents Section */}
                 {kycData ? (
-                    <div className="px-4 py-6 bg-white mb-4">
+                    <div className="px-4 py-6">
                         <h3 className="text-lg font-bold text-gray-900 mb-4">KYC Verification</h3>
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-4">
-                            <div className="flex items-center gap-2 text-green-700">
-                                <Shield size={20} />
-                                <span className="font-semibold">Verified Account</span>
-                            </div>
-                            <p className="text-sm text-green-600 mt-1">Status: {kycData.status}</p>
-                        </div>
 
-                        {/* Citizenship Images */}
-                        <div className="grid grid-cols-2 gap-3 mb-4">
-                            <div>
-                                <p className="text-sm font-semibold text-gray-700 mb-2">Front Side</p>
-                                <img
-                                    src={kycData.citizenship_photo_url}
-                                    alt="Citizenship Front"
-                                    className="w-full h-32 object-cover rounded-lg border border-gray-200"
-                                />
+                        {/* Verification Status */}
+                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
+                            <div className="flex items-center gap-3">
+                                <div className="flex-shrink-0">
+                                    <CheckCircle size={24} className="text-green-600" />
+                                </div>
+                                <div className="flex-1">
+                                    <h4 className="font-bold text-green-900">Verified Account</h4>
+                                    <p className="text-sm text-green-700">Your identity has been verified</p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-sm font-semibold text-gray-700 mb-2">Back Side</p>
-                                <img
-                                    src={kycData.citizenship_photo_back_url}
-                                    alt="Citizenship Back"
-                                    className="w-full h-32 object-cover rounded-lg border border-gray-200"
-                                />
+                            <div className="mt-3 pt-3 border-t border-green-200">
+                                <p className="text-xs text-green-700 font-semibold">Status: {kycData.status?.toUpperCase()}</p>
                             </div>
                         </div>
 
-                        {/* Details */}
-                        <div className="space-y-2 mb-4">
-                            <div className="flex justify-between py-2 border-b">
-                                <span className="text-gray-600">Citizenship No.</span>
-                                <span className="font-semibold">{kycData.citizenship_number}</span>
-                            </div>
-                            <div className="flex justify-between py-2 border-b">
-                                <span className="text-gray-600">Phone Number</span>
-                                <span className="font-semibold">{kycData.phone_number}</span>
+                        {/* Citizenship Documents */}
+                        <div className="bg-white rounded-xl p-4 mb-4">
+                            <h4 className="font-bold text-gray-900 mb-4">Citizenship Documents</h4>
+                            <div className="grid grid-cols-2 gap-3 mb-4">
+                                <div>
+                                    <p className="text-xs font-semibold text-gray-600 mb-2 uppercase">Front Side</p>
+                                    <img
+                                        src={kycData.citizenship_photo_url}
+                                        alt="Citizenship Front"
+                                        className="w-full h-40 object-cover rounded-lg border border-gray-200"
+                                    />
+                                </div>
+                                <div>
+                                    <p className="text-xs font-semibold text-gray-600 mb-2 uppercase">Back Side</p>
+                                    <img
+                                        src={kycData.citizenship_photo_back_url}
+                                        alt="Citizenship Back"
+                                        className="w-full h-40 object-cover rounded-lg border border-gray-200"
+                                    />
+                                </div>
                             </div>
                         </div>
 
-                        <button
-                            onClick={handleRequestEdit}
-                            className="w-full bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors"
-                        >
-                            Request Edit
-                        </button>
-                        <p className="text-xs text-gray-500 text-center mt-2">
-                            To edit your KYC documents, send a request to admin
-                        </p>
-                    </div>
-                ) : !loadingKyc && (
-                    <div className="px-4 py-6 bg-white mb-4">
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
-                            <Shield size={48} className="text-yellow-600 mx-auto mb-3" />
-                            <h3 className="text-lg font-bold text-gray-900 mb-2">KYC Verification Required</h3>
-                            <p className="text-sm text-gray-600 mb-4">
-                                Complete your KYC verification to post properties and build trust with renters.
+                        {/* KYC Details - Read Only */}
+                        <div className="bg-white rounded-xl p-4 mb-4">
+                            <h4 className="font-bold text-gray-900 mb-4">Verified Information</h4>
+                            <div className="space-y-3">
+                                <div className="flex justify-between py-3 border-b border-gray-100">
+                                    <span className="text-gray-600 font-medium">Citizenship Number</span>
+                                    <span className="font-semibold text-gray-900">{kycData.citizenship_number || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between py-3 border-b border-gray-100">
+                                    <span className="text-gray-600 font-medium">Phone Number</span>
+                                    <span className="font-semibold text-gray-900">{kycData.phone_number || 'N/A'}</span>
+                                </div>
+                                <div className="flex justify-between py-3 border-b border-gray-100">
+                                    <span className="text-gray-600 font-medium">Verified Date</span>
+                                    <span className="font-semibold text-gray-900">
+                                        {kycData.created_at ? new Date(kycData.created_at).toLocaleDateString() : 'N/A'}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Edit Request Button */}
+                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
+                            <p className="text-sm text-gray-700 mb-4">
+                                Your KYC information is verified and read-only for security. If you need to update any information, please submit a request below.
                             </p>
                             <button
-                                onClick={() => setShowKYCModal(true)}
-                                className="bg-sky-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-sky-600 transition-colors"
+                                onClick={handleRequestEdit}
+                                className="w-full bg-sky-500 text-white py-3 rounded-lg font-semibold hover:bg-sky-600 transition-colors flex items-center justify-center gap-2"
                             >
-                                Submit KYC Documents
+                                📧 Request Document Edit
                             </button>
+                            <p className="text-xs text-gray-600 text-center mt-3">
+                                An admin will review your request and contact you via email within 24 hours.
+                            </p>
+                        </div>
+
+                        {/* Terms & Conditions */}
+                        <div className="bg-white rounded-xl p-4">
+                            <h4 className="font-bold text-gray-900 mb-3">Verification Terms & Conditions</h4>
+                            <div className="space-y-2 text-xs text-gray-600">
+                                <p>✓ Your KYC data is encrypted and securely stored</p>
+                                <p>✓ This information is used only for verification purposes</p>
+                                <p>✓ We never share your personal data with third parties</p>
+                                <p>✓ You have the right to request data deletion anytime</p>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="px-4 py-6 bg-white mb-4">
+                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
+                            {loadingKyc ? (
+                                <div className="flex justify-center">
+                                    <div className="w-8 h-8 border-4 border-yellow-200 border-t-yellow-600 rounded-full animate-spin"></div>
+                                </div>
+                            ) : (
+                                <>
+                                    <Shield size={48} className="text-yellow-600 mx-auto mb-3" />
+                                    <h3 className="text-lg font-bold text-gray-900 mb-2">KYC Verification Required</h3>
+                                    <p className="text-sm text-gray-600 mb-4">
+                                        Complete your KYC verification to post properties and build trust with renters.
+                                    </p>
+                                    <button
+                                        onClick={() => setShowKYCModal(true)}
+                                        className="bg-sky-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-sky-600 transition-colors"
+                                    >
+                                        Submit KYC Documents
+                                    </button>
+                                </>
+                            )}
                         </div>
                     </div>
                 )}
@@ -930,8 +1141,8 @@ function RentEaseAppContent() {
                         onClick={() => setView('explore')}
                         className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'explore' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
                     >
-                        <Home size={24} strokeWidth={view === 'explore' ? 2.5 : 2} />
-                        <span className={`text-[10px] ${view === 'explore' ? 'font-semibold' : 'font-medium'}`}>Home</span>
+                        <Search size={24} strokeWidth={view === 'explore' ? 2.5 : 2} />
+                        <span className={`text-[10px] ${view === 'explore' ? 'font-semibold' : 'font-medium'}`}>Explore</span>
                     </div>
 
                     <div
