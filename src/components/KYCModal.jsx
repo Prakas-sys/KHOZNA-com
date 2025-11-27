@@ -16,6 +16,7 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     const [citizenshipNumber, setCitizenshipNumber] = useState('');
     const [phoneNumber, setPhoneNumber] = useState('');
     const [otp, setOtp] = useState('');
+    const [lastSentOtp, setLastSentOtp] = useState(''); // For testing/demo purposes
     const [resendCooldown, setResendCooldown] = useState(0);
 
     if (!isOpen) return null;
@@ -65,6 +66,11 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     };
 
     const handleStep1Submit = async () => {
+        if (!user?.id) {
+            setError('User not authenticated');
+            return;
+        }
+
         if (!citizenshipFileFront || !citizenshipFileBack || !citizenshipNumber) {
             setError('Please upload both sides of citizenship and enter number');
             return;
@@ -85,7 +91,7 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                     citizenship_photo_back_url: backUrl,
                     citizenship_number: citizenshipNumber,
                     status: 'pending'
-                });
+                }, { onConflict: 'user_id' });
 
             if (kycError) throw kycError;
 
@@ -126,6 +132,7 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     const sendOtp = async (phone) => {
         // Generate OTP (in production, use SMS service)
         const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
+        setLastSentOtp(generatedOtp);
 
         // Update KYC with phone number
         const { error: updateError } = await supabase
@@ -140,7 +147,7 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
         if (updateError) throw updateError;
 
         // In production, send SMS here
-        alert(`OTP sent to ${phone}: ${generatedOtp}`);
+        // alert(`OTP sent to ${phone}: ${generatedOtp}`);
 
         // Start cooldown
         setResendCooldown(30);
@@ -419,6 +426,11 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                                 </div>
                                 <h3 className="font-bold text-gray-900">Enter OTP</h3>
                                 <p className="text-sm text-gray-600">Sent to {phoneNumber}</p>
+                                {lastSentOtp && (
+                                    <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
+                                        <span className="font-semibold">Test Mode:</span> Your OTP is <strong>{lastSentOtp}</strong>
+                                    </div>
+                                )}
                             </div>
 
                             <div>

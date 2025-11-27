@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:kyc": "node tests/kyc-upsert.test.js"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.84.0",
