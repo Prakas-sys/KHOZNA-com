@@ -627,7 +627,7 @@ function RentEaseAppContent() {
                             {(user?.user_metadata?.full_name || user?.email || 'U')[0].toUpperCase()}
                         </div>
                         <div className="flex-1">
-                            {/*  {editMode ? (
+                            {editMode ? (
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
@@ -661,128 +661,14 @@ function RentEaseAppContent() {
                                         Edit Profile
                                     </button>
                                 </div>
-                            )} */}
+                            )}
                         </div>
                     </div>
                 </div>
 
-                {/* KYC Documents Section - MOVED TO TOP */}
-                {kycData ? (
-                    <div className="px-4 py-6">
-                        <h3 className="text-lg font-bold text-gray-900 mb-4">KYC Verification</h3>
 
-                        {/* Verification Status */}
-                        <div className="bg-green-50 border border-green-200 rounded-xl p-4 mb-6">
-                            <div className="flex items-center gap-3">
-                                <div className="flex-shrink-0">
-                                    <CheckCircle size={24} className="text-green-600" />
-                                </div>
-                                <div className="flex-1">
-                                    <h4 className="font-bold text-green-900">Verified Account</h4>
-                                    <p className="text-sm text-green-700">Your identity has been verified</p>
-                                </div>
-                            </div>
-                            <div className="mt-3 pt-3 border-t border-green-200">
-                                <p className="text-xs text-green-700 font-semibold">Status: {kycData.status?.toUpperCase()}</p>
-                            </div>
-                        </div>
 
-                        {/* Citizenship Documents */}
-                        <div className="bg-white rounded-xl p-4 mb-4">
-                            <h4 className="font-bold text-gray-900 mb-4">Citizenship Documents</h4>
-                            <div className="grid grid-cols-2 gap-3 mb-4">
-                                <div>
-                                    <p className="text-xs font-semibold text-gray-600 mb-2 uppercase">Front Side</p>
-                                    <img
-                                        src={kycData.citizenship_photo_url}
-                                        alt="Citizenship Front"
-                                        className="w-full h-40 object-cover rounded-lg border border-gray-200"
-                                    />
-                                </div>
-                                <div>
-                                    <p className="text-xs font-semibold text-gray-600 mb-2 uppercase">Back Side</p>
-                                    <img
-                                        src={kycData.citizenship_photo_back_url}
-                                        alt="Citizenship Back"
-                                        className="w-full h-40 object-cover rounded-lg border border-gray-200"
-                                    />
-                                </div>
-                            </div>
-                        </div>
 
-                        {/* KYC Details - Read Only */}
-                        <div className="bg-white rounded-xl p-4 mb-4">
-                            <h4 className="font-bold text-gray-900 mb-4">Verified Information</h4>
-                            <div className="space-y-3">
-                                <div className="flex justify-between py-3 border-b border-gray-100">
-                                    <span className="text-gray-600 font-medium">Citizenship Number</span>
-                                    <span className="font-semibold text-gray-900">{kycData.citizenship_number || 'N/A'}</span>
-                                </div>
-                                <div className="flex justify-between py-3 border-b border-gray-100">
-                                    <span className="text-gray-600 font-medium">Phone Number</span>
-                                    <span className="font-semibold text-gray-900">{kycData.phone_number || 'N/A'}</span>
-                                </div>
-                                <div className="flex justify-between py-3 border-b border-gray-100">
-                                    <span className="text-gray-600 font-medium">Verified Date</span>
-                                    <span className="font-semibold text-gray-900">
-                                        {kycData.created_at ? new Date(kycData.created_at).toLocaleDateString() : 'N/A'}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Edit Request Button */}
-                        <div className="bg-blue-50 border border-blue-200 rounded-xl p-4 mb-6">
-                            <p className="text-sm text-gray-700 mb-4">
-                                Your KYC information is verified and read-only for security. If you need to update any information, please submit a request below.
-                            </p>
-                            <button
-                                onClick={handleRequestEdit}
-                                className="w-full bg-sky-500 text-white py-3 rounded-lg font-semibold hover:bg-sky-600 transition-colors flex items-center justify-center gap-2"
-                            >
-                                📧 Request Document Edit
-                            </button>
-                            <p className="text-xs text-gray-600 text-center mt-3">
-                                An admin will review your request and contact you via email within 24 hours.
-                            </p>
-                        </div>
-
-                        {/* Terms & Conditions */}
-                        <div className="bg-white rounded-xl p-4">
-                            <h4 className="font-bold text-gray-900 mb-3">Verification Terms & Conditions</h4>
-                            <div className="space-y-2 text-xs text-gray-600">
-                                <p>✓ Your KYC data is encrypted and securely stored</p>
-                                <p>✓ This information is used only for verification purposes</p>
-                                <p>✓ We never share your personal data with third parties</p>
-                                <p>✓ You have the right to request data deletion anytime</p>
-                            </div>
-                        </div>
-                    </div>
-                ) : (
-                    <div className="px-4 py-6 bg-white mb-4">
-                        <div className="bg-yellow-50 border border-yellow-200 rounded-xl p-6 text-center">
-                            {loadingKyc ? (
-                                <div className="flex justify-center">
-                                    <div className="w-8 h-8 border-4 border-yellow-200 border-t-yellow-600 rounded-full animate-spin"></div>
-                                </div>
-                            ) : (
-                                <>
-                                    <Shield size={48} className="text-yellow-600 mx-auto mb-3" />
-                                    <h3 className="text-lg font-bold text-gray-900 mb-2">KYC Verification Required</h3>
-                                    <p className="text-sm text-gray-600 mb-4">
-                                        Complete your KYC verification to post properties and build trust with renters.
-                                    </p>
-                                    <button
-                                        onClick={() => setShowKYCModal(true)}
-                                        className="bg-sky-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-sky-600 transition-colors"
-                                    >
-                                        Submit KYC Documents
-                                    </button>
-                                </>
-                            )}
-                        </div>
-                    </div>
-                )}
 
                 {/* User's Listings */}
                 <div className="px-4 py-6">
