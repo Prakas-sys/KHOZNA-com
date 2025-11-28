@@ -32,8 +32,10 @@ if (fs.existsSync(envPath)) {
     console.log('.env file NOT found');
 }
 
-const supabaseUrl = process.env.VITE_SUPABASE_URL || envConfig.VITE_SUPABASE_URL;
-const supabaseAnonKey = process.env.VITE_SUPABASE_ANON_KEY || envConfig.VITE_SUPABASE_ANON_KEY;
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
+    || envConfig.VITE_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+    || envConfig.VITE_SUPABASE_ANON_KEY;
 
 console.log('URL:', supabaseUrl ? 'Found' : 'Missing');
 console.log('Key:', supabaseAnonKey ? 'Found' : 'Missing');
