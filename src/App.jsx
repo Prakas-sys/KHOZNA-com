@@ -939,7 +939,7 @@ function RentEaseAppContent() {
         ];
 
         return (
-            <div className="min-h-screen bg-gray-50 pb-24">
+            <div className="min-h-screen bg-gray-50">
                 {!selectedChat ? (
                     <>
                         {/* Header */}
