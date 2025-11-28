@@ -4,12 +4,7 @@
     "devCommand": "npm run dev",
     "installCommand": "npm install",
     "framework": "vite",
-    "env": {
-        "SUPABASE_SERVICE_ROLE_KEY": "@supabase_service_role_key",
-        "EMAIL_USER": "@email_user",
-        "EMAIL_PASSWORD": "@email_password",
-        "ADMIN_EMAIL": "@admin_email"
-    },
+    "env": {},
     "git": {
         "deploymentEnabled": {
             "main": true
