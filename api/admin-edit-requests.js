@@ -1,7 +1,7 @@
 import { createClient } from '@supabase/supabase-js';
 import nodemailer from 'nodemailer';
 
-const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 const emailUser = process.env.EMAIL_USER;
 const emailPassword = process.env.EMAIL_PASSWORD;
