@@ -627,7 +627,7 @@ function RentEaseAppContent() {
                             {(user?.user_metadata?.full_name || user?.email || 'U')[0].toUpperCase()}
                         </div>
                         <div className="flex-1">
-                            {editMode ? (
+                            {/*  {editMode ? (
                                 <div className="flex gap-2">
                                     <input
                                         type="text"
@@ -661,7 +661,7 @@ function RentEaseAppContent() {
                                         Edit Profile
                                     </button>
                                 </div>
-                            )}
+                            )} */}
                         </div>
                     </div>
                 </div>
@@ -939,7 +939,7 @@ function RentEaseAppContent() {
         ];
 
         return (
-            <div className="min-h-screen bg-gray-50">
+            <div className="min-h-screen bg-gray-50 pb-24">
                 {!selectedChat ? (
                     <>
                         {/* Header */}
