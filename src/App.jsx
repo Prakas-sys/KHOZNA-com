@@ -235,7 +235,12 @@ function RentEaseAppContent() {
             const matchesSearch = item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 item.title.toLowerCase().includes(searchQuery.toLowerCase());
             const matchesType = selectedPropertyType === 'all' || item.category === selectedPropertyType;
-            const matchesListingType = item.type === listingType;
+
+            // Handle missing type (default to 'rent') and ensure case-insensitive comparison
+            const itemType = (item.type || 'rent').toLowerCase();
+            const currentType = listingType.toLowerCase();
+            const matchesListingType = itemType === currentType;
+
             return matchesSearch && matchesType && matchesListingType;
         });
     }, [listings, searchQuery, selectedPropertyType, listingType]);
