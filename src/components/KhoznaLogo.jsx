@@ -5,8 +5,8 @@ export default function KhoznaLogo({
   ...props
 }) {
   return (
-    <img 
-      src="/logo.png" 
+    <img
+      src="/logo.jpg"
       alt="Khozna Logo"
       style={{ width: size, height: size, objectFit: 'contain' }}
       {...props}
