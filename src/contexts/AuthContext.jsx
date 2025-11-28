@@ -50,24 +50,21 @@ export const AuthProvider = ({ children }) => {
         return () => subscription.unsubscribe();
     }, []);
 
-    const signUp = async (email, password, fullName) => {
-        const { data, error } = await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-                data: {
-                    full_name: fullName,
-                },
-            },
+    const signInWithPhone = async (phone, fullName = null) => {
+        const options = fullName ? { data: { full_name: fullName } } : {};
+        const { data, error } = await supabase.auth.signInWithOtp({
+            phone,
+            options,
         });
         if (error) throw error;
         return data;
     };
 
-    const signIn = async (email, password) => {
-        const { data, error } = await supabase.auth.signInWithPassword({
-            email,
-            password,
+    const verifyOtp = async (phone, token) => {
+        const { data, error } = await supabase.auth.verifyOtp({
+            phone,
+            token,
+            type: 'sms',
         });
         if (error) throw error;
         return data;
@@ -85,8 +82,8 @@ export const AuthProvider = ({ children }) => {
     };
 
     const value = {
-        signUp,
-        signIn,
+        signInWithPhone,
+        verifyOtp,
         signOut,
         user,
         refreshProfile,
