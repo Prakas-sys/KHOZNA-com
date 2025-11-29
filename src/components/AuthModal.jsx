@@ -21,10 +21,24 @@ export default function AuthModal({ isOpen, onClose, mode: initialMode = 'login'
         setLoading(true)
 
         try {
-            await signInWithPhone(phone, mode === 'signup' ? fullName : null)
+            // Auto-format phone number for Nepal if missing country code
+            let formattedPhone = phone.trim();
+            if (!formattedPhone.startsWith('+') && formattedPhone.length === 10) {
+                formattedPhone = `+977${formattedPhone}`;
+            }
+
+            await signInWithPhone(formattedPhone, mode === 'signup' ? fullName : null)
+            // Update local state to show the formatted number in the verify step
+            setPhone(formattedPhone);
             setStep('otp')
         } catch (err) {
-            setError(err.message)
+            console.error("Login Error:", err);
+            // Improve error message for common issues
+            if (err.message.includes('Unsupported phone provider')) {
+                setError('SMS login is not currently enabled. Please contact support or try again later.');
+            } else {
+                setError(err.message)
+            }
         } finally {
             setLoading(false)
         }
