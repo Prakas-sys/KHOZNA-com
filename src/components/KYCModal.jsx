@@ -65,6 +65,61 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
         return { frontUrl: frontData.publicUrl, backUrl: backData.publicUrl };
     };
 
+    const fileToGenerativePart = async (file) => {
+        const base64EncodedDataPromise = new Promise((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () => resolve(reader.result.split(',')[1]);
+            reader.readAsDataURL(file);
+        });
+        return {
+            inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
+        };
+    };
+
+    const verifyDocumentWithAI = async (file) => {
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+        if (!apiKey) {
+            console.warn("Gemini API Key not found, skipping AI validation.");
+            return true;
+        }
+
+        const prompt = `
+        You are a document verification AI for Nepal.
+        Analyze this image. Is it a valid Nepalese Citizenship Card (Nagarikta) or Passport?
+        It can be the front or back side.
+        
+        If it looks like a valid ID document, respond with "VALID".
+        If it is a random photo, selfie, object, landscape, or clearly not an ID, respond with "INVALID".
+        Only respond with one word: VALID or INVALID.
+        `;
+
+        try {
+            const imagePart = await fileToGenerativePart(file);
+
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{ text: prompt }, imagePart]
+                        }]
+                    }),
+                }
+            );
+
+            if (!response.ok) throw new Error('AI Verification Failed');
+            const data = await response.json();
+            const result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase();
+
+            return result === 'VALID';
+        } catch (error) {
+            console.error("AI Verification Error:", error);
+            return true; // Fallback to allow if AI fails
+        }
+    };
+
     const handleStep1Submit = async () => {
         if (!user?.id) {
             setError('User not authenticated');
@@ -80,6 +135,16 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
         setError('');
 
         try {
+            // 0. AI Verification
+            const isFrontValid = await verifyDocumentWithAI(citizenshipFileFront);
+            if (!isFrontValid) {
+                throw new Error('The uploaded front document does not appear to be a valid Citizenship Card or Passport. Please upload a clear image of your ID.');
+            }
+
+            // Optional: Verify back side too, but front is usually enough to catch random photos
+            // const isBackValid = await verifyDocumentWithAI(citizenshipFileBack);
+            // if (!isBackValid) throw new Error('Back side invalid...');
+
             const { frontUrl, backUrl } = await uploadCitizenship();
 
             // Save to KYC table
