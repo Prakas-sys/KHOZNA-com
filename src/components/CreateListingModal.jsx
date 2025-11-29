@@ -57,6 +57,49 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
         return data.publicUrl;
     };
 
+    const validateContentWithAI = async (title, description) => {
+        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+        if (!apiKey) {
+            console.warn("Gemini API Key not found, skipping AI validation.");
+            return true; // Allow if no key (dev mode fallback) or handle as error
+        }
+
+        const prompt = `
+        You are a content moderator for a rental property platform called KHOZNA.
+        Analyze the following title and description for a new listing.
+        
+        Title: "${title}"
+        Description: "${description}"
+        
+        Task: Determine if this content is related to renting or selling a property (apartment, house, room, office) or a travel experience/stay.
+        If it is related, respond with "SAFE".
+        If it is unrelated (e.g., selling a bike, personal rant, spam, inappropriate content), respond with "UNSAFE".
+        Only respond with one word: SAFE or UNSAFE.
+        `;
+
+        try {
+            const response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
+                }
+            );
+
+            if (!response.ok) throw new Error('AI Validation Failed');
+            const data = await response.json();
+            const result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase();
+
+            return result === 'SAFE';
+        } catch (error) {
+            console.error("AI Validation Error:", error);
+            // In case of AI error, maybe allow or block? Let's allow but log, or block if strict.
+            // For this demo, let's assume safe if AI fails to avoid blocking users due to API issues.
+            return true;
+        }
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
         setLoading(true);
@@ -65,6 +108,12 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
         try {
             if (!user) throw new Error('You must be logged in to post a property.');
             if (!imageFile) throw new Error('Please upload an image for your property.');
+
+            // 0. AI Content Moderation
+            const isSafe = await validateContentWithAI(formData.title, formData.description);
+            if (!isSafe) {
+                throw new Error('Your listing appears to be unrelated to property rentals. Please ensure your post is relevant to KHOZNA.');
+            }
 
             // 1. Upload Image
             const imageUrl = await uploadImage(imageFile);

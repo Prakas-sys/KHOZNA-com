@@ -153,21 +153,36 @@ const ExploreView = ({
             <div id="listings-section" className="max-w-7xl mx-auto px-4 py-12">
                 <h2 className="text-3xl font-bold text-gray-900 mb-8">Explore nearby stays</h2>
 
-                {/* Property Type Filters - Optional to keep or remove. The design image doesn't show them explicitly in the hero, but they are useful. I'll keep them but style them subtly or put them above the grid. */}
-                <div className="flex gap-3 overflow-x-auto pb-6 scrollbar-hide mb-4">
-                    {propertyTypes.map(type => (
-                        <button
-                            key={type.id}
-                            onClick={() => setSelectedPropertyType(type.id)}
-                            className={`flex flex-col items-center gap-2 px-4 py-3 rounded-xl min-w-[80px] transition-all ${selectedPropertyType === type.id
-                                ? 'bg-sky-500 text-white shadow-lg'
-                                : 'bg-white border border-gray-200 text-gray-600 hover:bg-gray-50'
-                                }`}
-                        >
-                            <type.icon size={24} />
-                            <span className="text-xs font-medium whitespace-nowrap">{type.label}</span>
-                        </button>
-                    ))}
+                {/* Destinations Section */}
+                <div className="mb-8">
+                    <h3 className="text-xl font-bold text-gray-900 mb-4">Popular Destinations</h3>
+                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        {[
+                            { name: 'Kathmandu', image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80' },
+                            { name: 'Pokhara', image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80' },
+                            { name: 'Chitwan', image: 'https://images.unsplash.com/photo-1544640829-87580b037748?auto=format&fit=crop&w=800&q=80' },
+                            { name: 'Lumbini', image: 'https://images.unsplash.com/photo-1570701564993-e00652af8aa7?auto=format&fit=crop&w=800&q=80' }
+                        ].map((dest) => (
+                            <div
+                                key={dest.name}
+                                onClick={() => {
+                                    setSearchQuery(dest.name);
+                                    handleSearch();
+                                }}
+                                className="relative h-32 rounded-xl overflow-hidden cursor-pointer group shadow-md"
+                            >
+                                <img
+                                    src={dest.image}
+                                    alt={dest.name}
+                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                />
+                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
+                                <div className="absolute inset-0 flex items-center justify-center">
+                                    <span className="text-white font-bold text-lg shadow-sm">{dest.name}</span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Listing Controls (Rent/Sale, Sort, Map Toggle) */}
