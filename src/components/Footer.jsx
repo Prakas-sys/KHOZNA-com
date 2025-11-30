@@ -1,4 +1,5 @@
 import React from 'react';
+import { Mail, Phone, Instagram, Video } from 'lucide-react';
 
 const Footer = () => {
     return (
@@ -10,26 +11,38 @@ const Footer = () => {
                         <h3 className="font-bold text-lg mb-4">About</h3>
                         <ul className="space-y-2 text-sm">
                             <li><a href="#" className="hover:underline">How it works</a></li>
-                            <li><a href="#" className="hover:underline">Contact us</a></li>
                             <li><a href="#" className="hover:underline">Careers</a></li>
                         </ul>
                     </div>
 
-                    {/* Column 2 - Support */}
-                    <div>
-                        <h3 className="font-bold text-lg mb-4">Support</h3>
-                        <ul className="space-y-2 text-sm">
-                            <li><a href="#" className="hover:underline">Help Center</a></li>
-                            <li><a href="#" className="hover:underline">Safety</a></li>
-                        </ul>
-                    </div>
-
-                    {/* Column 3 - Community */}
-                    <div>
-                        <h3 className="font-bold text-lg mb-4">Community</h3>
-                        <ul className="space-y-2 text-sm">
-                            <li><a href="#" className="hover:underline">Blog</a></li>
-                            <li><a href="#" className="hover:underline">Forum</a></li>
+                    {/* Column 2 - Contact & Social */}
+                    <div className="col-span-1 md:col-span-2">
+                        <h3 className="font-bold text-lg mb-4">Contact & Social</h3>
+                        <ul className="space-y-3 text-sm">
+                            <li>
+                                <a href="https://wa.me/9779705278379" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-sky-200 transition-colors">
+                                    <Phone size={16} />
+                                    <span>WhatsApp: 9705278379</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="mailto:agentnepal850@gmail.com" className="flex items-center gap-2 hover:text-sky-200 transition-colors">
+                                    <Mail size={16} />
+                                    <span>agentnepal850@gmail.com</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://instagram.com/khozna_" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-sky-200 transition-colors">
+                                    <Instagram size={16} />
+                                    <span>@khozna_</span>
+                                </a>
+                            </li>
+                            <li>
+                                <a href="https://tiktok.com/@khozna_" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-sky-200 transition-colors">
+                                    <Video size={16} />
+                                    <span>@khozna_ (TikTok)</span>
+                                </a>
+                            </li>
                         </ul>
                     </div>
                 </div>
