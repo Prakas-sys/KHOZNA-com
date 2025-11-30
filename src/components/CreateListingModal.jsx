@@ -155,7 +155,10 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
 
                 {/* Header */}
                 <div className="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50">
-                    <h2 className="text-xl font-bold text-gray-900">Post Your Property</h2>
+                    <h2 className="text-xl font-bold text-gray-900">
+                        तपाईंको घर/जग्गा पोस्ट गर्नुहोस्
+                        <span className="block text-sm font-normal text-gray-500 mt-1">Post Your Property</span>
+                    </h2>
                     <button onClick={onClose} className="p-2 hover:bg-gray-200 rounded-full transition-colors">
                         <X size={20} />
                     </button>
@@ -168,7 +171,9 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
                         {/* Title & Location */}
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Property Title</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    सम्पत्तिको शीर्षक (Property Title)
+                                </label>
                                 <div className="relative">
                                     <Home size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                                     <input
@@ -178,12 +183,14 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
                                         value={formData.title}
                                         onChange={handleChange}
                                         className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
-                                        placeholder="e.g. Modern Apartment in Thamel"
+                                        placeholder="उदाहरण: ठमेलमा आधुनिक अपार्टमेन्ट"
                                     />
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Location</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    स्थान (Location)
+                                </label>
                                 <div className="relative">
                                     <MapPin size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                                     <input
@@ -193,7 +200,7 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
                                         value={formData.location}
                                         onChange={handleChange}
                                         className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
-                                        placeholder="e.g. Kathmandu"
+                                        placeholder="उदाहरण: काठमाडौं"
                                     />
                                 </div>
                             </div>
@@ -202,9 +209,11 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
                         {/* Price & Category */}
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Price (NPR)</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    मूल्य (Price)
+                                </label>
                                 <div className="relative">
-                                    <DollarSign size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500 font-bold text-sm">Rs.</span>
                                     <input
                                         type="number"
                                         name="price"
@@ -217,36 +226,42 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    श्रेणी (Category)
+                                </label>
                                 <select
                                     name="category"
                                     value={formData.category}
                                     onChange={handleChange}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none bg-white"
                                 >
-                                    <option value="apartment">Apartment</option>
-                                    <option value="house">House</option>
-                                    <option value="single">Single Room</option>
-                                    <option value="office">Office Space</option>
+                                    <option value="apartment">Apartment (अपार्टमेन्ट)</option>
+                                    <option value="house">House (घर)</option>
+                                    <option value="single">Single Room (एउटा कोठा)</option>
+                                    <option value="office">Office Space (अफिस)</option>
                                 </select>
                             </div>
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-1">Type</label>
+                                <label className="block text-sm font-medium text-gray-700 mb-1">
+                                    प्रकार (Type)
+                                </label>
                                 <select
                                     name="type"
                                     value={formData.type}
                                     onChange={handleChange}
                                     className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none bg-white"
                                 >
-                                    <option value="rent">For Rent</option>
-                                    <option value="sale">For Sale</option>
+                                    <option value="rent">For Rent (भाडामा)</option>
+                                    <option value="sale">For Sale (बिक्रीमा)</option>
                                 </select>
                             </div>
                         </div>
 
                         {/* Image Upload */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Property Image</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                फोटो (Property Image)
+                            </label>
                             <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 text-center hover:bg-gray-50 transition-colors cursor-pointer relative">
                                 <input
                                     type="file"
@@ -270,7 +285,8 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
                                         <div className="w-12 h-12 bg-sky-100 text-sky-500 rounded-full flex items-center justify-center mb-2">
                                             <Upload size={24} />
                                         </div>
-                                        <p className="text-sm font-medium text-gray-900">Click to upload image</p>
+                                        <p className="text-sm font-medium text-gray-900">फोटो अपलोड गर्न क्लिक गर्नुहोस्</p>
+                                        <p className="text-xs text-gray-500">Click to upload image</p>
                                         <p className="text-xs text-gray-500">SVG, PNG, JPG or GIF (max. 5MB)</p>
                                     </div>
                                 )}
@@ -279,7 +295,9 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
 
                         {/* Description */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                विवरण (Description)
+                            </label>
                             <textarea
                                 name="description"
                                 required
@@ -287,13 +305,15 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
                                 value={formData.description}
                                 onChange={handleChange}
                                 className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none resize-none"
-                                placeholder="Describe your property..."
+                                placeholder="तपाईंको सम्पत्तिको बारेमा लेख्नुहोस्... (Describe your property)"
                             />
                         </div>
 
                         {/* Amenities */}
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">Amenities</label>
+                            <label className="block text-sm font-medium text-gray-700 mb-1">
+                                सुविधाहरू (Amenities)
+                            </label>
                             <div className="relative">
                                 <Tag size={18} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
                                 <input
@@ -302,7 +322,7 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
                                     value={formData.amenities}
                                     onChange={handleChange}
                                     className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
-                                    placeholder="Wifi, AC, Parking (comma separated)"
+                                    placeholder="Wifi, Parking, Kitchen (comma separated)"
                                 />
                             </div>
                         </div>
@@ -327,7 +347,7 @@ export default function CreateListingModal({ isOpen, onClose, onSuccess }) {
                                         Posting...
                                     </>
                                 ) : (
-                                    'Post Property'
+                                    'पोस्ट गर्नुहोस् (Post Property)'
                                 )}
                             </button>
                         </div>

@@ -14,6 +14,7 @@ import KYCModal from './components/KYCModal';
 import ReportModal from './components/ReportModal';
 import ExploreView from './components/ExploreView';
 import KhoznaLogo from './components/KhoznaLogo';
+import LocationPermissionModal from './components/LocationPermissionModal';
 import { supabase } from './lib/supabase';
 
 // --- API Configuration ---
@@ -139,6 +140,7 @@ function RentEaseAppContent() {
     const [showCreateModal, setShowCreateModal] = useState(false);
     const [showKYCModal, setShowKYCModal] = useState(false);
     const [showReportModal, setShowReportModal] = useState(false);
+    const [showLocationModal, setShowLocationModal] = useState(false);
     const [listings, setListings] = useState([]);
     const [userListings, setUserListings] = useState([]);
     const [currentReelIndex, setCurrentReelIndex] = useState(0);
@@ -221,6 +223,16 @@ function RentEaseAppContent() {
 
     useEffect(() => {
         fetchListings();
+    }, []);
+
+    // Check location permission on first visit
+    useEffect(() => {
+        const hasAskedLocation = localStorage.getItem('locationAsked');
+        if (!hasAskedLocation) {
+            setTimeout(() => {
+                setShowLocationModal(true);
+            }, 2000); // Show after 2 seconds
+        }
     }, []);
 
     const toggleFavorite = (e, id) => {
@@ -1024,6 +1036,28 @@ function RentEaseAppContent() {
                 onClose={() => setShowReportModal(false)}
                 listing={selectedListing}
             />
+
+            {showLocationModal && (
+                <LocationPermissionModal
+                    onAllow={() => {
+                        localStorage.setItem('locationAsked', 'true');
+                        if ('geolocation' in navigator) {
+                            navigator.geolocation.getCurrentPosition(
+                                () => {
+                                    setShowLocationModal(false);
+                                },
+                                () => {
+                                    setShowLocationModal(false);
+                                }
+                            );
+                        }
+                    }}
+                    onDeny={() => {
+                        localStorage.setItem('locationAsked', 'true');
+                        setShowLocationModal(false);
+                    }}
+                />
+            )}
         </div>
     );
 }
