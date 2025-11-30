@@ -981,9 +981,9 @@ function RentEaseAppContent() {
                     <div className="relative -top-6">
                         <button
                             onClick={handlePostProperty}
-                            className="w-14 h-14 bg-gradient-to-br from-sky-400 to-sky-600 rounded-full flex items-center justify-center text-white shadow-xl shadow-sky-300 border-4 border-white hover:scale-105 transition-transform active:scale-95"
+                            className="w-14 h-14 bg-black rounded-xl flex items-center justify-center text-white border-4 border-white hover:scale-105 transition-transform active:scale-95"
                         >
-                            <PlusCircle size={32} strokeWidth={2.5} />
+                            <PlusCircle size={28} strokeWidth={2.5} />
                         </button>
                     </div>
 

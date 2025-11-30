@@ -98,7 +98,7 @@ export default function AuthModal({ isOpen, onClose, mode: initialMode = 'login'
                                             value={fullName}
                                             onChange={(e) => setFullName(e.target.value)}
                                             className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
-                                            placeholder="Prakash Balayar"
+                                            placeholder="Full Name"
                                             required
                                         />
                                     </div>
@@ -161,6 +161,21 @@ export default function AuthModal({ isOpen, onClose, mode: initialMode = 'login'
                         {loading ? 'Please wait...' : step === 'phone' ? 'Send OTP' : 'Verify & Sign In'}
                         {!loading && step === 'phone' && <ArrowRight size={18} />}
                     </button>
+
+                    {/* Test User Login Button */}
+                    {step === 'phone' && mode === 'login' && (
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setPhone('+9779800000000');
+                                setStep('otp');
+                                setTimeout(() => setOtp('123456'), 500);
+                            }}
+                            className="w-full mt-3 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
+                        >
+                            Test User Login
+                        </button>
+                    )}
                 </form>
 
                 {/* Footer */}
