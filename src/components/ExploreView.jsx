@@ -154,31 +154,47 @@ const ExploreView = ({
                 <h2 className="text-3xl font-bold text-gray-900 mb-8">Explore nearby stays</h2>
 
                 {/* Destinations Section */}
-                <div className="mb-8">
-                    <h3 className="text-xl font-bold text-gray-900 mb-4">Popular Destinations</h3>
-                    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="mb-12">
+                    <h3 className="text-3xl md:text-4xl font-bold text-gray-800 mb-8">Explore nearby stays</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
                         {[
-                            { name: 'Kathmandu', image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?auto=format&fit=crop&w=800&q=80' },
-                            { name: 'Pokhara', image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=800&q=80' },
-                            { name: 'Chitwan', image: 'https://images.unsplash.com/photo-1544640829-87580b037748?auto=format&fit=crop&w=800&q=80' },
-                            { name: 'Lumbini', image: 'https://images.unsplash.com/photo-1570701564993-e00652af8aa7?auto=format&fit=crop&w=800&q=80' }
+                            {
+                                name: 'Kathmandu, Nepal',
+                                properties: 856,
+                                image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop'
+                            },
+                            {
+                                name: 'Pokhara, Nepal',
+                                properties: 423,
+                                image: 'https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=400&h=300&fit=crop'
+                            },
+                            {
+                                name: 'Chitwan, Nepal',
+                                properties: 187,
+                                image: 'https://images.unsplash.com/photo-1564507592333-c60657eea523?w=400&h=300&fit=crop'
+                            },
+                            {
+                                name: 'Lumbini, Nepal',
+                                properties: 97,
+                                image: 'https://images.unsplash.com/photo-1569406995183-eb7c61f9dbb8?w=400&h=300&fit=crop'
+                            }
                         ].map((dest) => (
                             <div
                                 key={dest.name}
                                 onClick={() => {
-                                    setSearchQuery(dest.name);
+                                    setSearchQuery(dest.name.split(',')[0]);
                                     handleSearch();
                                 }}
-                                className="relative h-32 rounded-xl overflow-hidden cursor-pointer group shadow-md"
+                                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
                             >
                                 <img
                                     src={dest.image}
                                     alt={dest.name}
-                                    className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                                    className="w-full h-48 object-cover"
                                 />
-                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/30 transition-colors" />
-                                <div className="absolute inset-0 flex items-center justify-center">
-                                    <span className="text-white font-bold text-lg shadow-sm">{dest.name}</span>
+                                <div className="p-4">
+                                    <h3 className="font-semibold text-gray-800 text-lg">{dest.name}</h3>
+                                    <p className="text-gray-500 text-sm">{dest.properties} properties</p>
                                 </div>
                             </div>
                         ))}

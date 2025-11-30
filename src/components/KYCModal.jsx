@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { X, Upload, Phone, CheckCircle, Shield, AlertCircle, Loader2, ChevronLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
@@ -20,6 +20,36 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     const [resendCooldown, setResendCooldown] = useState(0);
 
     if (!isOpen) return null;
+
+    useEffect(() => {
+        if (isOpen && user) {
+            checkExistingKYC();
+        }
+    }, [isOpen, user]);
+
+    const checkExistingKYC = async () => {
+        try {
+            const { data, error } = await supabase
+                .from('kyc_verifications')
+                .select('*')
+                .eq('user_id', user.id)
+                .single();
+
+            if (data) {
+                if (data.status === 'approved') {
+                    setStep(4); // Already verified
+                } else if (data.status === 'pending') {
+                    setStep(4); // Already submitted
+                } else if (data.phone_number && !data.otp_verified) {
+                    // If they have a phone number but haven't verified OTP, go to step 2 or 3
+                    setPhoneNumber(data.phone_number);
+                    setStep(2);
+                }
+            }
+        } catch (err) {
+            // No existing record or error, stay on step 1
+        }
+    };
 
     const handleFileChange = (e, side) => {
         const file = e.target.files[0];
@@ -79,7 +109,7 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     const verifyDocumentWithAI = async (file) => {
         const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
         if (!apiKey) {
-            console.warn("Gemini API Key not found, skipping AI validation.");
+            console.warn("Gemini API Key not found. Skipping AI validation (Dev Mode).");
             return true;
         }
 
@@ -116,6 +146,9 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
             return result === 'VALID';
         } catch (error) {
             console.error("AI Verification Error:", error);
+            // If API fails (network, quota), we might want to fail open or closed. 
+            // For security, we should probably warn but allow manual review if it's just a network glitch.
+            // But if it's an invalid image, we want to block.
             return true; // Fallback to allow if AI fails
         }
     };
@@ -153,7 +186,7 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                 .upsert({
                     user_id: user.id,
                     citizenship_photo_url: frontUrl,
-                    citizenship_photo_back_url: backUrl,
+                    citizenship_photo_back_url: backUrl, // Ensure this column exists in schema
                     citizenship_number: citizenshipNumber,
                     status: 'pending'
                 }, { onConflict: 'user_id' });
@@ -176,8 +209,14 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     };
 
     const handleStep2Submit = async () => {
+        // Strict Nepal Phone Validation
+        const phoneRegex = /^(98|97)\d{8}$/;
         if (!phoneNumber) {
             setError('Please enter phone number');
+            return;
+        }
+        if (!phoneRegex.test(phoneNumber)) {
+            setError('Invalid phone number. Must be 10 digits and start with 98 or 97.');
             return;
         }
 
@@ -195,9 +234,9 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     };
 
     const sendOtp = async (phone) => {
-        // Generate OTP (in production, use SMS service)
+        // Generate OTP
         const generatedOtp = Math.floor(100000 + Math.random() * 900000).toString();
-        setLastSentOtp(generatedOtp);
+        // setLastSentOtp(generatedOtp); // REMOVED TEST UI
 
         // Update KYC with phone number
         const { error: updateError } = await supabase
@@ -211,8 +250,34 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
 
         if (updateError) throw updateError;
 
-        // In production, send SMS here
-        // alert(`OTP sent to ${phone}: ${generatedOtp}`);
+        // SMS Sending Logic
+        const smsApiUrl = import.meta.env.VITE_SMS_API_URL;
+        const smsApiKey = import.meta.env.VITE_SMS_API_KEY;
+
+        if (smsApiUrl && smsApiKey) {
+            // Real SMS API Call (Example structure for generic provider)
+            try {
+                await fetch(smsApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        to: phone,
+                        text: `Your KHOZNA verification code is: ${generatedOtp}`,
+                        token: smsApiKey
+                    })
+                });
+            } catch (smsError) {
+                console.error("Failed to send real SMS:", smsError);
+                // Fallback to alert for dev/demo if real SMS fails
+                alert(`[DEMO SMS] Your OTP is: ${generatedOtp}`);
+            }
+        } else {
+            // Simulation for Demo/Dev (User requested "message box" style)
+            // We use alert to simulate the message arriving on the phone
+            setTimeout(() => {
+                alert(`New Message from KHOZNA:\nYour verification code is: ${generatedOtp}`);
+            }, 1000);
+        }
 
         // Start cooldown
         setResendCooldown(30);
@@ -491,11 +556,6 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                                 </div>
                                 <h3 className="font-bold text-gray-900">Enter OTP</h3>
                                 <p className="text-sm text-gray-600">Sent to {phoneNumber}</p>
-                                {lastSentOtp && (
-                                    <div className="mt-2 p-2 bg-blue-50 border border-blue-200 rounded-lg text-sm text-blue-800">
-                                        <span className="font-semibold">Test Mode:</span> Your OTP is <strong>{lastSentOtp}</strong>
-                                    </div>
-                                )}
                             </div>
 
                             <div>

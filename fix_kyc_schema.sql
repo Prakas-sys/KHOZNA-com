@@ -7,6 +7,7 @@ DROP TABLE IF EXISTS public.kyc_verifications;
 CREATE TABLE public.kyc_verifications (
   user_id uuid PRIMARY KEY REFERENCES auth.users NOT NULL,
   citizenship_photo_url text,
+  citizenship_photo_back_url text,
   citizenship_number text,
   phone_number text,
   otp_code text,
