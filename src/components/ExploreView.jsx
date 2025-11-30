@@ -274,36 +274,30 @@ const ExploreView = ({
                                 <div
                                     key={listing.id}
                                     onClick={() => handleCardClick(listing)}
-                                    className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer group border border-gray-100"
+                                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
                                 >
-                                    <div className="relative aspect-[4/3] overflow-hidden">
+                                    <div className="relative">
                                         <img
                                             src={listing.image_url || listing.image}
                                             alt={listing.title}
-                                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                                            className="w-full h-44 object-cover"
                                         />
                                         <button
                                             onClick={(e) => toggleFavorite(e, listing.id)}
-                                            className="absolute top-3 right-3 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
+                                            className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-colors shadow-sm"
                                         >
                                             <Heart
-                                                size={18}
+                                                size={16}
                                                 className={favorites.includes(listing.id) ? "fill-red-500 text-red-500" : "text-gray-700"}
                                             />
                                         </button>
                                     </div>
                                     <div className="p-4">
-                                        <div className="flex justify-between items-start mb-1">
-                                            <h3 className="font-bold text-gray-900 truncate flex-1 pr-2">{listing.location}</h3>
-                                            <div className="flex items-center gap-1">
-                                                <Star size={14} className="fill-gray-900 text-gray-900" />
-                                                <span className="text-sm font-medium">{listing.rating || 'New'}</span>
-                                            </div>
-                                        </div>
-                                        <p className="text-gray-500 text-sm mb-2 truncate">{listing.title}</p>
+                                        <h3 className="font-semibold text-gray-800 text-lg truncate">{listing.title}</h3>
+                                        <p className="text-gray-500 text-sm mb-2">{listing.location}</p>
                                         <div className="flex items-baseline gap-1">
                                             <span className="font-bold text-gray-900">₹{listing.price.toLocaleString()}</span>
-                                            <span className="text-gray-500 text-sm"> night</span>
+                                            <span className="text-gray-500 text-sm">/ night</span>
                                         </div>
                                     </div>
                                 </div>
