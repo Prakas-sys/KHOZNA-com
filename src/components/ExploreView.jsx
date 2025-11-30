@@ -159,12 +159,12 @@ const ExploreView = ({
                             {
                                 name: 'Kathmandu, Nepal',
                                 properties: 856,
-                                image: 'https://images.unsplash.com/photo-1626621341517-bbf3d9990a23?w=400&h=300&fit=crop'
+                                image: 'https://images.unsplash.com/photo-1544735716-392fe2489ffa?w=400&h=300&fit=crop'
                             },
                             {
                                 name: 'Pokhara, Nepal',
                                 properties: 423,
-                                image: 'https://images.unsplash.com/photo-1605640840605-14ac1855827b?w=400&h=300&fit=crop'
+                                image: 'https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400&h=300&fit=crop'
                             },
                             {
                                 name: 'Chitwan, Nepal',
@@ -174,7 +174,7 @@ const ExploreView = ({
                             {
                                 name: 'Lumbini, Nepal',
                                 properties: 97,
-                                image: 'https://images.unsplash.com/photo-1569406995183-eb7c61f9dbb8?w=400&h=300&fit=crop'
+                                image: 'https://images.unsplash.com/photo-1570701564993-e00652af8aa7?w=400&h=300&fit=crop'
                             }
                         ].map((dest) => (
                             <div
