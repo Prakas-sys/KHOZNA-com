@@ -51,10 +51,28 @@ export const AuthProvider = ({ children }) => {
     }, []);
 
     const signInWithPhone = async (phone, fullName = null) => {
-        // DEV MODE: Check if SMS is enabled, if not use dev mode
+        // Check for Sparrow SMS Token
+        const sparrowToken = import.meta.env.VITE_SPARROW_SMS_TOKEN;
         const isDev = import.meta.env.DEV;
 
         try {
+            // 1. Try Sparrow SMS if configured
+            if (sparrowToken) {
+                const { sendOTPViaSparrow, generateOTP } = await import('../lib/sparrowSMS');
+                const otp = generateOTP();
+
+                console.log(`Attempting to send OTP via Sparrow to ${phone}`);
+                await sendOTPViaSparrow(phone, otp);
+
+                // Store for verification
+                localStorage.setItem('custom_auth_otp', otp);
+                localStorage.setItem('custom_auth_phone', phone);
+                if (fullName) localStorage.setItem('custom_auth_name', fullName);
+
+                return { data: { session: null }, error: null };
+            }
+
+            // 2. Try Supabase Native SMS
             const options = fullName ? { data: { full_name: fullName } } : {};
             const { data, error } = await supabase.auth.signInWithOtp({
                 phone,
@@ -62,20 +80,17 @@ export const AuthProvider = ({ children }) => {
             });
             if (error) throw error;
             return data;
-        } catch (error) {
-            // If SMS provider not configured, use dev mode
-            if (isDev && error.message?.includes('Unsupported phone provider')) {
-                console.warn('📱 DEV MODE: SMS not configured, using simulated OTP');
 
-                // Generate OTP
+        } catch (error) {
+            // 3. Dev Mode Fallback
+            if (isDev && (error.message?.includes('Unsupported phone provider') || !sparrowToken)) {
+                console.warn('📱 DEV MODE: SMS not configured, using simulated OTP');
                 const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
-                // Store in localStorage for verification
-                localStorage.setItem('dev_otp', otp);
-                localStorage.setItem('dev_phone', phone);
-                localStorage.setItem('dev_fullName', fullName || '');
+                localStorage.setItem('custom_auth_otp', otp);
+                localStorage.setItem('custom_auth_phone', phone);
+                if (fullName) localStorage.setItem('custom_auth_name', fullName);
 
-                // Show OTP to user
                 setTimeout(() => {
                     alert(`📱 DEV MODE - Your OTP is: ${otp}\n\nPhone: ${phone}`);
                 }, 500);
@@ -87,64 +102,69 @@ export const AuthProvider = ({ children }) => {
     };
 
     const verifyOtp = async (phone, token) => {
-        // DEV MODE: Check if we're using simulated OTP
-        const isDev = import.meta.env.DEV;
-        const devOtp = localStorage.getItem('dev_otp');
-        const devPhone = localStorage.getItem('dev_phone');
+        const storedOtp = localStorage.getItem('custom_auth_otp');
+        const storedPhone = localStorage.getItem('custom_auth_phone');
 
-        if (isDev && devOtp && devPhone === phone) {
-            if (token === devOtp) {
-                // Create a mock user session
-                const userId = `dev-user-${Date.now()}`;
-                const fullName = localStorage.getItem('dev_fullName') || 'Test User';
+        // Check if we are verifying a custom OTP (Sparrow or Dev)
+        if (storedOtp && storedPhone === phone) {
+            if (token === storedOtp) {
+                // OTP Matches! Now sign in the user.
+                const fullName = localStorage.getItem('custom_auth_name') || 'User';
 
-                // Clear dev storage
-                localStorage.removeItem('dev_otp');
-                localStorage.removeItem('dev_phone');
-                localStorage.removeItem('dev_fullName');
+                // Cleanup
+                localStorage.removeItem('custom_auth_otp');
+                localStorage.removeItem('custom_auth_phone');
+                localStorage.removeItem('custom_auth_name');
 
-                // Create profile in Supabase
-                // Note: This won't create an auth user, but we'll simulate it
-                console.log('📱 DEV MODE: OTP verified successfully');
-                alert('✅ DEV MODE: Login successful!\n\nNote: This is a simulated session for testing.');
-
-                // For dev mode, we need to use email auth as fallback
-                // Let's create a dev email based on phone
-                const devEmail = `${phone.replace(/\+/g, '')}@dev.khozna.local`;
+                // Workaround: Sign in using a generated email/password
+                // This allows us to use Supabase Auth without a native SMS provider
+                const dummyEmail = `${phone.replace(/\+/g, '')}@phone.khozna.com`;
+                const dummyPassword = `Khozna${phone}Pass!`; // Deterministic password
 
                 try {
-                    // Try to sign up with email (password is phone number)
-                    const { data, error } = await supabase.auth.signUp({
-                        email: devEmail,
-                        password: phone,
-                        options: {
-                            data: { full_name: fullName }
-                        }
+                    // 1. Try to Sign Up
+                    const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+                        email: dummyEmail,
+                        password: dummyPassword,
+                        options: { data: { full_name: fullName, phone: phone } }
                     });
 
-                    if (error && !error.message.includes('already registered')) {
-                        throw error;
+                    if (signUpError && !signUpError.message.includes('already registered')) {
+                        throw signUpError;
                     }
 
-                    // Sign in
+                    // 2. Sign In
                     const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-                        email: devEmail,
-                        password: phone,
+                        email: dummyEmail,
+                        password: dummyPassword,
                     });
 
                     if (signInError) throw signInError;
 
+                    // 3. Ensure profile exists and is linked
+                    if (signInData.user) {
+                        const { error: profileError } = await supabase
+                            .from('profiles')
+                            .upsert({
+                                id: signInData.user.id,
+                                full_name: fullName,
+                                role: 'user'
+                            }, { onConflict: 'id' });
+
+                        if (profileError) console.error('Error creating profile:', profileError);
+                    }
+
                     return signInData;
-                } catch (err) {
-                    console.error('Dev mode auth error:', err);
-                    throw new Error('Dev mode authentication failed. Please check console.');
+                } catch (authError) {
+                    console.error('Custom Auth Error:', authError);
+                    throw new Error('Authentication failed. Please try again.');
                 }
             } else {
-                throw new Error('Invalid OTP');
+                throw new Error('Invalid OTP code');
             }
         }
 
-        // Production mode: use real Supabase OTP
+        // Fallback to Supabase Native Verification
         const { data, error } = await supabase.auth.verifyOtp({
             phone,
             token,

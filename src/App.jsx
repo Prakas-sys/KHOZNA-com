@@ -16,6 +16,7 @@ import ReportModal from './components/ReportModal';
 import ExploreView from './components/ExploreView';
 import KhoznaLogo from './components/KhoznaLogo';
 import LocationPermissionModal from './components/LocationPermissionModal';
+import Footer from './components/Footer';
 import { supabase } from './lib/supabase';
 
 // --- API Configuration ---
@@ -122,7 +123,7 @@ export default function RentEaseApp() {
 }
 
 function RentEaseAppContent() {
-    const { user, signOut } = useAuth();
+    const { user, signOut, refreshProfile } = useAuth();
     const [view, setView] = useState('explore');
     const [selectedListing, setSelectedListing] = useState(null);
     const [searchQuery, setSearchQuery] = useState('');
@@ -275,17 +276,23 @@ function RentEaseAppContent() {
     };
 
     const handlePostProperty = () => {
+        console.log('handlePostProperty called. User:', user);
+
         if (!user) {
+            console.log('User not logged in, showing AuthModal');
             setAuthMode('signup');
             setShowAuthModal(true);
             return;
         }
 
-        if (!user.is_verified) {
+        // Check if user is verified (explicit check for true)
+        if (user.is_verified !== true) {
+            console.log('User not verified, showing KYCModal');
             setShowKYCModal(true);
             return;
         }
 
+        console.log('User verified, showing CreateModal');
         setShowCreateModal(true);
     };
 
@@ -499,9 +506,11 @@ function RentEaseAppContent() {
     // --- Profile View ---
     const ProfileView = () => {
         const [editMode, setEditMode] = useState(false);
+        const [showMyListings, setShowMyListings] = useState(false);
         const [profileName, setProfileName] = useState(user?.user_metadata?.full_name || '');
         const [kycData, setKycData] = useState(null);
         const [loadingKyc, setLoadingKyc] = useState(true);
+        const fileInputRef = useRef(null);
 
         useEffect(() => {
             if (user) {
@@ -557,9 +566,46 @@ function RentEaseAppContent() {
             }
         }, [user]);
 
+        const handleAvatarUpload = async (event) => {
+            try {
+                const file = event.target.files[0];
+                if (!file) return;
+
+                const fileExt = file.name.split('.').pop();
+                const fileName = `${user.id}-${Math.random()}.${fileExt}`;
+                const filePath = `${fileName}`;
+
+                const { error: uploadError } = await supabase.storage
+                    .from('avatars')
+                    .upload(filePath, file);
+
+                if (uploadError) throw uploadError;
+
+                const { data: { publicUrl } } = supabase.storage
+                    .from('avatars')
+                    .getPublicUrl(filePath);
+
+                const { error: updateError } = await supabase.auth.updateUser({
+                    data: { avatar_url: publicUrl }
+                });
+
+                if (updateError) throw updateError;
+
+                await supabase
+                    .from('profiles')
+                    .update({ avatar_url: publicUrl })
+                    .eq('id', user.id);
+
+                await refreshProfile();
+                alert('Profile picture updated!');
+            } catch (error) {
+                console.error('Error uploading avatar:', error);
+                alert('Error uploading avatar: ' + error.message);
+            }
+        };
+
         const handleRequestEdit = async () => {
             try {
-                // Send email to admin
                 const response = await fetch('/api/send-edit-request', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -573,7 +619,6 @@ function RentEaseAppContent() {
                 });
 
                 if (response.ok) {
-                    // Also create notification in database
                     await supabase
                         .from('notifications')
                         .insert({
@@ -634,15 +679,30 @@ function RentEaseAppContent() {
                     <div className="flex items-center gap-4 mb-6">
                         <div className="relative">
                             <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-3xl font-bold text-gray-500 overflow-hidden border border-gray-100 shadow-sm">
-                                {(user?.user_metadata?.full_name || user?.email || 'U')[0].toUpperCase()}
+                                {user?.user_metadata?.avatar_url ? (
+                                    <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover" />
+                                ) : (
+                                    (user?.user_metadata?.full_name || user?.email || 'U')[0].toUpperCase()
+                                )}
                             </div>
-                            <button className="absolute bottom-0 right-0 bg-white p-1.5 rounded-full shadow-md border border-gray-100 text-gray-600 hover:text-sky-600 transition-colors">
+                            <button
+                                onClick={() => fileInputRef.current?.click()}
+                                className="absolute bottom-0 right-0 bg-white p-1.5 rounded-full shadow-md border border-gray-100 text-gray-600 hover:text-sky-600 transition-colors"
+                            >
                                 <Camera size={14} strokeWidth={2.5} />
                             </button>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleAvatarUpload}
+                                className="hidden"
+                                accept="image/*"
+                            />
                         </div>
                         <div className="flex-1">
                             <h2 className="text-xl font-semibold text-gray-900">{user?.user_metadata?.full_name || 'User'}</h2>
                             <p className="text-gray-500 text-sm mb-1">{user?.email}</p>
+                            <p className="text-gray-500 text-sm mb-1">{user?.user_metadata?.phone || user?.phone || ''}</p>
                             <button
                                 onClick={() => setEditMode(true)}
                                 className="text-sm font-semibold text-gray-900 underline decoration-gray-300 underline-offset-4 hover:decoration-gray-900 transition-all"
@@ -667,7 +727,10 @@ function RentEaseAppContent() {
                         </div>
 
                         {/* My Listings */}
-                        <div className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors">
+                        <div
+                            className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors"
+                            onClick={() => setShowMyListings(true)}
+                        >
                             <div className="flex items-center gap-4">
                                 <HomeIcon size={24} className="text-gray-500" />
                                 <span className="text-gray-700 font-medium">My Listings</span>
@@ -748,9 +811,16 @@ function RentEaseAppContent() {
                                 <div className="flex justify-center mb-8">
                                     <div className="relative">
                                         <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-5xl font-bold text-gray-500">
-                                            {(user?.user_metadata?.full_name || user?.email || 'U')[0].toUpperCase()}
+                                            {user?.user_metadata?.avatar_url ? (
+                                                <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover rounded-full" />
+                                            ) : (
+                                                (user?.user_metadata?.full_name || user?.email || 'U')[0].toUpperCase()
+                                            )}
                                         </div>
-                                        <button className="absolute bottom-0 right-0 bg-sky-500 p-3 rounded-full shadow-lg text-white hover:bg-sky-600">
+                                        <button
+                                            onClick={() => fileInputRef.current?.click()}
+                                            className="absolute bottom-0 right-0 bg-sky-500 p-3 rounded-full shadow-lg text-white hover:bg-sky-600"
+                                        >
                                             <Camera size={20} />
                                         </button>
                                     </div>
@@ -782,6 +852,57 @@ function RentEaseAppContent() {
                                 >
                                     Save Changes
                                 </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* My Listings Modal */}
+                {showMyListings && (
+                    <div className="fixed inset-0 bg-white z-50 animate-in slide-in-from-bottom duration-300 overflow-y-auto">
+                        <div className="px-6 py-6">
+                            <div className="flex items-center justify-between mb-8">
+                                <button onClick={() => setShowMyListings(false)} className="p-2 -ml-2 hover:bg-gray-100 rounded-full">
+                                    <ChevronLeft size={24} />
+                                </button>
+                                <h2 className="text-lg font-bold">My Listings</h2>
+                                <div className="w-8"></div>
+                            </div>
+
+                            <div className="space-y-4">
+                                {userListings.length === 0 ? (
+                                    <div className="text-center py-12 text-gray-500">
+                                        <HomeIcon size={48} className="mx-auto mb-4 opacity-20" />
+                                        <p>You haven't posted any listings yet.</p>
+                                        <Button onClick={() => { setShowMyListings(false); handlePostProperty(); }} className="mt-4">
+                                            Post Property
+                                        </Button>
+                                    </div>
+                                ) : (
+                                    userListings.map(listing => (
+                                        <div key={listing.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm flex">
+                                            <div className="w-32 h-32 bg-gray-200 shrink-0">
+                                                <img src={listing.image_url || listing.image} alt={listing.title} className="w-full h-full object-cover" />
+                                            </div>
+                                            <div className="p-4 flex-1 flex flex-col justify-between">
+                                                <div>
+                                                    <h3 className="font-semibold text-gray-900 line-clamp-1">{listing.title}</h3>
+                                                    <p className="text-sm text-gray-500">{listing.location}</p>
+                                                    <p className="font-bold text-gray-900 mt-1">₹{listing.price.toLocaleString()}</p>
+                                                </div>
+                                                <div className="flex justify-end gap-2">
+                                                    <button
+                                                        onClick={() => handleDeleteListing(listing.id)}
+                                                        className="p-2 text-red-500 hover:bg-red-50 rounded-full"
+                                                        title="Delete Listing"
+                                                    >
+                                                        <Trash2 size={18} />
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    ))
+                                )}
                             </div>
                         </div>
                     </div>
@@ -1016,6 +1137,8 @@ function RentEaseAppContent() {
                     toggleFavorite={toggleFavorite}
                 />
             )}
+            {view === 'explore' && <Footer />}
+
             {view === 'details' && <DetailsView />}
             {view === 'profile' && <ProfileView />}
             {view === 'reels' && <ReelsView />}
