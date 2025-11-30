@@ -21,11 +21,16 @@ export default function AuthModal({ isOpen, onClose, mode: initialMode = 'login'
         setLoading(true)
 
         try {
-            // Auto-format phone number for Nepal if missing country code
+            // Auto-format phone number for Nepal
             let formattedPhone = phone.trim();
-            if (!formattedPhone.startsWith('+') && formattedPhone.length === 10) {
-                formattedPhone = `+977${formattedPhone}`;
+            // Remove any existing +977 or non-digit chars to clean it first
+            formattedPhone = formattedPhone.replace(/\D/g, '');
+            // Take last 10 digits if longer (in case they pasted full number)
+            if (formattedPhone.length > 10) {
+                formattedPhone = formattedPhone.slice(-10);
             }
+            // Add +977
+            formattedPhone = `+977${formattedPhone}`;
 
             await signInWithPhone(formattedPhone, mode === 'signup' ? fullName : null)
             // Update local state to show the formatted number in the verify step
@@ -109,18 +114,24 @@ export default function AuthModal({ isOpen, onClose, mode: initialMode = 'login'
                                 <label className="block text-sm font-medium text-gray-700 mb-2">
                                     Phone Number
                                 </label>
-                                <div className="relative">
-                                    <Phone size={20} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
+                                <div className="relative flex items-center border border-gray-300 rounded-lg focus-within:ring-2 focus-within:ring-sky-500 focus-within:border-transparent overflow-hidden">
+                                    <div className="bg-gray-50 px-3 py-3 border-r border-gray-200 flex items-center gap-2 text-gray-600 font-medium">
+                                        <span>🇳🇵</span>
+                                        <span>+977</span>
+                                    </div>
                                     <input
                                         type="tel"
                                         value={phone}
-                                        onChange={(e) => setPhone(e.target.value)}
-                                        className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 focus:border-transparent outline-none"
-                                        placeholder="+977 9800000000"
+                                        onChange={(e) => {
+                                            // Only allow numbers
+                                            const val = e.target.value.replace(/\D/g, '');
+                                            if (val.length <= 10) setPhone(val);
+                                        }}
+                                        className="w-full px-4 py-3 outline-none"
+                                        placeholder="98XXXXXXXX"
                                         required
                                     />
                                 </div>
-                                <p className="text-xs text-gray-500 mt-1">Include country code (e.g., +977)</p>
                             </div>
                         </>
                     )}
