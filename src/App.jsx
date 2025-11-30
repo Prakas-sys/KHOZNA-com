@@ -660,7 +660,7 @@ function RentEaseAppContent() {
                         {/* Personal Info */}
                         <div className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors" onClick={() => setEditMode(true)}>
                             <div className="flex items-center gap-4">
-                                <UserIcon size={24} className="text-gray-500" />
+                                <User size={24} className="text-gray-500" />
                                 <span className="text-gray-700 font-medium">Personal Information</span>
                             </div>
                             <ChevronRight size={20} className="text-gray-400" />
