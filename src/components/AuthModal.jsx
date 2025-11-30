@@ -173,20 +173,7 @@ export default function AuthModal({ isOpen, onClose, mode: initialMode = 'login'
                         {!loading && step === 'phone' && <ArrowRight size={18} />}
                     </button>
 
-                    {/* Test User Login Button */}
-                    {step === 'phone' && mode === 'login' && (
-                        <button
-                            type="button"
-                            onClick={() => {
-                                setPhone('+9779800000000');
-                                setStep('otp');
-                                setTimeout(() => setOtp('123456'), 500);
-                            }}
-                            className="w-full mt-3 bg-gray-100 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-200 transition-colors flex items-center justify-center gap-2"
-                        >
-                            Test User Login
-                        </button>
-                    )}
+
                 </form>
 
                 {/* Footer */}
