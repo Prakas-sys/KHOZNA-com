@@ -5,7 +5,8 @@ import {
     CheckCircle, User, Menu, Globe, DollarSign, Calendar,
     Home, Film, PlusCircle, Send, Sparkles, X, BellDot,
     SlidersHorizontal, Building, Building2, HomeIcon, Briefcase, UserCircle2, LogOut,
-    Edit, Trash2, MessageCircle, ChevronRight, Play, Pause, Shield, Flag, Phone
+    Edit, Trash2, MessageCircle, ChevronRight, Play, Pause, Shield, Flag, Phone,
+    Settings, CreditCard, HelpCircle, Camera, Lock, LogOut as LogoutIcon
 } from 'lucide-react';
 import { useAuth, AuthProvider } from './contexts/AuthContext';
 import AuthModal from './components/AuthModal';
@@ -622,108 +623,169 @@ function RentEaseAppContent() {
         };
 
         return (
-            <div className="min-h-screen bg-gray-50 pb-24">
-                {/* Header with Logo */}
-                <div className="bg-gradient-to-br from-sky-400 to-sky-600 px-4 py-8 text-white">
-                    <div className="flex items-center justify-between mb-6">
-                        {/* Logo and Brand Name */}
-                        <div className="flex items-center gap-3">
-                            {/* Brand Logo */}
-                            <KhoznaLogo size={40} color="#0284C7" />
-                            <h1 className="text-2xl font-bold">KHOZNA</h1>
+            <div className="min-h-screen bg-white pb-24">
+                {/* 1. Top Header (Airbnb Style) */}
+                <div className="px-6 pt-12 pb-6">
+                    <h1 className="text-3xl font-bold text-gray-900">Profile</h1>
+                </div>
+
+                {/* 2. Profile Card */}
+                <div className="px-6 mb-8">
+                    <div className="flex items-center gap-4 mb-6">
+                        <div className="relative">
+                            <div className="w-20 h-20 rounded-full bg-gray-200 flex items-center justify-center text-3xl font-bold text-gray-500 overflow-hidden border border-gray-100 shadow-sm">
+                                {(user?.user_metadata?.full_name || user?.email || 'U')[0].toUpperCase()}
+                            </div>
+                            <button className="absolute bottom-0 right-0 bg-white p-1.5 rounded-full shadow-md border border-gray-100 text-gray-600 hover:text-sky-600 transition-colors">
+                                <Camera size={14} strokeWidth={2.5} />
+                            </button>
+                        </div>
+                        <div className="flex-1">
+                            <h2 className="text-xl font-semibold text-gray-900">{user?.user_metadata?.full_name || 'User'}</h2>
+                            <p className="text-gray-500 text-sm mb-1">{user?.email}</p>
+                            <button
+                                onClick={() => setEditMode(true)}
+                                className="text-sm font-semibold text-gray-900 underline decoration-gray-300 underline-offset-4 hover:decoration-gray-900 transition-all"
+                            >
+                                Show Profile
+                            </button>
                         </div>
                     </div>
 
-                    <div className="flex items-center gap-4">
-                        <div className="w-20 h-20 rounded-full bg-white/20 flex items-center justify-center text-3xl font-bold">
-                            {(user?.user_metadata?.full_name || user?.email || 'U')[0].toUpperCase()}
+                    {/* Airbnb-style Divider */}
+                    <div className="h-px bg-gray-200 w-full my-6"></div>
+
+                    {/* 3. Menu Options */}
+                    <div className="space-y-2">
+                        {/* Personal Info */}
+                        <div className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors" onClick={() => setEditMode(true)}>
+                            <div className="flex items-center gap-4">
+                                <UserIcon size={24} className="text-gray-500" />
+                                <span className="text-gray-700 font-medium">Personal Information</span>
+                            </div>
+                            <ChevronRight size={20} className="text-gray-400" />
                         </div>
-                        <div className="flex-1">
-                            {editMode ? (
-                                <div className="flex gap-2">
+
+                        {/* My Listings */}
+                        <div className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors">
+                            <div className="flex items-center gap-4">
+                                <HomeIcon size={24} className="text-gray-500" />
+                                <span className="text-gray-700 font-medium">My Listings</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {userListings.length > 0 && (
+                                    <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded-full">{userListings.length}</span>
+                                )}
+                                <ChevronRight size={20} className="text-gray-400" />
+                            </div>
+                        </div>
+
+                        {/* KYC / Trust */}
+                        <div className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors" onClick={() => setShowKYCModal(true)}>
+                            <div className="flex items-center gap-4">
+                                <Shield size={24} className="text-gray-500" />
+                                <span className="text-gray-700 font-medium">Identity Verification</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                {kycData ? (
+                                    <span className="text-green-600 text-xs font-bold">Verified</span>
+                                ) : (
+                                    <span className="text-gray-400 text-xs">Required</span>
+                                )}
+                                <ChevronRight size={20} className="text-gray-400" />
+                            </div>
+                        </div>
+
+                        {/* Payments (Mock) */}
+                        <div className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors">
+                            <div className="flex items-center gap-4">
+                                <CreditCard size={24} className="text-gray-500" />
+                                <span className="text-gray-700 font-medium">Payments & Payouts</span>
+                            </div>
+                            <ChevronRight size={20} className="text-gray-400" />
+                        </div>
+
+                        {/* Support (Mock) */}
+                        <div className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors">
+                            <div className="flex items-center gap-4">
+                                <HelpCircle size={24} className="text-gray-500" />
+                                <span className="text-gray-700 font-medium">Support</span>
+                            </div>
+                            <ChevronRight size={20} className="text-gray-400" />
+                        </div>
+                    </div>
+
+                    {/* Divider */}
+                    <div className="h-px bg-gray-200 w-full my-6"></div>
+
+                    {/* 4. Logout */}
+                    <button
+                        onClick={signOut}
+                        className="w-full py-3 border border-gray-900 rounded-lg font-semibold text-gray-900 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
+                    >
+                        <LogoutIcon size={18} />
+                        Log Out
+                    </button>
+
+                    <p className="text-center text-xs text-gray-400 mt-8">
+                        Version 1.0.0 • KHOZNA Inc.
+                    </p>
+                </div>
+
+                {/* Edit Profile Modal Overlay (Simple inline for now) */}
+                {editMode && (
+                    <div className="fixed inset-0 bg-white z-50 animate-in slide-in-from-bottom duration-300 overflow-y-auto">
+                        <div className="px-6 py-6">
+                            <div className="flex items-center justify-between mb-8">
+                                <button onClick={() => setEditMode(false)} className="p-2 -ml-2 hover:bg-gray-100 rounded-full">
+                                    <ChevronLeft size={24} />
+                                </button>
+                                <h2 className="text-lg font-bold">Edit Profile</h2>
+                                <div className="w-8"></div> {/* Spacer */}
+                            </div>
+
+                            <div className="space-y-6">
+                                <div className="flex justify-center mb-8">
+                                    <div className="relative">
+                                        <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-5xl font-bold text-gray-500">
+                                            {(user?.user_metadata?.full_name || user?.email || 'U')[0].toUpperCase()}
+                                        </div>
+                                        <button className="absolute bottom-0 right-0 bg-sky-500 p-3 rounded-full shadow-lg text-white hover:bg-sky-600">
+                                            <Camera size={20} />
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
                                     <input
                                         type="text"
                                         value={profileName}
                                         onChange={(e) => setProfileName(e.target.value)}
-                                        className="flex-1 px-3 py-2 rounded-lg text-gray-900"
-                                        placeholder="Your name"
+                                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
                                     />
-                                    <button
-                                        onClick={handleUpdateProfile}
-                                        className="px-4 py-2 bg-white text-sky-600 rounded-lg font-semibold"
-                                    >
-                                        Save
-                                    </button>
-                                    <button
-                                        onClick={() => setEditMode(false)}
-                                        className="px-4 py-2 bg-white/20 rounded-lg"
-                                    >
-                                        Cancel
-                                    </button>
                                 </div>
-                            ) : (
+
                                 <div>
-                                    <h2 className="text-xl font-bold">{user?.user_metadata?.full_name || 'User'}</h2>
-                                    <p className="text-white/80 text-sm">{user?.email}</p>
-                                    <button
-                                        onClick={() => setEditMode(true)}
-                                        className="mt-2 flex items-center gap-1 text-sm text-white/90 hover:text-white"
-                                    >
-                                        <Edit size={14} />
-                                        Edit Profile
-                                    </button>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                                    <input
+                                        type="email"
+                                        value={user?.email}
+                                        disabled
+                                        className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
+                                    />
                                 </div>
-                            )}
+
+                                <button
+                                    onClick={handleUpdateProfile}
+                                    className="w-full bg-sky-500 text-white py-3 rounded-lg font-bold hover:bg-sky-600 transition-colors shadow-lg shadow-sky-200"
+                                >
+                                    Save Changes
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-
-
-
-
-                {/* User's Listings */}
-                <div className="px-4 py-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">My Listings ({userListings.length})</h3>
-
-                    {userListings.length === 0 ? (
-                        <div className="text-center py-12 bg-white rounded-xl">
-                            <HomeIcon size={48} className="text-gray-300 mx-auto mb-3" />
-                            <p className="text-gray-500 mb-4">You haven't posted any properties yet</p>
-                            <button
-                                onClick={handlePostProperty}
-                                className="px-6 py-2 bg-sky-500 text-white rounded-lg font-semibold hover:bg-sky-600"
-                            >
-                                Post Your First Property
-                            </button>
-                        </div>
-                    ) : (
-                        <div className="space-y-4">
-                            {userListings.map(listing => (
-                                <div key={listing.id} className="bg-white rounded-xl overflow-hidden shadow-md flex">
-                                    <img
-                                        src={listing.image_url}
-                                        alt={listing.title}
-                                        className="w-32 h-32 object-cover"
-                                    />
-                                    <div className="flex-1 p-4">
-                                        <h4 className="font-bold text-gray-900">{listing.title}</h4>
-                                        <p className="text-sm text-gray-600">{listing.location}</p>
-                                        <p className="text-sky-600 font-bold mt-2">₹{listing.price.toLocaleString()}</p>
-                                    </div>
-                                    <div className="flex flex-col justify-center px-4 gap-2">
-                                        <button
-                                            onClick={() => handleDeleteListing(listing.id)}
-                                            className="p-2 text-red-500 hover:bg-red-50 rounded-lg"
-                                        >
-                                            <Trash2 size={20} />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                )}
             </div>
         );
     };
