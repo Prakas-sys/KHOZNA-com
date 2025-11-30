@@ -397,8 +397,24 @@ function RentEaseAppContent() {
                         <div className="mb-6">
                             <h3 className="font-semibold text-lg mb-3">Amenities</h3>
                             <div className="grid grid-cols-2 gap-3">
-                                {selectedListing.amenities && selectedListing.amenities.map((amenity, idx) => (
-                                    <div key={idx} className="flex items-center gap-2 text-gray-600">
+                                {['Wifi', 'Parking', 'Water', 'Electricity', 'Kitchen', 'AC', 'TV'].map((amenity) => {
+                                    const hasAmenity = selectedListing.amenities?.includes(amenity);
+                                    return (
+                                        <div key={amenity} className="flex items-center gap-2">
+                                            {hasAmenity ? (
+                                                <CheckCircle size={18} className="text-green-500" />
+                                            ) : (
+                                                <X size={18} className="text-red-400" />
+                                            )}
+                                            <span className={`text-sm ${hasAmenity ? 'text-gray-900 font-medium' : 'text-gray-400'}`}>
+                                                {amenity}: {hasAmenity ? 'Yes' : 'No'}
+                                            </span>
+                                        </div>
+                                    );
+                                })}
+                                {/* Show other custom amenities */}
+                                {selectedListing.amenities?.filter(a => !['Wifi', 'Parking', 'Water', 'Electricity', 'Kitchen', 'AC', 'TV'].includes(a)).map((amenity, idx) => (
+                                    <div key={`custom-${idx}`} className="flex items-center gap-2 text-gray-600">
                                         <CheckCircle size={18} className="text-sky-500" />
                                         <span className="text-sm">{amenity}</span>
                                     </div>
