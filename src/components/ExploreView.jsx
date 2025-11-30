@@ -255,7 +255,7 @@ const ExploreView = ({
                                             <div className="w-40">
                                                 <img src={listing.image_url || listing.image} className="w-full h-24 object-cover rounded-lg mb-2" />
                                                 <h3 className="font-bold text-sm">{listing.title}</h3>
-                                                <p className="text-sky-600 font-bold">₹{listing.price.toLocaleString()}</p>
+                                                <p className="text-sky-600 font-bold">Rs. {listing.price.toLocaleString()}</p>
                                                 <button
                                                     onClick={() => handleCardClick(listing)}
                                                     className="mt-2 w-full bg-sky-500 text-white text-xs py-1 rounded"
@@ -296,7 +296,7 @@ const ExploreView = ({
                                         <h3 className="font-semibold text-gray-800 text-lg truncate">{listing.title}</h3>
                                         <p className="text-gray-500 text-sm mb-2">{listing.location}</p>
                                         <div className="flex items-baseline gap-1">
-                                            <span className="font-bold text-gray-900">₹{listing.price.toLocaleString()}</span>
+                                            <span className="font-bold text-gray-900">Rs. {listing.price.toLocaleString()}</span>
                                             <span className="text-gray-500 text-sm">/ night</span>
                                         </div>
                                     </div>
