@@ -82,17 +82,20 @@ export const AuthProvider = ({ children }) => {
             return data;
 
         } catch (error) {
-            // 3. Dev Mode Fallback
-            if (isDev && (error.message?.includes('Unsupported phone provider') || !sparrowToken)) {
-                console.warn('📱 DEV MODE: SMS not configured, using simulated OTP');
+            // 3. Fallback to Simulated OTP (Demo Mode)
+            // This runs if Sparrow is not configured AND Supabase SMS fails (e.g. no credit/provider)
+            // We enable this in production too per user request for "demo" purposes without budget.
+            if (error.message?.includes('Unsupported phone provider') || error.message?.includes('SMS login is not currently enabled') || !sparrowToken) {
+                console.warn('📱 DEMO MODE: SMS not configured, using simulated OTP');
                 const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
                 localStorage.setItem('custom_auth_otp', otp);
                 localStorage.setItem('custom_auth_phone', phone);
                 if (fullName) localStorage.setItem('custom_auth_name', fullName);
 
+                // Show OTP to user
                 setTimeout(() => {
-                    alert(`📱 DEV MODE - Your OTP is: ${otp}\n\nPhone: ${phone}`);
+                    alert(`📱 DEMO MODE - Your OTP is: ${otp}\n\nPhone: ${phone}`);
                 }, 500);
 
                 return { session: null };
