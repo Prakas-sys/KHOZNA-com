@@ -1,7 +1,7 @@
 import React from 'react';
 import { Facebook, Instagram, Twitter, TikTok, Mail, Phone, MapPin, Globe } from 'lucide-react';
 
-export default function AppFooter() {
+export default function Footer() {
     return (
         <footer className="bg-sky-900 text-white pt-12 pb-24">
             {/* Updated Contact Info & Social Links */}

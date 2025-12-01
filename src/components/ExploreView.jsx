@@ -10,7 +10,7 @@ import { NEPAL_LOCATIONS } from '../data/locations';
 import KhoznaLogo from './KhoznaLogo';
 import Navbar from './Navbar';
 import Hero from './Hero';
-import AppFooter from './AppFooter';
+import Footer from './Footer';
 
 // Fix Leaflet marker icon issue
 import L from 'leaflet';
@@ -323,7 +323,7 @@ const ExploreView = ({
             </div>
 
 
-            <AppFooter />
+            <Footer />
         </div>
     );
 };
