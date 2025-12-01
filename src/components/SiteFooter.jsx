@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Instagram, Twitter, TikTok, Mail, Phone, MapPin, Globe } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Video, Mail, Phone, MapPin, Globe } from 'lucide-react';
 
 export default function SiteFooter() {
     return (
@@ -62,7 +62,7 @@ export default function SiteFooter() {
                         © {new Date().getFullYear()} KHOZNA Inc. All rights reserved.
                     </p>
                     <div className="flex items-center gap-6">
-                        <a href="#" className="text-gray-400 hover:text-white transition-colors"><TikTok size={20} /></a>
+                        <a href="#" className="text-gray-400 hover:text-white transition-colors"><Video size={20} /></a>
                         <a href="#" className="text-gray-400 hover:text-white transition-colors"><Facebook size={20} /></a>
                         <a href="#" className="text-gray-400 hover:text-white transition-colors"><Instagram size={20} /></a>
                         <a href="#" className="text-gray-400 hover:text-white transition-colors"><Twitter size={20} /></a>

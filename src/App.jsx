@@ -4,7 +4,7 @@ import {
     Wifi, Car, Coffee, Tv, Wind, ChevronLeft,
     CheckCircle, User, Menu, Globe, DollarSign, Calendar,
     Home, Film, PlusCircle, Send, Sparkles, X, BellDot,
-    SlidersHorizontal, Building, Building2, HomeIcon, Briefcase, UserCircle2, LogOut,
+    SlidersHorizontal, Building, Building2, HomeIcon, Briefcase, UserCircle2,
     Edit, Trash2, MessageCircle, ChevronRight, Play, Pause, Shield, Flag, Phone,
     Settings, CreditCard, HelpCircle, Camera, Lock, LogOut as LogoutIcon
 } from 'lucide-react';
