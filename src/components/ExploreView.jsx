@@ -322,7 +322,7 @@ const ExploreView = ({
                 </div>
             </div>
 
-            <Footer />
+
         </div>
     );
 };

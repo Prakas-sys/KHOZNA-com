@@ -11,8 +11,8 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                     <div className="flex justify-between items-center h-20">
                         {/* Logo - Marvel Style */}
                         <div className="flex items-center cursor-pointer">
-                            <div className="border-4 border-[#00A8E8] px-4 py-1 rounded">
-                                <span className="text-2xl font-black text-[#00A8E8] tracking-wider">KHOZNA</span>
+                            <div className="border-2 border-[#00A8E8] px-3 py-0.5 rounded">
+                                <span className="text-xl font-black text-[#00A8E8] tracking-wider">KHOZNA</span>
                             </div>
                         </div>
 

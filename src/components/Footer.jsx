@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Instagram, Twitter, Mail, Phone, MapPin, Globe } from 'lucide-react';
+import { Facebook, Instagram, Twitter, TikTok, Mail, Phone, MapPin, Globe } from 'lucide-react';
 
 export default function Footer() {
     return (
@@ -46,7 +46,7 @@ export default function Footer() {
                             </li>
                             <li className="flex items-center gap-3">
                                 <Phone size={16} className="text-sky-500" />
-                                <span>+977 9800000000</span>
+                                <span>+977 9863590097</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Mail size={16} className="text-sky-500" />
@@ -61,6 +61,7 @@ export default function Footer() {
                         © {new Date().getFullYear()} KHOZNA Inc. All rights reserved.
                     </p>
                     <div className="flex items-center gap-6">
+                        <a href="#" className="text-gray-400 hover:text-white transition-colors"><TikTok size={20} /></a>
                         <a href="#" className="text-gray-400 hover:text-white transition-colors"><Facebook size={20} /></a>
                         <a href="#" className="text-gray-400 hover:text-white transition-colors"><Instagram size={20} /></a>
                         <a href="#" className="text-gray-400 hover:text-white transition-colors"><Twitter size={20} /></a>
