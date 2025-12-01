@@ -16,7 +16,7 @@ import ReportModal from './components/ReportModal';
 import ExploreView from './components/ExploreView';
 import KhoznaLogo from './components/KhoznaLogo';
 import LocationPermissionModal from './components/LocationPermissionModal';
-import Footer from './components/Footer';
+
 import { supabase } from './lib/supabase';
 
 // --- API Configuration ---
@@ -710,6 +710,16 @@ function RentEaseAppContent() {
                             <input
                                 type="file"
                                 ref={fileInputRef}
+                                accept="image/*"
+                                onChange={handleAvatarUpload}
+                                className="hidden"
+                            />
+                        </div>
+                        <div className="flex-1">
+                            <h2 className="text-xl font-semibold text-gray-900">
+                                {user?.user_metadata?.full_name || user?.email || 'User'}
+                            </h2>
+                            <p className="text-sm text-gray-500">{user?.email}</p>
                         </div>
                     </div>
 
@@ -1138,7 +1148,7 @@ function RentEaseAppContent() {
                     toggleFavorite={toggleFavorite}
                 />
             )}
-            {view === 'explore' && <Footer />}
+
 
             {view === 'details' && <DetailsView />}
             {view === 'profile' && <ProfileView />}
