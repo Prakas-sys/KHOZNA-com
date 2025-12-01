@@ -214,6 +214,7 @@ function RentEaseAppContent() {
 
             setListings(enrichedData);
             console.log('✅ Listings fetched & enriched:', enrichedData.length);
+            console.log('Latest listing:', enrichedData[0]); // Log the newest listing
 
         } catch (err) {
             console.error('❌ Error fetching listings:', err);
@@ -244,20 +245,7 @@ function RentEaseAppContent() {
         );
     };
 
-    const filteredListings = useMemo(() => {
-        return listings.filter(item => {
-            const matchesSearch = item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                item.title.toLowerCase().includes(searchQuery.toLowerCase());
-            const matchesType = selectedPropertyType === 'all' || item.category === selectedPropertyType;
 
-            // Handle missing type (default to 'rent') and ensure case-insensitive comparison
-            const itemType = (item.type || 'rent').toLowerCase();
-            const currentType = listingType.toLowerCase();
-            const matchesListingType = itemType === currentType;
-
-            return matchesSearch && matchesType && matchesListingType;
-        });
-    }, [listings, searchQuery, selectedPropertyType, listingType]);
 
     const handleCardClick = (listing) => {
         setSelectedListing(listing);

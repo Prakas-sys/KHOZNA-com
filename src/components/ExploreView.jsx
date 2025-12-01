@@ -98,6 +98,7 @@ const ExploreView = ({
     }, [searchQuery]);
 
     const filteredListings = useMemo(() => {
+        console.log('🔍 ExploreView filtering:', listings.length, 'listings');
         return listings.filter(item => {
             const matchesSearch = item.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
                 item.title.toLowerCase().includes(searchQuery.toLowerCase());
