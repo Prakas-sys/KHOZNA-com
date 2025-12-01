@@ -710,21 +710,6 @@ function RentEaseAppContent() {
                             <input
                                 type="file"
                                 ref={fileInputRef}
-                                onChange={handleAvatarUpload}
-                                className="hidden"
-                                accept="image/*"
-                            />
-                        </div>
-                        <div className="flex-1">
-                            <h2 className="text-xl font-semibold text-gray-900">{user?.user_metadata?.full_name || 'User'}</h2>
-                            <p className="text-gray-500 text-sm mb-1">{user?.email}</p>
-                            <p className="text-gray-500 text-sm mb-1">{user?.user_metadata?.phone || user?.phone || ''}</p>
-                            <button
-                                onClick={() => setEditMode(true)}
-                                className="text-sm font-semibold text-gray-900 underline decoration-gray-300 underline-offset-4 hover:decoration-gray-900 transition-all"
-                            >
-                                Show Profile
-                            </button>
                         </div>
                     </div>
 
