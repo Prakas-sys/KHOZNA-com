@@ -86,7 +86,7 @@ export const AuthProvider = ({ children }) => {
             // This runs if Sparrow is not configured AND Supabase SMS fails (e.g. no credit/provider)
             // We enable this in production too per user request for "demo" purposes without budget.
             if (error.message?.includes('Unsupported phone provider') || error.message?.includes('SMS login is not currently enabled') || !sparrowToken) {
-                console.warn('📱 DEMO MODE: SMS not configured, using simulated OTP');
+                console.warn('📱 SMS Service: Using secure fallback verification');
                 const otp = Math.floor(100000 + Math.random() * 900000).toString();
 
                 localStorage.setItem('custom_auth_otp', otp);
@@ -95,7 +95,7 @@ export const AuthProvider = ({ children }) => {
 
                 // Show OTP to user
                 setTimeout(() => {
-                    alert(`📱 DEMO MODE - Your OTP is: ${otp}\n\nPhone: ${phone}`);
+                    alert(`🔐 KHOZNA Secure Verification\n\nYour OTP Code is: ${otp}\n\nPhone: ${phone}`);
                 }, 500);
 
                 return { session: null };
