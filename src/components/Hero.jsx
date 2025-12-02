@@ -39,13 +39,11 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
                 <div className="relative max-w-3xl mx-auto">
                     <div className="bg-white rounded-full shadow-lg p-2 flex items-center">
                         <div className="flex-1 flex items-center px-4">
-                            <div className="relative flex items-center justify-center mr-3">
-                                {/* Custom Solid House Shape (Home Plate / Pentagon) */}
-                                <svg className="w-6 h-7 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 3L4 10V21H20V10L12 3Z" strokeLinejoin="round" strokeWidth="2" stroke="currentColor" />
+                            <div className="mr-3">
+                                <svg className="w-6 h-6 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M12 3C9.5 3 7.5 4.5 7.5 7.5V9.5C5 10 3 12.5 3 15.5V19C3 20.5 4.5 22 6 22H18C19.5 22 21 20.5 21 19V15.5C21 12.5 19 10 16.5 9.5V7.5C16.5 4.5 14.5 3 12 3Z" />
+                                    <path d="M12 10C10 10 8.5 11.5 8.5 13.5C8.5 16 12 18.5 12 18.5C12 18.5 15.5 16 15.5 13.5C15.5 11.5 14 10 12 10Z" fill="white" />
                                 </svg>
-                                {/* White Heart Centered Inside */}
-                                <Heart className="w-2.5 h-2.5 text-white absolute mt-1.5" fill="currentColor" strokeWidth={0} />
                             </div>
                             <input
                                 type="text"
