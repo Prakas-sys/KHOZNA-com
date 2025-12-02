@@ -19,7 +19,7 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     const [lastSentOtp, setLastSentOtp] = useState(''); // For testing/demo purposes
     const [resendCooldown, setResendCooldown] = useState(0);
 
-    if (!isOpen) return null;
+    // MOVED: if (!isOpen) return null; check is now at the bottom to prevent Hook errors
 
     useEffect(() => {
         if (isOpen && user) {
@@ -357,6 +357,8 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
             setLoading(false);
         }
     };
+
+    if (!isOpen) return null;
 
     return (
         <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/60 backdrop-blur-sm">
