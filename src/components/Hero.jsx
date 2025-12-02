@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, MapPin } from 'lucide-react';
+import { Search, MapPin, Home, Heart } from 'lucide-react';
 import { NEPAL_LOCATIONS } from '../data/locations';
 
 const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
@@ -39,7 +39,10 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
                 <div className="relative max-w-3xl mx-auto">
                     <div className="bg-white rounded-full shadow-lg p-2 flex items-center">
                         <div className="flex-1 flex items-center px-4">
-                            <MapPin className="w-5 h-5 text-gray-400 mr-3" />
+                            <div className="flex items-center gap-1 mr-3 text-gray-400">
+                                <Home className="w-5 h-5" />
+                                <Heart className="w-4 h-4" fill="currentColor" />
+                            </div>
                             <input
                                 type="text"
                                 placeholder="Where to stay?"
