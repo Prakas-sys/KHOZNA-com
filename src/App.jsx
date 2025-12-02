@@ -984,372 +984,420 @@ function RentEaseAppContent() {
                     </div>
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Full Name</label>
-                        <input
-                            type="text"
-                            value={profileName}
-                            onChange={(e) => setProfileName(e.target.value)}
-                            className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-sky-500 outline-none"
-                        />
-                    </div>
+                        <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
+                            <input
+                                type="email"
+                                value={user?.email}
+                                disabled
+                                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
+                            />
+                        </div>
 
-                    <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input
-                            type="email"
-                            value={user?.email}
-                            disabled
-                            className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
-                        />
+                        <button
+                            onClick={handleUpdateProfile}
+                            className="w-full bg-sky-500 text-white py-3 rounded-lg font-bold hover:bg-sky-600 transition-colors shadow-lg shadow-sky-200"
+                        >
+                            Save Changes
+                        </button>
                     </div>
-
-                    <button
-                        onClick={handleUpdateProfile}
-                        className="w-full bg-sky-500 text-white py-3 rounded-lg font-bold hover:bg-sky-600 transition-colors shadow-lg shadow-sky-200"
-                    >
-                        Save Changes
-                    </button>
                 </div>
             </div>
         );
     };
-            </div >
-        );
-};
+    {/* Gradient Overlay */ }
+    <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70" />
 
-// --- Reels View ---
-const ReelsView = () => {
-    const handleSwipe = (direction) => {
-        if (direction === 'up' && currentReelIndex < listings.length - 1) {
-            setCurrentReelIndex(prev => prev + 1);
-        } else if (direction === 'down' && currentReelIndex > 0) {
-            setCurrentReelIndex(prev => prev - 1);
-        }
-    };
+    {/* Top Bar */ }
+    <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between text-white z-10">
+        <button
+            onClick={() => setView('explore')}
+            className="p-2 hover:bg-white/20 rounded-full"
+        >
+            <X size={24} />
+        </button>
+        <span className="text-sm">
+            {currentReelIndex + 1} / {listings.length}
+        </span>
+    </div>
 
-    const currentReel = listings[currentReelIndex];
-
-    return (
-        <div className="fixed inset-0 bg-black">
-            {listings.length === 0 ? (
-                <div className="flex items-center justify-center h-full text-white">
-                    <div className="text-center">
-                        <Film size={64} className="mx-auto mb-4 opacity-50" />
-                        <p>No properties to show</p>
-                    </div>
-                </div>
-            ) : (
-                <div className="relative h-full">
-                    {/* Property Image */}
-                    <img
-                        src={currentReel?.image_url || currentReel?.image}
-                        alt={currentReel?.title}
-                        className="w-full h-full object-cover"
-                    />
-
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70" />
-
-                    {/* Top Bar */}
-                    <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between text-white z-10">
-                        <button
-                            onClick={() => setView('explore')}
-                            className="p-2 hover:bg-white/20 rounded-full"
-                        >
-                            <X size={24} />
-                        </button>
-                        <span className="text-sm">
-                            {currentReelIndex + 1} / {listings.length}
-                        </span>
-                    </div>
-
-                    {/* Property Info */}
-                    <div className="absolute bottom-20 left-0 right-0 p-6 text-white z-10">
-                        <h2 className="text-2xl font-bold mb-2">{currentReel?.title}</h2>
-                        <div className="flex items-center gap-2 mb-3">
-                            <MapPin size={16} />
-                            <span>{currentReel?.location}</span>
-                        </div>
-                        <p className="text-3xl font-bold mb-4">₹{currentReel?.price.toLocaleString()}</p>
-                        <button
-                            onClick={() => {
-                                setSelectedListing(currentReel);
-                                setView('details');
-                            }}
-                            className="w-full bg-white text-sky-600 py-3 rounded-full font-bold"
-                        >
-                            View Details
-                        </button>
-                    </div>
-
-                    {/* Swipe Indicators */}
-                    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-6 z-10">
-                        <button
-                            onClick={() => handleSwipe('down')}
-                            disabled={currentReelIndex === 0}
-                            className={`p-3 rounded-full ${currentReelIndex === 0 ? 'bg-white/20' : 'bg-white/40 hover:bg-white/60'}`}
-                        >
-                            <ChevronLeft size={24} className="text-white rotate-90" />
-                        </button>
-                        <button
-                            onClick={(e) => toggleFavorite(e, currentReel?.id)}
-                            className="p-3 bg-white/40 hover:bg-white/60 rounded-full"
-                        >
-                            <Heart
-                                size={24}
-                                className={favorites.includes(currentReel?.id) ? "fill-red-500 text-red-500" : "text-white"}
-                            />
-                        </button>
-                        <button
-                            onClick={() => handleSwipe('up')}
-                            disabled={currentReelIndex === listings.length - 1}
-                            className={`p-3 rounded-full ${currentReelIndex === listings.length - 1 ? 'bg-white/20' : 'bg-white/40 hover:bg-white/60'}`}
-                        >
-                            <ChevronRight size={24} className="text-white rotate-90" />
-                        </button>
-                    </div>
-                </div>
-            )}
+    {/* Property Info */ }
+    <div className="absolute bottom-20 left-0 right-0 p-6 text-white z-10">
+        <h2 className="text-2xl font-bold mb-2">{currentReel?.title}</h2>
+        <div className="flex items-center gap-2 mb-3">
+            <MapPin size={16} />
+            <span>{currentReel?.location}</span>
         </div>
-    );
-};
+        <p className="text-3xl font-bold mb-4">₹{currentReel?.price.toLocaleString()}</p>
+        <button
+            onClick={() => {
+                setSelectedListing(currentReel);
+                setView('details');
+            }}
+            className="w-full bg-white text-sky-600 py-3 rounded-full font-bold"
+        >
+            View Details
+        </button>
+    </div>
 
-// --- Messages View ---
-const MessagesView = () => {
-    const [selectedChat, setSelectedChat] = useState(null);
-    const [messageText, setMessageText] = useState('');
+    {/* Swipe Indicators */ }
+    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-6 z-10">
+        <button
+            onClick={() => handleSwipe('down')}
+            disabled={currentReelIndex === 0}
+            className={`p-3 rounded-full ${currentReelIndex === 0 ? 'bg-white/20' : 'bg-white/40 hover:bg-white/60'}`}
+        >
+            <ChevronLeft size={24} className="text-white rotate-90" />
+        </button>
+        <button
+            onClick={(e) => toggleFavorite(e, currentReel?.id)}
+            className="p-3 bg-white/40 hover:bg-white/60 rounded-full"
+        >
+            <Heart
+                size={24}
+                className={favorites.includes(currentReel?.id) ? "fill-red-500 text-red-500" : "text-white"}
+            />
+        </button>
+        <button
+            onClick={() => handleSwipe('up')}
+            disabled={currentReelIndex === listings.length - 1}
+            className={`p-3 rounded-full ${currentReelIndex === listings.length - 1 ? 'bg-white/20' : 'bg-white/40 hover:bg-white/60'}`}
+        >
+            <ChevronRight size={24} className="text-white rotate-90" />
+        </button>
+    </div>
+    // --- Reels View ---
+    const ReelsView = () => {
+        const handleSwipe = (direction) => {
+            if (direction === 'up' && currentReelIndex < listings.length - 1) {
+                setCurrentReelIndex(prev => prev + 1);
+            } else if (direction === 'down' && currentReelIndex > 0) {
+                setCurrentReelIndex(prev => prev - 1);
+            }
+        };
 
-    // Mock conversations for now
-    const conversations = [
-        { id: 1, name: 'Rajesh S.', lastMessage: 'Is the apartment still available?', time: '2h ago', unread: 2 },
-        { id: 2, name: 'Sita M.', lastMessage: 'Thank you for your interest!', time: '1d ago', unread: 0 },
-    ];
+        const currentReel = listings[currentReelIndex];
 
-    return (
-        <div className="min-h-screen bg-gray-50 pb-24">
-            {!selectedChat ? (
-                <>
-                    {/* Header */}
-                    <div className="bg-white px-4 py-4 border-b">
-                        <h1 className="text-xl font-bold text-gray-900">Messages</h1>
-                    </div>
-
-                    {/* Conversations List */}
-                    <div className="divide-y">
-                        {conversations.length === 0 ? (
-                            <div className="text-center py-12">
-                                <MessageCircle size={48} className="text-gray-300 mx-auto mb-3" />
-                                <p className="text-gray-500">No messages yet</p>
-                            </div>
-                        ) : (
-                            conversations.map(conv => (
-                                <div
-                                    key={conv.id}
-                                    onClick={() => setSelectedChat(conv)}
-                                    className="bg-white px-4 py-4 flex items-center gap-3 hover:bg-gray-50 cursor-pointer"
-                                >
-                                    <div className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold">
-                                        {conv.name[0]}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center justify-between mb-1">
-                                            <h3 className="font-semibold text-gray-900">{conv.name}</h3>
-                                            <span className="text-xs text-gray-500">{conv.time}</span>
-                                        </div>
-                                        <p className="text-sm text-gray-600 truncate">{conv.lastMessage}</p>
-                                    </div>
-                                    {conv.unread > 0 && (
-                                        <div className="w-6 h-6 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                                            {conv.unread}
-                                        </div>
-                                    )}
-                                </div>
-                            ))
-                        )}
-                    </div>
-                </>
-            ) : (
-                <>
-                    {/* Chat Header */}
-                    <div className="bg-white px-4 py-4 border-b flex items-center gap-3">
-                        <button
-                            onClick={() => setSelectedChat(null)}
-                            className="p-2 hover:bg-gray-100 rounded-full"
-                        >
-                            <ChevronLeft size={20} />
-                        </button>
-                        <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold">
-                            {selectedChat.name[0]}
-                        </div>
-                        <h2 className="font-semibold text-gray-900">{selectedChat.name}</h2>
-                    </div>
-
-                    {/* Messages */}
-                    <div className="flex-1 p-4 space-y-4">
-                        <div className="flex justify-start">
-                            <div className="bg-white px-4 py-2 rounded-2xl rounded-tl-none shadow-sm max-w-[70%]">
-                                <p className="text-sm">{selectedChat.lastMessage}</p>
-                                <span className="text-xs text-gray-500 mt-1 block">{selectedChat.time}</span>
-                            </div>
-                        </div>
-                        <div className="flex justify-end">
-                            <div className="bg-sky-500 text-white px-4 py-2 rounded-2xl rounded-tr-none shadow-sm max-w-[70%]">
-                                <p className="text-sm">Yes, it's available! Would you like to schedule a viewing?</p>
-                                <span className="text-xs text-sky-100 mt-1 block">Just now</span>
-                            </div>
+        return (
+            <div className="fixed inset-0 bg-black">
+                {listings.length === 0 ? (
+                    <div className="flex items-center justify-center h-full text-white">
+                        <div className="text-center">
+                            <Film size={64} className="mx-auto mb-4 opacity-50" />
+                            <p>No properties to show</p>
                         </div>
                     </div>
+                ) : (
+                    <div className="relative h-full">
+                        {/* Property Image */}
+                        <img
+                            src={currentReel?.image_url || currentReel?.image}
+                            alt={currentReel?.title}
+                            className="w-full h-full object-cover"
+                        />
 
-                    {/* Message Input */}
-                    <div className="fixed bottom-20 left-0 right-0 bg-white border-t px-4 py-3">
-                        <div className="flex gap-2">
-                            <input
-                                type="text"
-                                value={messageText}
-                                onChange={(e) => setMessageText(e.target.value)}
-                                placeholder="Type a message..."
-                                className="flex-1 px-4 py-2 border border-gray-300 rounded-full outline-none focus:border-sky-500"
-                            />
-                            <button className="w-12 h-12 bg-sky-500 text-white rounded-full flex items-center justify-center hover:bg-sky-600">
-                                <Send size={20} />
+                        {/* Gradient Overlay */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70" />
+
+                        {/* Top Bar */}
+                        <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between text-white z-10">
+                            <button
+                                onClick={() => setView('explore')}
+                                className="p-2 hover:bg-white/20 rounded-full"
+                            >
+                                <X size={24} />
+                            </button>
+                            <span className="text-sm">
+                                {currentReelIndex + 1} / {listings.length}
+                            </span>
+                        </div>
+
+                        {/* Property Info */}
+                        <div className="absolute bottom-20 left-0 right-0 p-6 text-white z-10">
+                            <h2 className="text-2xl font-bold mb-2">{currentReel?.title}</h2>
+                            <div className="flex items-center gap-2 mb-3">
+                                <MapPin size={16} />
+                                <span>{currentReel?.location}</span>
+                            </div>
+                            <p className="text-3xl font-bold mb-4">₹{currentReel?.price.toLocaleString()}</p>
+                            <button
+                                onClick={() => {
+                                    setSelectedListing(currentReel);
+                                    setView('details');
+                                }}
+                                className="w-full bg-white text-sky-600 py-3 rounded-full font-bold"
+                            >
+                                View Details
+                            </button>
+                        </div>
+
+                        {/* Swipe Indicators */}
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-6 z-10">
+                            <button
+                                onClick={() => handleSwipe('down')}
+                                disabled={currentReelIndex === 0}
+                                className={`p-3 rounded-full ${currentReelIndex === 0 ? 'bg-white/20' : 'bg-white/40 hover:bg-white/60'}`}
+                            >
+                                <ChevronLeft size={24} className="text-white rotate-90" />
+                            </button>
+                            <button
+                                onClick={(e) => toggleFavorite(e, currentReel?.id)}
+                                className="p-3 bg-white/40 hover:bg-white/60 rounded-full"
+                            >
+                                <Heart
+                                    size={24}
+                                    className={favorites.includes(currentReel?.id) ? "fill-red-500 text-red-500" : "text-white"}
+                                />
+                            </button>
+                            <button
+                                onClick={() => handleSwipe('up')}
+                                disabled={currentReelIndex === listings.length - 1}
+                                className={`p-3 rounded-full ${currentReelIndex === listings.length - 1 ? 'bg-white/20' : 'bg-white/40 hover:bg-white/60'}`}
+                            >
+                                <ChevronRight size={24} className="text-white rotate-90" />
                             </button>
                         </div>
                     </div>
-                </>
+                )}
+            </div>
+        );
+    };
+
+    // --- Messages View ---
+    const MessagesView = () => {
+        const [selectedChat, setSelectedChat] = useState(null);
+        const [messageText, setMessageText] = useState('');
+
+        // Mock conversations for now
+        const conversations = [
+            { id: 1, name: 'Rajesh S.', lastMessage: 'Is the apartment still available?', time: '2h ago', unread: 2 },
+            { id: 2, name: 'Sita M.', lastMessage: 'Thank you for your interest!', time: '1d ago', unread: 0 },
+        ];
+
+        return (
+            <div className="min-h-screen bg-gray-50 pb-24">
+                {!selectedChat ? (
+                    <>
+                        {/* Header */}
+                        <div className="bg-white px-4 py-4 border-b">
+                            <h1 className="text-xl font-bold text-gray-900">Messages</h1>
+                        </div>
+
+                        {/* Conversations List */}
+                        <div className="divide-y">
+                            {conversations.length === 0 ? (
+                                <div className="text-center py-12">
+                                    <MessageCircle size={48} className="text-gray-300 mx-auto mb-3" />
+                                    <p className="text-gray-500">No messages yet</p>
+                                </div>
+                            ) : (
+                                conversations.map(conv => (
+                                    <div
+                                        key={conv.id}
+                                        onClick={() => setSelectedChat(conv)}
+                                        className="bg-white px-4 py-4 flex items-center gap-3 hover:bg-gray-50 cursor-pointer"
+                                    >
+                                        <div className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold">
+                                            {conv.name[0]}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <div className="flex items-center justify-between mb-1">
+                                                <h3 className="font-semibold text-gray-900">{conv.name}</h3>
+                                                <span className="text-xs text-gray-500">{conv.time}</span>
+                                            </div>
+                                            <p className="text-sm text-gray-600 truncate">{conv.lastMessage}</p>
+                                        </div>
+                                        {conv.unread > 0 && (
+                                            <div className="w-6 h-6 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
+                                                {conv.unread}
+                                            </div>
+                                        )}
+                                    </div>
+                                ))
+                            )}
+                        </div>
+                    </>
+                ) : (
+                    <>
+                        {/* Chat Header */}
+                        <div className="bg-white px-4 py-4 border-b flex items-center gap-3">
+                            <button
+                                onClick={() => setSelectedChat(null)}
+                                className="p-2 hover:bg-gray-100 rounded-full"
+                            >
+                                <ChevronLeft size={20} />
+                            </button>
+                            <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold">
+                                {selectedChat.name[0]}
+                            </div>
+                            <h2 className="font-semibold text-gray-900">{selectedChat.name}</h2>
+                        </div>
+
+                        {/* Messages */}
+                        <div className="flex-1 p-4 space-y-4">
+                            <div className="flex justify-start">
+                                <div className="bg-white px-4 py-2 rounded-2xl rounded-tl-none shadow-sm max-w-[70%]">
+                                    <p className="text-sm">{selectedChat.lastMessage}</p>
+                                    <span className="text-xs text-gray-500 mt-1 block">{selectedChat.time}</span>
+                                </div>
+                            </div>
+                            <div className="flex justify-end">
+                                <div className="bg-sky-500 text-white px-4 py-2 rounded-2xl rounded-tr-none shadow-sm max-w-[70%]">
+                                    <p className="text-sm">Yes, it's available! Would you like to schedule a viewing?</p>
+                                    <span className="text-xs text-sky-100 mt-1 block">Just now</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Message Input */}
+                        <div className="fixed bottom-20 left-0 right-0 bg-white border-t px-4 py-3">
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={messageText}
+                                    onChange={(e) => setMessageText(e.target.value)}
+                                    placeholder="Type a message..."
+                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-full outline-none focus:border-sky-500"
+                                />
+                                <button className="w-12 h-12 bg-sky-500 text-white rounded-full flex items-center justify-center hover:bg-sky-600">
+                                    <Send size={20} />
+                                </button>
+                            </div>
+                        </div>
+                    </>
+                )}
+            </div>
+        );
+    };
+
+    return (
+        <div className="min-h-screen bg-gray-50">
+            {view === 'explore' && (
+                <ExploreView
+                    user={user}
+                    signOut={signOut}
+                    setAuthMode={setAuthMode}
+                    setShowAuthModal={setShowAuthModal}
+                    searchQuery={searchQuery}
+                    setSearchQuery={setSearchQuery}
+                    selectedPropertyType={selectedPropertyType}
+                    setSelectedPropertyType={setSelectedPropertyType}
+                    listingType={listingType}
+                    setListingType={setListingType}
+                    listings={listings}
+                    loadingListings={loadingListings}
+                    handlePostProperty={handlePostProperty}
+                    handleCardClick={handleCardClick}
+                    favorites={favorites}
+                    toggleFavorite={toggleFavorite}
+                />
+            )}
+
+
+            {view === 'details' && <DetailsView />}
+            {view === 'profile' && <ProfileView />}
+            {view === 'reels' && <ReelsView />}
+            {view === 'messages' && <MessagesView />}
+
+            {/* Bottom Navigation */}
+            {(view === 'explore' || view === 'profile' || view === 'reels' || view === 'messages') && (
+                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 flex justify-between items-center z-50 h-[70px] shadow-lg">
+                    <div
+                        onClick={() => setView('explore')}
+                        className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'explore' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
+                    >
+                        <Search size={24} strokeWidth={view === 'explore' ? 2.5 : 2} />
+                        <span className={`text-[10px] ${view === 'explore' ? 'font-semibold' : 'font-medium'}`}>Explore</span>
+                    </div>
+
+                    <div
+                        onClick={() => setView('reels')}
+                        className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'reels' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
+                    >
+                        <Film size={24} strokeWidth={view === 'reels' ? 2.5 : 2} />
+                        <span className={`text-[10px] ${view === 'reels' ? 'font-semibold' : 'font-medium'}`}>Reels</span>
+                    </div>
+
+                    <div className="relative -top-6">
+                        <button
+                            onClick={handlePostProperty}
+                            className="w-14 h-14 bg-gradient-to-br from-sky-400 to-sky-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-sky-300 hover:scale-105 transition-transform active:scale-95"
+                        >
+                            <PlusCircle size={28} strokeWidth={2.5} />
+                        </button>
+                    </div>
+
+                    <div
+                        onClick={() => setView('messages')}
+                        className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'messages' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
+                    >
+                        <Send size={24} strokeWidth={view === 'messages' ? 2.5 : 2} />
+                        <span className={`text-[10px] ${view === 'messages' ? 'font-semibold' : 'font-medium'}`}>Messages</span>
+                    </div>
+
+                    <div
+                        onClick={() => setView('profile')}
+                        className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'profile' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
+                    >
+                        <UserCircle2 size={24} strokeWidth={view === 'profile' ? 2.5 : 2} />
+                        <span className={`text-[10px] ${view === 'profile' ? 'font-semibold' : 'font-medium'}`}>Profile</span>
+                    </div>
+                </div>
+            )}
+
+            {/* Auth Modal */}
+            <AuthModal
+                isOpen={showAuthModal}
+                onClose={() => setShowAuthModal(false)}
+                mode={authMode}
+            />
+
+            {/* Create Listing Modal */}
+            <CreateListingModal
+                isOpen={showCreateModal}
+                onClose={() => setShowCreateModal(false)}
+                onSuccess={() => {
+                    fetchListings();
+                    alert('Property posted successfully!');
+                }}
+            />
+
+            <KYCModal
+                isOpen={showKYCModal}
+                onClose={() => setShowKYCModal(false)}
+                onSuccess={() => {
+                    setShowKYCModal(false);
+                    setShowCreateModal(true);
+                }}
+            />
+
+            <ReportModal
+                isOpen={showReportModal}
+                onClose={() => setShowReportModal(false)}
+                listing={selectedListing}
+            />
+
+            {showLocationModal && (
+                <LocationPermissionModal
+                    onAllow={() => {
+                        localStorage.setItem('locationAsked', 'true');
+                        if ('geolocation' in navigator) {
+                            navigator.geolocation.getCurrentPosition(
+                                () => {
+                                    setShowLocationModal(false);
+                                },
+                                () => {
+                                    setShowLocationModal(false);
+                                }
+                            );
+                        }
+                    }}
+                    onDeny={() => {
+                        localStorage.setItem('locationAsked', 'true');
+                        setShowLocationModal(false);
+                    }}
+                />
             )}
         </div>
     );
-};
-
-return (
-    <div className="min-h-screen bg-gray-50">
-        {view === 'explore' && (
-            <ExploreView
-                user={user}
-                signOut={signOut}
-                setAuthMode={setAuthMode}
-                setShowAuthModal={setShowAuthModal}
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                selectedPropertyType={selectedPropertyType}
-                setSelectedPropertyType={setSelectedPropertyType}
-                listingType={listingType}
-                setListingType={setListingType}
-                listings={listings}
-                loadingListings={loadingListings}
-                handlePostProperty={handlePostProperty}
-                handleCardClick={handleCardClick}
-                favorites={favorites}
-                toggleFavorite={toggleFavorite}
-            />
-        )}
-
-
-        {view === 'details' && <DetailsView />}
-        {view === 'profile' && <ProfileView />}
-        {view === 'reels' && <ReelsView />}
-        {view === 'messages' && <MessagesView />}
-
-        {/* Bottom Navigation */}
-        {(view === 'explore' || view === 'profile' || view === 'reels' || view === 'messages') && (
-            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 flex justify-between items-center z-50 h-[70px] shadow-lg">
-                <div
-                    onClick={() => setView('explore')}
-                    className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'explore' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
-                >
-                    <Search size={24} strokeWidth={view === 'explore' ? 2.5 : 2} />
-                    <span className={`text-[10px] ${view === 'explore' ? 'font-semibold' : 'font-medium'}`}>Explore</span>
-                </div>
-
-                <div
-                    onClick={() => setView('reels')}
-                    className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'reels' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
-                >
-                    <Film size={24} strokeWidth={view === 'reels' ? 2.5 : 2} />
-                    <span className={`text-[10px] ${view === 'reels' ? 'font-semibold' : 'font-medium'}`}>Reels</span>
-                </div>
-
-                <div className="relative -top-6">
-                    <button
-                        onClick={handlePostProperty}
-                        className="w-14 h-14 bg-gradient-to-br from-sky-400 to-sky-600 rounded-xl flex items-center justify-center text-white shadow-lg shadow-sky-300 hover:scale-105 transition-transform active:scale-95"
-                    >
-                        <PlusCircle size={28} strokeWidth={2.5} />
-                    </button>
-                </div>
-
-                <div
-                    onClick={() => setView('messages')}
-                    className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'messages' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
-                >
-                    <Send size={24} strokeWidth={view === 'messages' ? 2.5 : 2} />
-                    <span className={`text-[10px] ${view === 'messages' ? 'font-semibold' : 'font-medium'}`}>Messages</span>
-                </div>
-
-                <div
-                    onClick={() => setView('profile')}
-                    className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'profile' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
-                >
-                    <UserCircle2 size={24} strokeWidth={view === 'profile' ? 2.5 : 2} />
-                    <span className={`text-[10px] ${view === 'profile' ? 'font-semibold' : 'font-medium'}`}>Profile</span>
-                </div>
-            </div>
-        )}
-
-        {/* Auth Modal */}
-        <AuthModal
-            isOpen={showAuthModal}
-            onClose={() => setShowAuthModal(false)}
-            mode={authMode}
-        />
-
-        {/* Create Listing Modal */}
-        <CreateListingModal
-            isOpen={showCreateModal}
-            onClose={() => setShowCreateModal(false)}
-            onSuccess={() => {
-                fetchListings();
-                alert('Property posted successfully!');
-            }}
-        />
-
-        <KYCModal
-            isOpen={showKYCModal}
-            onClose={() => setShowKYCModal(false)}
-            onSuccess={() => {
-                setShowKYCModal(false);
-                setShowCreateModal(true);
-            }}
-        />
-
-        <ReportModal
-            isOpen={showReportModal}
-            onClose={() => setShowReportModal(false)}
-            listing={selectedListing}
-        />
-
-        {showLocationModal && (
-            <LocationPermissionModal
-                onAllow={() => {
-                    localStorage.setItem('locationAsked', 'true');
-                    if ('geolocation' in navigator) {
-                        navigator.geolocation.getCurrentPosition(
-                            () => {
-                                setShowLocationModal(false);
-                            },
-                            () => {
-                                setShowLocationModal(false);
-                            }
-                        );
-                    }
-                }}
-                onDeny={() => {
-                    localStorage.setItem('locationAsked', 'true');
-                    setShowLocationModal(false);
-                }}
-            />
-        )}
-    </div>
-);
 }
-
