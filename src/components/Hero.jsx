@@ -40,10 +40,10 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
                     <div className="bg-white rounded-full shadow-lg p-2 flex items-center">
                         <div className="flex-1 flex items-center px-4">
                             <div className="relative flex items-center justify-center mr-3">
-                                {/* Solid Gray Home - Narrower/Taller look */}
-                                <Home className="w-6 h-7 text-gray-400" fill="currentColor" strokeWidth={0} />
+                                {/* Solid Gray Home - Much Narrower/Taller */}
+                                <Home className="w-5 h-7 text-gray-400" fill="currentColor" strokeWidth={0} />
                                 {/* White Heart Centered Inside */}
-                                <Heart className="w-3 h-3 text-white absolute mt-1" fill="currentColor" strokeWidth={0} />
+                                <Heart className="w-2.5 h-2.5 text-white absolute mt-1" fill="currentColor" strokeWidth={0} />
                             </div>
                             <input
                                 type="text"
