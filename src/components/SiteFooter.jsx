@@ -1,5 +1,5 @@
 import React from 'react';
-import { <Facebook></Facebook>, <Instagram></Instagram>, <TikTok></TikTok>, Video, Mail, Phone, MapPin, Globe } from 'lucide-react';
+import { Facebook, Instagram, TikTok, Twitter, Video, Mail, Phone, MapPin, Globe } from 'lucide-react';
 
 export default function SiteFooter() {
     return (
