@@ -1,5 +1,5 @@
 import React from 'react';
-import { Facebook, Instagram, Twitter, Video, Mail, Phone, MapPin, Globe } from 'lucide-react';
+import { <Facebook></Facebook>, <Instagram></Instagram>, <TikTok></TikTok>, Video, Mail, Phone, MapPin, Globe } from 'lucide-react';
 
 export default function SiteFooter() {
     return (
@@ -47,11 +47,11 @@ export default function SiteFooter() {
                             </li>
                             <li className="flex items-center gap-3">
                                 <Phone size={16} className="text-sky-500" />
-                                <span>+977 9863590097</span>
+                                <span>+977 9705278379</span>
                             </li>
                             <li className="flex items-center gap-3">
                                 <Mail size={16} className="text-sky-500" />
-                                <span>support@khozna.com</span>
+                                <span>prakashbalayar706@gmail.com</span>
                             </li>
                         </ul>
                     </div>

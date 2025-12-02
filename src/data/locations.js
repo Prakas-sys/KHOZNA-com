@@ -18,7 +18,6 @@ export const NEPAL_LOCATIONS = [
     "Bandipur",
     "Lumbini",
     "Gorkha",
-    "Ilam",
     "Tansen",
     "Mustang",
     "Manang",
