@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search } from 'lucide-react';
+import { Search, Home, Heart } from 'lucide-react';
 
 const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
     return (
@@ -15,7 +15,11 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
                 {/* Search Bar */}
                 <div className="bg-white rounded-full shadow-lg p-2 flex items-center max-w-3xl mx-auto">
                     <div className="flex-1 flex items-center px-4">
-                        <Search className="w-5 h-5 text-gray-400 mr-3" />
+                        <div className="flex items-center gap-2 mr-3">
+                            <Search className="w-5 h-5 text-gray-400" />
+                            <Home className="w-5 h-5 text-gray-400" />
+                            <Heart className="w-5 h-5 text-red-500" fill="currentColor" />
+                        </div>
                         <input
                             type="text"
                             placeholder="Where to stay?"
