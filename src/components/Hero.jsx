@@ -41,8 +41,10 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
                         <div className="flex-1 flex items-center px-4">
                             <div className="mr-3">
                                 <svg className="w-6 h-6 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M12 3C9.5 3 7.5 4.5 7.5 7.5V9.5C5 10 3 12.5 3 15.5V19C3 20.5 4.5 22 6 22H18C19.5 22 21 20.5 21 19V15.5C21 12.5 19 10 16.5 9.5V7.5C16.5 4.5 14.5 3 12 3Z" />
-                                    <path d="M12 10C10 10 8.5 11.5 8.5 13.5C8.5 16 12 18.5 12 18.5C12 18.5 15.5 16 15.5 13.5C15.5 11.5 14 10 12 10Z" fill="white" />
+                                    {/* Magic Shape: Narrow House with Rounded Bottom Corners */}
+                                    <path d="M12 2L5 8V19C5 20.1 5.9 21 7 21H17C18.1 21 19 20.1 19 19V8L12 2Z" />
+                                    {/* Perfect Heart Cutout */}
+                                    <path d="M12 9.5C10.5 9.5 9.25 10.5 9.25 12.25C9.25 14.5 12 16.5 12 16.5C12 16.5 14.75 14.5 14.75 12.25C14.75 10.5 13.5 9.5 12 9.5Z" fill="white" />
                                 </svg>
                             </div>
                             <input
