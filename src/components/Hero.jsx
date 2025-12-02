@@ -39,11 +39,15 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
                 <div className="relative max-w-3xl mx-auto">
                     <div className="bg-white rounded-full shadow-lg p-2 flex items-center">
                         <div className="flex-1 flex items-center px-4">
-                            <div className="mr-3">
+                            <div className="mr-3 flex items-center justify-center">
                                 <img
                                     src="/mage_home-heart-fill.png"
                                     alt="Home"
-                                    className="w-5 h-5"
+                                    className="w-5 h-5 object-contain"
+                                    onError={(e) => {
+                                        console.error('Image failed to load:', e.target.src);
+                                        e.target.style.display = 'none';
+                                    }}
                                 />
                             </div>
                             <input
