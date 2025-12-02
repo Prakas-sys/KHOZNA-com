@@ -3,7 +3,7 @@ import { Facebook, Instagram, TikTok, Twitter, Video, Mail, Phone, MapPin, Globe
 
 export default function SiteFooter() {
     return (
-        <footer className="bg-sky-900 text-white pt-12 pb-24">
+        <footer className="bg-khozna-blue text-white pt-12 pb-24">
             {/* Updated Contact Info & Social Links */}
             <div className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-12">

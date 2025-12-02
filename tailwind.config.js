@@ -6,6 +6,9 @@ export default {
     ],
     theme: {
         extend: {
+            colors: {
+                'khozna-blue': '#0077B6',
+            },
             animation: {
                 'fade-in': 'fadeIn 0.3s ease-in-out',
                 'in': 'fadeIn 0.2s ease-in-out',
