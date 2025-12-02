@@ -40,11 +40,11 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
                     <div className="bg-white rounded-full shadow-lg p-2 flex items-center">
                         <div className="flex-1 flex items-center px-4">
                             <div className="mr-3">
-                                <svg className="w-6 h-6 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
-                                    {/* Tapered House Shape: Wide Top, Narrow Bottom (Girl Figure) */}
+                                <svg className="w-5 h-5 text-gray-400" viewBox="0 0 24 24" fill="currentColor">
+                                    {/* Tapered House Shape: Wide Top, Narrow Bottom */}
                                     <path d="M12 2L4 8L6.5 20C6.8 21.2 7.8 22 9 22H15C16.2 22 17.2 21.2 17.5 20L20 8L12 2Z" />
-                                    {/* Perfect Heart Cutout */}
-                                    <path d="M12 9.5C10.5 9.5 9.25 10.5 9.25 12.25C9.25 14.5 12 16.5 12 16.5C12 16.5 14.75 14.5 14.75 12.25C14.75 10.5 13.5 9.5 12 9.5Z" fill="white" />
+                                    {/* Perfect Heart Cutout - Centered Lower */}
+                                    <path d="M12 11C10.5 11 9.25 12 9.25 13.75C9.25 16 12 18 12 18C12 18 14.75 16 14.75 13.75C14.75 12 13.5 11 12 11Z" fill="white" />
                                 </svg>
                             </div>
                             <input
