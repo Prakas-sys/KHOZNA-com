@@ -718,63 +718,76 @@ function RentEaseAppContent() {
                     {/* 3. Menu Options */}
                     <div className="space-y-2">
                         {/* Personal Info */}
-                        <div className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors" onClick={() => setEditMode(true)}>
+                        <div className="flex items-center justify-between py-4 cursor-pointer hover:bg-gray-100 active:scale-[0.98] active:bg-gray-200 -mx-2 px-4 rounded-xl transition-all duration-200 group" onClick={() => setEditMode(true)}>
                             <div className="flex items-center gap-4">
-                                <User size={24} className="text-gray-500" />
-                                <span className="text-gray-700 font-medium">Personal Information</span>
+                                <div className="p-2 bg-gray-50 rounded-full group-hover:bg-white transition-colors">
+                                    <User size={20} className="text-gray-600 group-hover:text-gray-900" />
+                                </div>
+                                <span className="text-gray-700 font-medium group-hover:text-gray-900">Personal Information</span>
                             </div>
-                            <ChevronRight size={20} className="text-gray-400" />
+                            <ChevronRight size={20} className="text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all" />
                         </div>
 
                         {/* My Listings */}
                         <div
-                            className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors"
+                            className="flex items-center justify-between py-4 cursor-pointer hover:bg-gray-100 active:scale-[0.98] active:bg-gray-200 -mx-2 px-4 rounded-xl transition-all duration-200 group"
                             onClick={() => setShowMyListings(true)}
                         >
                             <div className="flex items-center gap-4">
-                                <HomeIcon size={24} className="text-gray-500" />
-                                <span className="text-gray-700 font-medium">My Listings</span>
+                                <div className="p-2 bg-gray-50 rounded-full group-hover:bg-white transition-colors">
+                                    <HomeIcon size={20} className="text-gray-600 group-hover:text-gray-900" />
+                                </div>
+                                <span className="text-gray-700 font-medium group-hover:text-gray-900">My Listings</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 {userListings.length > 0 && (
                                     <span className="bg-gray-100 text-gray-600 text-xs font-bold px-2 py-1 rounded-full">{userListings.length}</span>
                                 )}
-                                <ChevronRight size={20} className="text-gray-400" />
+                                <ChevronRight size={20} className="text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all" />
                             </div>
                         </div>
 
                         {/* KYC / Trust */}
-                        <div className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors" onClick={() => kycData ? setShowKYCDetails(true) : setShowKYCModal(true)}>
+                        <div
+                            className="flex items-center justify-between py-4 cursor-pointer hover:bg-gray-100 active:scale-[0.98] active:bg-gray-200 -mx-2 px-4 rounded-xl transition-all duration-200 group"
+                            onClick={() => kycData ? setShowKYCDetails(true) : setShowKYCModal(true)}
+                        >
                             <div className="flex items-center gap-4">
-                                <Shield size={24} className="text-gray-500" />
-                                <span className="text-gray-700 font-medium">Identity Verification</span>
+                                <div className="p-2 bg-gray-50 rounded-full group-hover:bg-white transition-colors">
+                                    <Shield size={20} className="text-gray-600 group-hover:text-gray-900" />
+                                </div>
+                                <span className="text-gray-700 font-medium group-hover:text-gray-900">Identity Verification</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 {kycData ? (
-                                    <span className="text-green-600 text-xs font-bold">Verified</span>
+                                    <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">Verified</span>
                                 ) : (
-                                    <span className="text-gray-400 text-xs">Required</span>
+                                    <span className="bg-gray-100 text-gray-500 px-2 py-0.5 rounded text-xs">Required</span>
                                 )}
-                                <ChevronRight size={20} className="text-gray-400" />
+                                <ChevronRight size={20} className="text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all" />
                             </div>
                         </div>
 
                         {/* Payments (Mock) */}
-                        <div className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors">
+                        <div className="flex items-center justify-between py-4 cursor-pointer hover:bg-gray-100 active:scale-[0.98] active:bg-gray-200 -mx-2 px-4 rounded-xl transition-all duration-200 group">
                             <div className="flex items-center gap-4">
-                                <CreditCard size={24} className="text-gray-500" />
-                                <span className="text-gray-700 font-medium">Payments & Payouts</span>
+                                <div className="p-2 bg-gray-50 rounded-full group-hover:bg-white transition-colors">
+                                    <CreditCard size={20} className="text-gray-600 group-hover:text-gray-900" />
+                                </div>
+                                <span className="text-gray-700 font-medium group-hover:text-gray-900">Payments & Payouts</span>
                             </div>
-                            <ChevronRight size={20} className="text-gray-400" />
+                            <ChevronRight size={20} className="text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all" />
                         </div>
 
                         {/* Support (Mock) */}
-                        <div className="flex items-center justify-between py-3 cursor-pointer hover:bg-gray-50 -mx-2 px-2 rounded-lg transition-colors">
+                        <div className="flex items-center justify-between py-4 cursor-pointer hover:bg-gray-100 active:scale-[0.98] active:bg-gray-200 -mx-2 px-4 rounded-xl transition-all duration-200 group">
                             <div className="flex items-center gap-4">
-                                <HelpCircle size={24} className="text-gray-500" />
-                                <span className="text-gray-700 font-medium">Support</span>
+                                <div className="p-2 bg-gray-50 rounded-full group-hover:bg-white transition-colors">
+                                    <HelpCircle size={20} className="text-gray-600 group-hover:text-gray-900" />
+                                </div>
+                                <span className="text-gray-700 font-medium group-hover:text-gray-900">Support</span>
                             </div>
-                            <ChevronRight size={20} className="text-gray-400" />
+                            <ChevronRight size={20} className="text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all" />
                         </div>
                     </div>
 
@@ -998,65 +1011,11 @@ function RentEaseAppContent() {
                     </button>
                 </div>
             </div>
-                    </div >
-                )
-}
-
-{/* My Listings Modal */ }
-{
-    showMyListings && (
-        <div className="fixed inset-0 bg-white z-50 animate-in slide-in-from-bottom duration-300 overflow-y-auto">
-            <div className="px-6 py-6">
-                <div className="flex items-center justify-between mb-8">
-                    <button onClick={() => setShowMyListings(false)} className="p-2 -ml-2 hover:bg-gray-100 rounded-full">
-                        <ChevronLeft size={24} />
-                    </button>
-                    <h2 className="text-lg font-bold">My Listings</h2>
-                    <div className="w-8"></div>
-                </div>
-
-                <div className="space-y-4">
-                    {userListings.length === 0 ? (
-                        <div className="text-center py-12 text-gray-500">
-                            <HomeIcon size={48} className="mx-auto mb-4 opacity-20" />
-                            <p>You haven't posted any listings yet.</p>
-                            <Button onClick={() => { setShowMyListings(false); handlePostProperty(); }} className="mt-4">
-                                Post Property
-                            </Button>
-                        </div>
-                    ) : (
-                        userListings.map(listing => (
-                            <div key={listing.id} className="bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm flex">
-                                <div className="w-32 h-32 bg-gray-200 shrink-0">
-                                    <img src={listing.image_url || listing.image} alt={listing.title} className="w-full h-full object-cover" />
-                                </div>
-                                <div className="p-4 flex-1 flex flex-col justify-between">
-                                    <div>
-                                        <h3 className="font-semibold text-gray-900 line-clamp-1">{listing.title}</h3>
-                                        <p className="text-sm text-gray-500">{listing.location}</p>
-                                        <p className="font-bold text-gray-900 mt-1">₹{listing.price.toLocaleString()}</p>
-                                    </div>
-                                    <div className="flex justify-end gap-2">
-                                        <button
-                                            onClick={() => handleDeleteListing(listing.id)}
-                                            className="p-2 text-red-500 hover:bg-red-50 rounded-full"
-                                            title="Delete Listing"
-                                        >
-                                            <Trash2 size={18} />
-                                        </button>
-                                    </div>
-                                </div>
-                            </div>
-                        ))
-                    )}
-                </div>
-            </div>
-        </div>
-    )
-}
-            </div >
         );
     };
+            </div >
+        );
+};
 
 // --- Reels View ---
 const ReelsView = () => {

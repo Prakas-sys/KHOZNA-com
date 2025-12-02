@@ -44,10 +44,6 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
                                     src="/mage_home-heart-fill.png"
                                     alt="Home"
                                     className="w-5 h-5 object-contain"
-                                    onError={(e) => {
-                                        console.error('Image failed to load:', e.target.src);
-                                        e.target.style.display = 'none';
-                                    }}
                                 />
                             </div>
                             <input
