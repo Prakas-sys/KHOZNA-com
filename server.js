@@ -10,7 +10,14 @@ dotenv.config();
 const app = express();
 const PORT = 3001;
 
-app.use(cors());
+app.use((req, res, next) => {
+    // Content Security Policy to allow the specific inline script hash
+    res.setHeader(
+        'Content-Security-Policy',
+        "script-src 'self' 'wasm-unsafe-eval' 'inline-speculation-rules' 'sha256-kPx0AsF0oz2kKiZ875xSvv693TBHkQ/0SkMJZnnNpnQ='"
+    );
+    next();
+});
 app.use(express.json());
 
 // Helper to load handler from api directory

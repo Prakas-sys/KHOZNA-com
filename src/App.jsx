@@ -1005,67 +1005,7 @@ function RentEaseAppContent() {
             </div>
         );
     };
-    {/* Gradient Overlay */ }
-    <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/70" />
 
-    {/* Top Bar */ }
-    <div className="absolute top-0 left-0 right-0 p-4 flex items-center justify-between text-white z-10">
-        <button
-            onClick={() => setView('explore')}
-            className="p-2 hover:bg-white/20 rounded-full"
-        >
-            <X size={24} />
-        </button>
-        <span className="text-sm">
-            {currentReelIndex + 1} / {listings.length}
-        </span>
-    </div>
-
-    {/* Property Info */ }
-    <div className="absolute bottom-20 left-0 right-0 p-6 text-white z-10">
-        <h2 className="text-2xl font-bold mb-2">{currentReel?.title}</h2>
-        <div className="flex items-center gap-2 mb-3">
-            <MapPin size={16} />
-            <span>{currentReel?.location}</span>
-        </div>
-        <p className="text-3xl font-bold mb-4">₹{currentReel?.price.toLocaleString()}</p>
-        <button
-            onClick={() => {
-                setSelectedListing(currentReel);
-                setView('details');
-            }}
-            className="w-full bg-white text-sky-600 py-3 rounded-full font-bold"
-        >
-            View Details
-        </button>
-    </div>
-
-    {/* Swipe Indicators */ }
-    <div className="absolute right-4 top-1/2 -translate-y-1/2 flex flex-col gap-6 z-10">
-        <button
-            onClick={() => handleSwipe('down')}
-            disabled={currentReelIndex === 0}
-            className={`p-3 rounded-full ${currentReelIndex === 0 ? 'bg-white/20' : 'bg-white/40 hover:bg-white/60'}`}
-        >
-            <ChevronLeft size={24} className="text-white rotate-90" />
-        </button>
-        <button
-            onClick={(e) => toggleFavorite(e, currentReel?.id)}
-            className="p-3 bg-white/40 hover:bg-white/60 rounded-full"
-        >
-            <Heart
-                size={24}
-                className={favorites.includes(currentReel?.id) ? "fill-red-500 text-red-500" : "text-white"}
-            />
-        </button>
-        <button
-            onClick={() => handleSwipe('up')}
-            disabled={currentReelIndex === listings.length - 1}
-            className={`p-3 rounded-full ${currentReelIndex === listings.length - 1 ? 'bg-white/20' : 'bg-white/40 hover:bg-white/60'}`}
-        >
-            <ChevronRight size={24} className="text-white rotate-90" />
-        </button>
-    </div>
     // --- Reels View ---
     const ReelsView = () => {
         const handleSwipe = (direction) => {
