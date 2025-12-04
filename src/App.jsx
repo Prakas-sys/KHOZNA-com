@@ -472,113 +472,74 @@ function RentEaseAppContent() {
                         </div>
                     </div>
                 </div>
-
-                {showAIModal && (
-                    <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/40">
-                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-hidden flex flex-col">
-                            <div className="p-4 border-b flex justify-between items-center bg-gradient-to-r from-violet-50 to-white">
-                                <div className="flex items-center gap-2 text-violet-600">
-                                    <Sparkles size={20} />
-                                    <h3 className="font-bold">AI Travel Planner</h3>
-                                </div>
-                                <button onClick={() => setShowAIModal(false)} className="p-1 rounded-full hover:bg-gray-100">
-                                    <X size={20} />
-                                </button>
-                            </div>
-
-                            <div className="p-6 overflow-y-auto">
-                                {isAiLoading ? (
-                                    <div className="space-y-3 animate-pulse">
-                                        <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                                        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                                        <div className="h-20 bg-gray-100 rounded-xl mt-4"></div>
-                                    </div>
-                                ) : (
-                                    <div className="text-gray-700 whitespace-pre-wrap leading-relaxed">{aiContent}</div>
-                                )}
-                            </div>
-
-                            <div className="p-4 border-t bg-gray-50 flex justify-end">
-                                <Button variant="outline" onClick={() => setShowAIModal(false)}>Close</Button>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
         );
     };
 
-    // --- Profile View ---
     const ProfileView = () => {
         const [editMode, setEditMode] = useState(false);
-        const [showMyListings, setShowMyListings] = useState(false);
         const [profileName, setProfileName] = useState(user?.user_metadata?.full_name || '');
-        const [kycData, setKycData] = useState(null);
-        const [loadingKyc, setLoadingKyc] = useState(true);
+        const [userListings, setUserListings] = useState([]);
+        const [showMyListings, setShowMyListings] = useState(false);
+        const [showKYCDetails, setShowKYCDetails] = useState(false);
         const fileInputRef = useRef(null);
+
+        // Use kycMap if available, otherwise fetch or use null. 
+        // Since kycMap is local to fetchListings, we need to access it or fetch it.
+        // For now, let's assume we fetch it or it's passed. 
+        // Actually, we should probably store kycData in a state in RentEaseAppContent if we want to access it here easily without prop drilling.
+        // But for now, let's just use the user object or fetch it if needed.
+        // Wait, the previous code used `kycMap[user?.id]`. `kycMap` was defined in `fetchListings`.
+        // We should probably lift `kycMap` to state or just fetch current user's KYC.
+        // Let's add a `currentUserKYC` state to `RentEaseAppContent` and pass it or use it.
+        // For simplicity in this fix, I will add `currentUserKYC` state.
+
+        // FIX: Accessing kycMap from fetchListings scope is not possible here.
+        // I will add a simple effect to fetch current user KYC in ProfileView.
+        const [myKYC, setMyKYC] = useState(null);
+
+        useEffect(() => {
+            const fetchMyKYC = async () => {
+                if (user) {
+                    const { data } = await supabase.from('kyc_verifications').select('*').eq('user_id', user.id).single();
+                    setMyKYC(data);
+                }
+            };
+            fetchMyKYC();
+        }, [user]);
 
         useEffect(() => {
             if (user) {
-                // Fetch user's listings
-                const fetchUserListings = async () => {
-                    try {
-                        const { data, error } = await supabase
-                            .from('listings')
-                            .select('*')
-                            .eq('user_id', user.id)
-                            .order('created_at', { ascending: false });
-
-                        if (error) {
-                            console.error('Error fetching user listings:', error.message);
-                            setUserListings([]);
-                        } else {
-                            setUserListings(data || []);
-                        }
-                    } catch (err) {
-                        console.error('Exception fetching user listings:', err);
-                        setUserListings([]);
-                    }
-                };
-
-                // Fetch KYC data
-                const fetchKycData = async () => {
-                    setLoadingKyc(true);
-                    try {
-                        const { data, error } = await supabase
-                            .from('kyc_verifications')
-                            .select('*')
-                            .eq('user_id', user.id);
-
-                        if (error) {
-                            console.warn('Error fetching KYC data:', error.message);
-                            setKycData(null);
-                        } else if (data && data.length > 0) {
-                            const sorted = data.sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
-                            setKycData(sorted[0]);
-                        } else {
-                            setKycData(null);
-                        }
-                    } catch (err) {
-                        console.error('Exception fetching KYC data:', err);
-                        setKycData(null);
-                    } finally {
-                        setLoadingKyc(false);
-                    }
-                };
-
-                fetchUserListings();
-                fetchKycData();
+                const myListings = listings.filter(l => l.user_id === user.id);
+                setUserListings(myListings);
+                if (user.user_metadata?.full_name) {
+                    setProfileName(user.user_metadata.full_name);
+                }
             }
-        }, [user]);
+        }, [user, listings]);
 
-        const handleAvatarUpload = async (event) => {
+        const handleUpdateProfile = async () => {
             try {
-                const file = event.target.files[0];
-                if (!file) return;
+                const { error } = await supabase.auth.updateUser({
+                    data: { full_name: profileName }
+                });
+                if (!error) {
+                    setEditMode(false);
+                    alert('Profile updated!');
+                }
+            } catch (err) {
+                alert('Failed to update profile');
+            }
+        };
 
+        const handleAvatarUpload = async (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+
+            try {
                 const fileExt = file.name.split('.').pop();
                 const fileName = `${user.id}-${Math.random()}.${fileExt}`;
-                const filePath = `${fileName}`;
+                const filePath = `avatars/${fileName}`;
 
                 const { error: uploadError } = await supabase.storage
                     .from('avatars')
@@ -595,66 +556,10 @@ function RentEaseAppContent() {
                 });
 
                 if (updateError) throw updateError;
-
-                await supabase
-                    .from('profiles')
-                    .update({ avatar_url: publicUrl })
-                    .eq('id', user.id);
-
-                await refreshProfile();
-                alert('Profile picture updated!');
+                alert('Avatar updated!');
             } catch (error) {
                 console.error('Error uploading avatar:', error);
-                alert('Error uploading avatar: ' + error.message);
-            }
-        };
-
-        const handleRequestEdit = async () => {
-            try {
-                const response = await fetch('/api/send-edit-request', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        userId: user.id,
-                        email: user.email,
-                        fullName: user?.user_metadata?.full_name,
-                        citizenshipNo: kycData?.citizenship_number,
-                        requestType: 'kyc_edit'
-                    })
-                });
-
-                if (response.ok) {
-                    await supabase
-                        .from('notifications')
-                        .insert({
-                            user_id: user.id,
-                            title: 'KYC Edit Request Sent',
-                            message: 'Your edit request has been sent to the admin. You will be notified once reviewed.',
-                            type: 'info',
-                            read: false
-                        });
-
-                    alert('✅ Edit request sent! Admin will review and contact you via email.');
-                } else {
-                    alert('❌ Failed to send request. Please try again.');
-                }
-            } catch (err) {
-                console.error('Error sending edit request:', err);
-                alert('❌ Error sending request. Please try again later.');
-            }
-        };
-
-        const handleUpdateProfile = async () => {
-            try {
-                const { error } = await supabase.auth.updateUser({
-                    data: { full_name: profileName }
-                });
-                if (!error) {
-                    setEditMode(false);
-                    alert('Profile updated!');
-                }
-            } catch (err) {
-                alert('Failed to update profile');
+                alert('Failed to upload avatar');
             }
         };
 
@@ -671,6 +576,49 @@ function RentEaseAppContent() {
                 }
             }
         };
+
+        if (!user) {
+            return (
+                <div className="min-h-screen bg-white pb-24 flex flex-col items-center justify-center p-6">
+                    <div className="w-24 h-24 bg-sky-100 rounded-full flex items-center justify-center mb-6">
+                        <UserCircle2 size={48} className="text-sky-600" />
+                    </div>
+                    <h2 className="text-2xl font-bold text-gray-900 mb-2">Log in to view profile</h2>
+                    <p className="text-gray-500 text-center mb-8 max-w-xs">
+                        Join our community to manage your bookings, listings, and profile details.
+                    </p>
+                    <div className="w-full max-w-xs space-y-3">
+                        <Button onClick={() => { setAuthMode('login'); setShowAuthModal(true); }} className="w-full py-3 text-lg">
+                            Log In
+                        </Button>
+                        <Button variant="outline" onClick={() => { setAuthMode('signup'); setShowAuthModal(true); }} className="w-full py-3 text-lg">
+                            Create Account
+                        </Button>
+                    </div>
+
+                    <div className="mt-12 grid grid-cols-3 gap-8 text-center w-full max-w-md">
+                        <div className="flex flex-col items-center">
+                            <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center mb-2">
+                                <Shield size={20} className="text-green-600" />
+                            </div>
+                            <span className="text-xs font-medium text-gray-600">Verified</span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center mb-2">
+                                <Sparkles size={20} className="text-purple-600" />
+                            </div>
+                            <span className="text-xs font-medium text-gray-600">AI Trips</span>
+                        </div>
+                        <div className="flex flex-col items-center">
+                            <div className="w-10 h-10 bg-orange-100 rounded-full flex items-center justify-center mb-2">
+                                <HomeIcon size={20} className="text-orange-600" />
+                            </div>
+                            <span className="text-xs font-medium text-gray-600">Hosting</span>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
 
         return (
             <div className="min-h-screen bg-white pb-24">
@@ -750,7 +698,7 @@ function RentEaseAppContent() {
                         {/* KYC / Trust */}
                         <div
                             className="flex items-center justify-between py-4 cursor-pointer hover:bg-gray-100 active:scale-[0.98] active:bg-gray-200 -mx-2 px-4 rounded-xl transition-all duration-200 group"
-                            onClick={() => kycData ? setShowKYCDetails(true) : setShowKYCModal(true)}
+                            onClick={() => myKYC ? setShowKYCDetails(true) : setShowKYCModal(true)}
                         >
                             <div className="flex items-center gap-4">
                                 <div className="p-2 bg-gray-50 rounded-full group-hover:bg-white transition-colors">
@@ -759,7 +707,7 @@ function RentEaseAppContent() {
                                 <span className="text-gray-700 font-medium group-hover:text-gray-900">Identity Verification</span>
                             </div>
                             <div className="flex items-center gap-2">
-                                {kycData ? (
+                                {myKYC ? (
                                     <span className="bg-green-100 text-green-700 px-2 py-0.5 rounded text-xs font-bold">Verified</span>
                                 ) : (
                                     <span className="bg-gray-100 text-gray-500 px-2 py-0.5 rounded text-xs">Required</span>
@@ -802,16 +750,12 @@ function RentEaseAppContent() {
                         <LogoutIcon size={18} />
                         Log Out
                     </button>
-
-                    <p className="text-center text-xs text-gray-400 mt-8">
-                        Version 1.0.0 • KHOZNA Inc.
-                    </p>
                 </div>
 
-                {/* Edit Profile Modal Overlay */}
+                {/* Edit Profile Modal */}
                 {editMode && (
                     <div className="fixed inset-0 bg-white z-50 animate-in slide-in-from-bottom duration-300 overflow-y-auto">
-                        <div className="px-6 py-6">
+                        <div className="p-6">
                             <div className="flex items-center justify-between mb-8">
                                 <h2 className="text-2xl font-bold">Edit Profile</h2>
                                 <button onClick={() => setEditMode(false)} className="p-2 hover:bg-gray-100 rounded-full">
@@ -825,188 +769,87 @@ function RentEaseAppContent() {
                                         type="text"
                                         value={profileName}
                                         onChange={(e) => setProfileName(e.target.value)}
-                                        className="w-full p-4 border border-gray-300 rounded-xl focus:ring-2 focus:ring-sky-500 outline-none"
+                                        className="w-full p-4 bg-gray-50 rounded-xl border-none focus:ring-2 focus:ring-sky-500"
                                     />
                                 </div>
-                                <Button onClick={handleUpdateProfile} className="w-full py-3">Save Changes</Button>
+                                <Button onClick={handleUpdateProfile} className="w-full py-4 text-lg">
+                                    Save Changes
+                                </Button>
                             </div>
                         </div>
                     </div>
                 )}
 
-                {/* My Listings Modal Overlay */}
+                {/* My Listings Modal */}
                 {showMyListings && (
-                    <div className="fixed inset-0 bg-white z-50 animate-in slide-in-from-right duration-300 overflow-y-auto">
-                        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-center gap-4 z-10">
-                            <button onClick={() => setShowMyListings(false)} className="p-2 hover:bg-gray-100 rounded-full">
-                                <ChevronLeft size={24} />
-                            </button>
-                            <h2 className="text-xl font-bold">My Listings</h2>
-                        </div>
-                        <div className="p-6 space-y-4">
-                            {userListings.length === 0 ? (
-                                <div className="text-center py-12 text-gray-500">
-                                    <HomeIcon size={48} className="mx-auto mb-4 opacity-20" />
-                                    <p>No listings yet.</p>
-                                </div>
-                            ) : (
-                                userListings.map(listing => (
-                                    <div key={listing.id} className="border border-gray-200 rounded-xl p-4 flex gap-4">
-                                        <img src={listing.image} alt="" className="w-24 h-24 object-cover rounded-lg bg-gray-100" />
-                                        <div className="flex-1">
-                                            <h3 className="font-semibold line-clamp-1">{listing.title}</h3>
-                                            <p className="text-sm text-gray-500 mb-2">{listing.location}</p>
-                                            <div className="flex items-center justify-between">
-                                                <span className="font-bold text-sky-600">₹{listing.price}</span>
-                                                <button
-                                                    onClick={() => handleDeleteListing(listing.id)}
-                                                    className="p-2 text-red-500 hover:bg-red-50 rounded-full"
-                                                >
-                                                    <Trash2 size={18} />
-                                                </button>
+                    <div className="fixed inset-0 bg-white z-50 animate-in slide-in-from-bottom duration-300 overflow-y-auto">
+                        <div className="p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-2xl font-bold">My Listings</h2>
+                                <button onClick={() => setShowMyListings(false)} className="p-2 hover:bg-gray-100 rounded-full">
+                                    <X size={24} />
+                                </button>
+                            </div>
+                            <div className="space-y-4">
+                                {userListings.length === 0 ? (
+                                    <p className="text-gray-500 text-center py-10">No listings yet.</p>
+                                ) : (
+                                    userListings.map(listing => (
+                                        <div key={listing.id} className="flex gap-4 p-4 bg-gray-50 rounded-xl">
+                                            <img src={listing.image_url || listing.image} alt={listing.title} className="w-20 h-20 rounded-lg object-cover" />
+                                            <div className="flex-1">
+                                                <h3 className="font-semibold">{listing.title}</h3>
+                                                <p className="text-sm text-gray-500">₹{listing.price.toLocaleString()}</p>
+                                                <button onClick={() => handleDeleteListing(listing.id)} className="text-red-500 text-sm mt-2">Delete</button>
                                             </div>
                                         </div>
-                                    </div>
-                                ))
-                            )}
+                                    ))
+                                )}
+                            </div>
                         </div>
                     </div>
                 )}
 
-                {/* KYC Details Read-Only Modal */}
-                {showKYCDetails && kycData && (
-                    <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-                        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-                            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center z-10">
-                                <div className="flex items-center gap-2">
-                                    <Shield size={20} className="text-green-600" />
-                                    <h2 className="text-xl font-bold">KYC Documents</h2>
-                                </div>
+                {/* KYC Details Modal */}
+                {showKYCDetails && myKYC && (
+                    <div className="fixed inset-0 bg-white z-50 animate-in slide-in-from-bottom duration-300 overflow-y-auto">
+                        <div className="p-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <h2 className="text-2xl font-bold">Identity Verification</h2>
                                 <button onClick={() => setShowKYCDetails(false)} className="p-2 hover:bg-gray-100 rounded-full">
                                     <X size={24} />
                                 </button>
                             </div>
-
-                            <div className="p-6 space-y-6">
-                                {/* Status Badge */}
-                                <div className="flex items-center justify-between bg-gray-50 p-4 rounded-xl border border-gray-100">
-                                    <span className="text-gray-600 font-medium">Verification Status</span>
-                                    <span className={`px-3 py-1 rounded-full text-sm font-bold ${kycData.status === 'approved' ? 'bg-green-100 text-green-700' :
-                                        kycData.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
-                                            'bg-red-100 text-red-700'
-                                        }`}>
-                                        {kycData.status?.toUpperCase()}
-                                    </span>
-                                </div>
-
-                                {/* Personal Details */}
-                                <div>
-                                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Personal Details</h3>
-                                    <div className="grid grid-cols-1 gap-4">
-                                        <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                            <p className="text-xs text-gray-500 mb-1">Citizenship Number</p>
-                                            <p className="font-mono text-gray-900 font-medium">{kycData.citizenship_number}</p>
-                                        </div>
-                                        <div className="bg-gray-50 p-3 rounded-lg border border-gray-100">
-                                            <p className="text-xs text-gray-500 mb-1">Verified Phone</p>
-                                            <div className="flex items-center gap-2">
-                                                <Phone size={14} className="text-gray-400" />
-                                                <p className="font-mono text-gray-900 font-medium">{kycData.phone_number}</p>
-                                            </div>
-                                        </div>
+                            <div className="space-y-4">
+                                <div className="p-4 bg-green-50 rounded-xl border border-green-100">
+                                    <div className="flex items-center gap-3 mb-2">
+                                        <CheckCircle className="text-green-600" size={24} />
+                                        <h3 className="font-bold text-green-800">Verified Identity</h3>
                                     </div>
+                                    <p className="text-green-700 text-sm">Your identity has been verified. You can now post properties.</p>
                                 </div>
-
-                                {/* Documents */}
-                                <div>
-                                    <h3 className="text-sm font-bold text-gray-900 uppercase tracking-wider mb-3">Submitted Documents</h3>
-                                    <div className="space-y-4">
-                                        <div>
-                                            <p className="text-sm text-gray-600 mb-2">Citizenship (Front)</p>
-                                            <div className="aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
-                                                <img
-                                                    src={kycData.citizenship_photo_url}
-                                                    alt="Citizenship Front"
-                                                    className="w-full h-full object-contain"
-                                                />
-                                            </div>
-                                        </div>
-                                        {kycData.citizenship_photo_back_url && (
-                                            <div>
-                                                <p className="text-sm text-gray-600 mb-2">Citizenship (Back)</p>
-                                                <div className="aspect-video bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
-                                                    <img
-                                                        src={kycData.citizenship_photo_back_url}
-                                                        alt="Citizenship Back"
-                                                        className="w-full h-full object-contain"
-                                                    />
-                                                </div>
-                                            </div>
-                                        )}
+                                <div className="space-y-4">
+                                    <div className="p-4 bg-gray-50 rounded-xl">
+                                        <p className="text-sm text-gray-500 mb-1">Full Name</p>
+                                        <p className="font-medium">{myKYC.full_name}</p>
                                     </div>
-                                </div>
-
-                                <div className="bg-blue-50 p-4 rounded-xl flex gap-3 items-start">
-                                    <AlertCircle size={20} className="text-blue-600 shrink-0 mt-0.5" />
-                                    <p className="text-sm text-blue-700">
-                                        These documents are read-only. To update them, please contact support or submit an edit request.
-                                    </p>
+                                    <div className="p-4 bg-gray-50 rounded-xl">
+                                        <p className="text-sm text-gray-500 mb-1">Phone Number</p>
+                                        <p className="font-medium">{myKYC.phone_number}</p>
+                                    </div>
+                                    <div className="p-4 bg-gray-50 rounded-xl">
+                                        <p className="text-sm text-gray-500 mb-1">Citizenship Number</p>
+                                        <p className="font-medium">{myKYC.citizenship_number}</p>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 )}
-                <div className="flex items-center justify-between mb-8">
-                    <button onClick={() => setEditMode(false)} className="p-2 -ml-2 hover:bg-gray-100 rounded-full">
-                        <ChevronLeft size={24} />
-                    </button>
-                    <h2 className="text-lg font-bold">Edit Profile</h2>
-                    <div className="w-8"></div> {/* Spacer */}
-                </div>
-
-                <div className="space-y-6">
-                    <div className="flex justify-center mb-8">
-                        <div className="relative">
-                            <div className="w-32 h-32 rounded-full bg-gray-200 flex items-center justify-center text-5xl font-bold text-gray-500">
-                                {user?.user_metadata?.avatar_url ? (
-                                    <img src={user.user_metadata.avatar_url} alt="Profile" className="w-full h-full object-cover rounded-full" />
-                                ) : (
-                                    (user?.user_metadata?.full_name || user?.email || 'U')[0].toUpperCase()
-                                )}
-                            </div>
-                            <button
-                                onClick={() => fileInputRef.current?.click()}
-                                className="absolute bottom-0 right-0 bg-sky-500 p-3 rounded-full shadow-lg text-white hover:bg-sky-600"
-                            >
-                                <Camera size={20} />
-                            </button>
-                        </div>
-                    </div>
-
-                    <div>
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                            <input
-                                type="email"
-                                value={user?.email}
-                                disabled
-                                className="w-full px-4 py-3 border border-gray-200 rounded-lg bg-gray-50 text-gray-500"
-                            />
-                        </div>
-
-                        <button
-                            onClick={handleUpdateProfile}
-                            className="w-full bg-sky-500 text-white py-3 rounded-lg font-bold hover:bg-sky-600 transition-colors shadow-lg shadow-sky-200"
-                        >
-                            Save Changes
-                        </button>
-                    </div>
-                </div>
             </div>
         );
     };
 
-    // --- Reels View ---
     const ReelsView = () => {
         const handleSwipe = (direction) => {
             if (direction === 'up' && currentReelIndex < listings.length - 1) {
@@ -1103,7 +946,6 @@ function RentEaseAppContent() {
         );
     };
 
-    // --- Messages View ---
     const MessagesView = () => {
         const [selectedChat, setSelectedChat] = useState(null);
         const [messageText, setMessageText] = useState('');
