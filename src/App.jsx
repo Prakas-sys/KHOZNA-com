@@ -1,21 +1,8 @@
-import React, { useState, useEffect, useMemo, useRef } from 'react';
-import {
-    Search, MapPin, Star, Heart, Filter,
-    Wifi, Car, Coffee, Tv, Wind, ChevronLeft,
-    CheckCircle, User, Menu, Globe, DollarSign, Calendar,
-    Home, Film, PlusCircle, Send, Sparkles, X, BellDot,
-    SlidersHorizontal, Building, Building2, HomeIcon, Briefcase, UserCircle2,
-    Edit, Trash2, MessageCircle, ChevronRight, Play, Pause, Shield, Flag, Phone,
-    Settings, CreditCard, HelpCircle, Camera, Lock, LogOut as LogoutIcon
-} from 'lucide-react';
-import { useAuth, AuthProvider } from './contexts/AuthContext';
-import AuthModal from './components/AuthModal';
-import CreateListingModal from './components/CreateListingModal';
-import KYCModal from './components/KYCModal';
 import ReportModal from './components/ReportModal';
 import ExploreView from './components/ExploreView';
 import KhoznaLogo from './components/KhoznaLogo';
 import LocationPermissionModal from './components/LocationPermissionModal';
+import Toast from './components/Toast';
 
 import { supabase } from './lib/supabase';
 
@@ -148,6 +135,21 @@ function RentEaseAppContent() {
     const [userListings, setUserListings] = useState([]);
     const [currentReelIndex, setCurrentReelIndex] = useState(0);
     const [loadingListings, setLoadingListings] = useState(true);
+    const [toast, setToast] = useState(null);
+
+    useEffect(() => {
+        const handleShowOtpToast = (e) => {
+            const { otp, phone } = e.detail;
+            setToast({
+                message: `🔐 OTP Code: ${otp} (sent to ${phone})`,
+                type: 'info',
+                duration: 10000
+            });
+        };
+
+        window.addEventListener('show-otp-toast', handleShowOtpToast);
+        return () => window.removeEventListener('show-otp-toast', handleShowOtpToast);
+    }, []);
 
     const propertyTypes = [
         { id: 'all', label: 'All', icon: Building },
@@ -1178,6 +1180,15 @@ function RentEaseAppContent() {
                         localStorage.setItem('locationAsked', 'true');
                         setShowLocationModal(false);
                     }}
+                />
+            )}
+
+            {toast && (
+                <Toast
+                    message={toast.message}
+                    type={toast.type}
+                    duration={toast.duration}
+                    onClose={() => setToast(null)}
                 />
             )}
         </div>

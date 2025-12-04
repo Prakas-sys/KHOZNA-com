@@ -93,10 +93,10 @@ export const AuthProvider = ({ children }) => {
                 localStorage.setItem('custom_auth_phone', phone);
                 if (fullName) localStorage.setItem('custom_auth_name', fullName);
 
-                // Show OTP to user
-                setTimeout(() => {
-                    alert(`🔐 KHOZNA Secure Verification\n\nYour OTP Code is: ${otp}\n\nPhone: ${phone}`);
-                }, 500);
+                // Dispatch event to show Toast in App.jsx
+                window.dispatchEvent(new CustomEvent('show-otp-toast', {
+                    detail: { otp, phone }
+                }));
 
                 return { session: null };
             }
