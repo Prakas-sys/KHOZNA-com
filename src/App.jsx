@@ -1,3 +1,26 @@
+import React, { useState, useEffect, useMemo, useRef } from 'react';
+import {
+    Search, MapPin, Star, Heart, Filter,
+    Wifi, Car, Coffee, Tv, Wind, ChevronLeft,
+    CheckCircle, User, Menu, Globe, DollarSign, Calendar,
+    Home, Film, PlusCircle, Send, Sparkles, X, BellDot,
+    SlidersHorizontal, Building, Building2, HomeIcon, Briefcase, UserCircle2,
+    Edit, Trash2, MessageCircle, ChevronRight, Play, Pause, Shield, Flag, Phone,
+    Settings, CreditCard, HelpCircle, Camera, Lock, LogOut as LogoutIcon
+} from 'lucide-react';
+import { useAuth, AuthProvider } from './contexts/AuthContext';
+import AuthModal from './components/AuthModal';
+import CreateListingModal from './components/CreateListingModal';
+import KYCModal from './components/KYCModal';
+import ReportModal from './components/ReportModal';
+import ExploreView from './components/ExploreView';
+import KhoznaLogo from './components/KhoznaLogo';
+import LocationPermissionModal from './components/LocationPermissionModal';
+import Toast from './components/Toast';
+
+import { supabase } from './lib/supabase';
+
+// --- API Configuration ---
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
 
 // --- Mock Data ---
