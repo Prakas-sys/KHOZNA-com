@@ -1,12 +1,3 @@
-import ReportModal from './components/ReportModal';
-import ExploreView from './components/ExploreView';
-import KhoznaLogo from './components/KhoznaLogo';
-import LocationPermissionModal from './components/LocationPermissionModal';
-import Toast from './components/Toast';
-
-import { supabase } from './lib/supabase';
-
-// --- API Configuration ---
 const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
 
 // --- Mock Data ---
