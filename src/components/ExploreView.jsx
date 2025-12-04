@@ -298,7 +298,7 @@ const ExploreView = ({
                                         <p className="text-gray-500 text-sm mb-2">{listing.location}</p>
                                         <div className="flex items-baseline gap-1">
                                             <span className="font-bold text-gray-900">Rs. {listing.price.toLocaleString()}</span>
-                                            <span className="text-gray-500 text-sm">/ night</span>
+                                            <span className="text-gray-500 text-sm">/ month</span>
                                         </div>
                                     </div>
                                 </div>

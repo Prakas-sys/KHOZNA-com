@@ -456,7 +456,7 @@ function RentEaseAppContent() {
                             <div className="flex justify-between items-baseline mb-4">
                                 <div>
                                     <span className="text-3xl font-bold text-gray-900">₹{selectedListing.price.toLocaleString()}</span>
-                                    <span className="text-gray-500 ml-2">/ night</span>
+                                    <span className="text-gray-500 ml-2">/ month</span>
                                 </div>
                             </div>
 
