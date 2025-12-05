@@ -18,7 +18,7 @@ import ChatModal from './components/ChatModal';
 import KhoznaLogo from './components/KhoznaLogo';
 import LocationPermissionModal from './components/LocationPermissionModal';
 import Toast from './components/Toast';
-
+import ConversationsView from './components/ConversationsView';
 import { supabase } from './lib/supabase';
 
 // --- API Configuration ---
@@ -977,108 +977,36 @@ function RentEaseAppContent() {
         );
     };
 
-    const MessagesView = () => {
-        const [selectedChat, setSelectedChat] = useState(null);
-        const [messageText, setMessageText] = useState('');
+    const MessagesView = () => <ConversationsView />;
+    {/* Chat Header */ }
+    <div className="bg-white px-4 py-4 border-b flex items-center gap-3">
+        <button
+            onClick={() => setSelectedChat(null)}
+            className="p-2 hover:bg-gray-100 rounded-full"
+        >
+            <ChevronLeft size={20} />
+        </button>
+        <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold">
+            {selectedChat.name[0]}
+        </div>
+        <h2 className="font-semibold text-gray-900">{selectedChat.name}</h2>
+    </div>
 
-        // Real conversations happen via Contact buttons on property cards - use them instead!
-        const conversations = [];
-
-        return (
-            <div className="min-h-screen bg-gray-50 pb-24">
-                {!selectedChat ? (
-                    <>
-                        {/* Header */}
-                        <div className="bg-white px-4 py-4 border-b">
-                            <h1 className="text-xl font-bold text-gray-900">Messages</h1>
-                        </div>
-
-                        {/* Conversations List */}
-                        <div className="divide-y">
-                            {conversations.length === 0 ? (
-                                <div className="text-center py-12">
-                                    <MessageCircle size={48} className="text-gray-300 mx-auto mb-3" />
-                                    <p className="text-gray-500">No messages yet</p>
-                                </div>
-                            ) : (
-                                conversations.map(conv => (
-                                    <div
-                                        key={conv.id}
-                                        onClick={() => setSelectedChat(conv)}
-                                        className="bg-white px-4 py-4 flex items-center gap-3 hover:bg-gray-50 cursor-pointer"
-                                    >
-                                        <div className="w-12 h-12 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold">
-                                            {conv.name[0]}
-                                        </div>
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <h3 className="font-semibold text-gray-900">{conv.name}</h3>
-                                                <span className="text-xs text-gray-500">{conv.time}</span>
-                                            </div>
-                                            <p className="text-sm text-gray-600 truncate">{conv.lastMessage}</p>
-                                        </div>
-                                        {conv.unread > 0 && (
-                                            <div className="w-6 h-6 bg-sky-500 text-white rounded-full flex items-center justify-center text-xs font-bold">
-                                                {conv.unread}
-                                            </div>
-                                        )}
-                                    </div>
-                                ))
-                            )}
-                        </div>
-                    </>
-                ) : (
-                    <>
-                        {/* Chat Header */}
-                        <div className="bg-white px-4 py-4 border-b flex items-center gap-3">
-                            <button
-                                onClick={() => setSelectedChat(null)}
-                                className="p-2 hover:bg-gray-100 rounded-full"
-                            >
-                                <ChevronLeft size={20} />
-                            </button>
-                            <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold">
-                                {selectedChat.name[0]}
-                            </div>
-                            <h2 className="font-semibold text-gray-900">{selectedChat.name}</h2>
-                        </div>
-
-                        {/* Messages */}
-                        <div className="flex-1 p-4 space-y-4">
-                            <div className="flex justify-start">
-                                <div className="bg-white px-4 py-2 rounded-2xl rounded-tl-none shadow-sm max-w-[70%]">
-                                    <p className="text-sm">{selectedChat.lastMessage}</p>
-                                    <span className="text-xs text-gray-500 mt-1 block">{selectedChat.time}</span>
-                                </div>
-                            </div>
-                            <div className="flex justify-end">
-                                <div className="bg-sky-500 text-white px-4 py-2 rounded-2xl rounded-tr-none shadow-sm max-w-[70%]">
-                                    <p className="text-sm">Yes, it's available! Would you like to schedule a viewing?</p>
-                                    <span className="text-xs text-sky-100 mt-1 block">Just now</span>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Message Input */}
-                        <div className="fixed bottom-20 left-0 right-0 bg-white border-t px-4 py-3">
-                            <div className="flex gap-2">
-                                <input
-                                    type="text"
-                                    value={messageText}
-                                    onChange={(e) => setMessageText(e.target.value)}
-                                    placeholder="Type a message..."
-                                    className="flex-1 px-4 py-2 border border-gray-300 rounded-full outline-none focus:border-sky-500"
-                                />
-                                <button className="w-12 h-12 bg-sky-500 text-white rounded-full flex items-center justify-center hover:bg-sky-600">
-                                    <Send size={20} />
-                                </button>
-                            </div>
-                        </div>
-                    </>
-                )}
+    {/* Messages */ }
+    <div className="flex-1 p-4 space-y-4">
+        <div className="flex justify-start">
+            <div className="bg-white px-4 py-2 rounded-2xl rounded-tl-none shadow-sm max-w-[70%]">
+                <p className="text-sm">{selectedChat.lastMessage}</p>
+                <span className="text-xs text-gray-500 mt-1 block">{selectedChat.time}</span>
             </div>
-        );
-    };
+        </div>
+        <div className="flex justify-end">
+            <div className="bg-sky-500 text-white px-4 py-2 rounded-2xl rounded-tr-none shadow-sm max-w-[70%]">
+                <p className="text-sm">Yes, it's available! Would you like to schedule a viewing?</p>
+                <span className="text-xs text-sky-100 mt-1 block">Just now</span>
+            </div>
+        </div>
+    </div>
 
     return (
         <div className="min-h-screen bg-gray-50">
