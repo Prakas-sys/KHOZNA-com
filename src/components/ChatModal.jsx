@@ -8,7 +8,7 @@ import OnlineStatus from './OnlineStatus';
 export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
     const { user } = useAuth();
     const { isUserOnline, getLastSeenText, getUserStatus } = useUserPresence(user?.id);
-
+    const [sellerProfile, setSellerProfile] = useState(null);
     const [conversation, setConversation] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
@@ -77,7 +77,23 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
     // Get or create conversation
     const initializeChat = async () => {
         if (!user || !listing) return;
+        // Fetch seller profile data
+        const fetchSellerProfile = async () => {
+            if (!sellerId) return;
 
+            try {
+                const { data, error } = await supabase
+                    .from('profiles')
+                    .select('full_name, avatar_url, phone')
+                    .eq('id', sellerId)
+                    .single();
+
+                if (error) throw error;
+                setSellerProfile(data);
+            } catch (error) {
+                console.error('Error fetching seller profile:', error);
+            }
+        };
         try {
             setLoading(true);
 
@@ -151,6 +167,12 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
 
         initializeChat();
     }, [isOpen, user, listing]);
+
+    useEffect(() => {
+        if (isOpen && sellerId) {
+            fetchSellerProfile();
+        }
+    }, [isOpen, sellerId]);
 
     // 🔥 REALTIME SUBSCRIPTIONS
     useEffect(() => {
@@ -413,7 +435,7 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
                     <div className="flex items-center gap-3">
                         <div className="relative">
                             <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold">
-                                {listing?.profiles?.full_name?.[0] || 'S'}
+                                {sellerProfile?.full_name?.[0] || listing?.profiles?.full_name?.[0] || 'S'}
                             </div>
                             {/* Online Status Indicator using our component */}
                             <div className="absolute -bottom-1 -right-1">
@@ -426,7 +448,7 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
                         </div>
                         <div>
                             <h3 className="font-semibold text-gray-900">
-                                {listing?.profiles?.full_name || 'Seller'}
+                                {sellerProfile?.full_name || listing?.profiles?.full_name || 'Seller'}
                             </h3>
                             <p className="text-xs text-gray-500">
                                 {sellerOnline ? (
