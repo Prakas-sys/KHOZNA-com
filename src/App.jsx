@@ -982,10 +982,7 @@ function RentEaseAppContent() {
         const [messageText, setMessageText] = useState('');
 
         // Real conversations happen via Contact buttons on property cards - use them instead!
-        const conversations = [
-            { id: 1, name: 'Rajesh S.', lastMessage: 'Is the apartment still available?', time: '2h ago', unread: 2 },
-            { id: 2, name: 'Sita M.', lastMessage: 'Thank you for your interest!', time: '1d ago', unread: 0 },
-        ];
+        const conversations = [];
 
         return (
             <div className="min-h-screen bg-gray-50 pb-24">
@@ -1106,7 +1103,6 @@ function RentEaseAppContent() {
                     handleOpenChat={handleOpenChat}
                 />
             )}
-
 
             {view === 'details' && <DetailsView />}
             {view === 'profile' && <ProfileView />}

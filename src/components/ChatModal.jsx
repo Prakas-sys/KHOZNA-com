@@ -2,9 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, Paperclip, Smile, MoreVertical, Edit2, Trash2, Search, Volume2, VolumeX, Check, CheckCheck, Reply, Download, Image as ImageIcon } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
+import { useUserPresence } from '../hooks/useUserPresence';
+import OnlineStatus from './OnlineStatus';
 
 export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
     const { user } = useAuth();
+    const { isUserOnline, getLastSeenText, getUserStatus } = useUserPresence(user?.id);
+
     const [conversation, setConversation] = useState(null);
     const [messages, setMessages] = useState([]);
     const [newMessage, setNewMessage] = useState('');
@@ -22,13 +26,15 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
     const [editingMessage, setEditingMessage] = useState(null);
     const [replyingTo, setReplyingTo] = useState(null);
     const [uploadingFile, setUploadingFile] = useState(false);
-    const [sellerOnline, setSellerOnline] = useState(false);
-    const [lastSeen, setLastSeen] = useState(null);
     const fileInputRef = useRef(null);
     const typingTimeoutRef = useRef(null);
 
     const reactions = ['👍', '❤️', '😂', '😮', '😢', '😡'];
     const reactionMap = { '👍': 'like', '❤️': 'love', '😂': 'laugh', '😮': 'wow', '😢': 'sad', '😡': 'angry' };
+
+    // Get seller's online status
+    const sellerStatus = getUserStatus(sellerId);
+    const sellerOnline = isUserOnline(sellerId);
 
     // Auto-scroll to bottom
     const scrollToBottom = () => {
@@ -220,23 +226,7 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
                     setTimeout(() => setIsTyping(false), 3000);
                 }
             })
-            // Subscribe to presence (online status)
-            .on('presence', { event: 'sync' }, () => {
-                const state = channel.presenceState();
-                const isSellerOnline = Object.values(state).some(
-                    presences => presences.some(p => p.user_id === sellerId)
-                );
-                setSellerOnline(isSellerOnline);
-            })
-            .subscribe(async (status) => {
-                if (status === 'SUBSCRIBED') {
-                    // Track own presence
-                    await channel.track({
-                        user_id: user.id,
-                        online_at: new Date().toISOString()
-                    });
-                }
-            });
+            .subscribe();
 
         return () => {
             channel.unsubscribe();
@@ -425,9 +415,14 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
                             <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold">
                                 {listing?.profiles?.full_name?.[0] || 'S'}
                             </div>
-                            {sellerOnline && (
-                                <div className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-white"></div>
-                            )}
+                            {/* Online Status Indicator using our component */}
+                            <div className="absolute -bottom-1 -right-1">
+                                <OnlineStatus
+                                    isOnline={sellerOnline}
+                                    lastSeen={sellerStatus.lastSeen}
+                                    size="sm"
+                                />
+                            </div>
                         </div>
                         <div>
                             <h3 className="font-semibold text-gray-900">
@@ -435,11 +430,9 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
                             </h3>
                             <p className="text-xs text-gray-500">
                                 {sellerOnline ? (
-                                    <span className="text-green-600">● Online</span>
-                                ) : lastSeen ? (
-                                    `Last seen ${formatTime(lastSeen)}`
+                                    <span className="text-green-600 font-medium">● Online</span>
                                 ) : (
-                                    'Offline'
+                                    <span>{getLastSeenText(sellerId)}</span>
                                 )}
                             </p>
                         </div>
@@ -511,8 +504,8 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
                                             {/* Message bubble */}
                                             <div
                                                 className={`px-4 py-2 rounded-2xl ${isOwn
-                                                        ? 'bg-sky-500 text-white rounded-tr-none'
-                                                        : 'bg-gray-200 text-gray-900 rounded-tl-none'
+                                                    ? 'bg-sky-500 text-white rounded-tr-none'
+                                                    : 'bg-gray-200 text-gray-900 rounded-tl-none'
                                                     } ${isDeleted ? 'italic opacity-60' : ''}`}
                                             >
                                                 {isDeleted ? (
@@ -614,7 +607,6 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
 
                                         {/* Reactions display */}
                                         {msg.message_reactions && msg.message_reactions.length > 0 && (
-
                                             <div className="flex gap-1 flex-wrap px-2">
                                                 {Object.entries(
                                                     msg.message_reactions.reduce((acc, r) => {
