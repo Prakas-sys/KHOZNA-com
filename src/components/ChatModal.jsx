@@ -74,26 +74,28 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
         return date.toLocaleDateString();
     };
 
+    // Fetch seller profile data
+    const fetchSellerProfile = async () => {
+        if (!sellerId) return;
+
+        try {
+            const { data, error } = await supabase
+                .from('profiles')
+                .select('full_name, avatar_url, phone')
+                .eq('id', sellerId)
+                .single();
+
+            if (error) throw error;
+            setSellerProfile(data);
+        } catch (error) {
+            console.error('Error fetching seller profile:', error);
+        }
+    };
+
     // Get or create conversation
     const initializeChat = async () => {
         if (!user || !listing) return;
-        // Fetch seller profile data
-        const fetchSellerProfile = async () => {
-            if (!sellerId) return;
 
-            try {
-                const { data, error } = await supabase
-                    .from('profiles')
-                    .select('full_name, avatar_url, phone')
-                    .eq('id', sellerId)
-                    .single();
-
-                if (error) throw error;
-                setSellerProfile(data);
-            } catch (error) {
-                console.error('Error fetching seller profile:', error);
-            }
-        };
         try {
             setLoading(true);
 
@@ -164,7 +166,6 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
 
     useEffect(() => {
         if (!isOpen || !user || !listing) return;
-
         initializeChat();
     }, [isOpen, user, listing]);
 
