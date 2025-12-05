@@ -981,7 +981,7 @@ function RentEaseAppContent() {
         const [selectedChat, setSelectedChat] = useState(null);
         const [messageText, setMessageText] = useState('');
 
-        // Mock conversations for now
+        // Real conversations happen via Contact buttons on property cards - use them instead!
         const conversations = [
             { id: 1, name: 'Rajesh S.', lastMessage: 'Is the apartment still available?', time: '2h ago', unread: 2 },
             { id: 2, name: 'Sita M.', lastMessage: 'Thank you for your interest!', time: '1d ago', unread: 0 },
