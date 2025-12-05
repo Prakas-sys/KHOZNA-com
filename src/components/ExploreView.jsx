@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
     Search, MapPin, SlidersHorizontal, Building, HomeIcon, Building2, Briefcase,
-    UserCircle2, BellDot, LogOut, Heart, Star, Map as MapIcon, List
+    UserCircle2, BellDot, LogOut, Heart, Star, Map as MapIcon, List, MessageCircle
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
@@ -42,7 +42,8 @@ const ExploreView = ({
     handlePostProperty,
     handleCardClick,
     favorites,
-    toggleFavorite
+    toggleFavorite,
+    handleOpenChat
 }) => {
     const [showMap, setShowMap] = useState(false);
     const [showAutocomplete, setShowAutocomplete] = useState(false);
@@ -300,6 +301,18 @@ const ExploreView = ({
                                             <span className="font-bold text-gray-900">Rs. {listing.price.toLocaleString()}</span>
                                             <span className="text-gray-500 text-sm">/ month</span>
                                         </div>
+
+                                        {/* Contact Button */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                handleOpenChat(listing);
+                                            }}
+                                            className="mt-3 w-full bg-green-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
+                                        >
+                                            <MessageCircle size={16} />
+                                            Contact
+                                        </button>
                                     </div>
                                 </div>
                             ))}

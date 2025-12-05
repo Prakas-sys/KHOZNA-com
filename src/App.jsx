@@ -14,6 +14,7 @@ import CreateListingModal from './components/CreateListingModal';
 import KYCModal from './components/KYCModal';
 import ReportModal from './components/ReportModal';
 import ExploreView from './components/ExploreView';
+import ChatModal from './components/ChatModal';
 import KhoznaLogo from './components/KhoznaLogo';
 import LocationPermissionModal from './components/LocationPermissionModal';
 import Toast from './components/Toast';
@@ -145,6 +146,8 @@ function RentEaseAppContent() {
     const [showKYCDetails, setShowKYCDetails] = useState(false); // New state for read-only view
     const [showReportModal, setShowReportModal] = useState(false);
     const [showLocationModal, setShowLocationModal] = useState(false);
+    const [showChatModal, setShowChatModal] = useState(false);
+    const [chatListing, setChatListing] = useState(null);
     const [listings, setListings] = useState([]);
     const [userListings, setUserListings] = useState([]);
     const [currentReelIndex, setCurrentReelIndex] = useState(0);
@@ -263,6 +266,18 @@ function RentEaseAppContent() {
     };
 
 
+
+
+
+    const handleOpenChat = (listing) => {
+        if (!user) {
+            setAuthMode('login');
+            setShowAuthModal(true);
+            return;
+        }
+        setChatListing(listing);
+        setShowChatModal(true);
+    };
 
     const handleCardClick = (listing) => {
         setSelectedListing(listing);
@@ -1088,6 +1103,7 @@ function RentEaseAppContent() {
                     handleCardClick={handleCardClick}
                     favorites={favorites}
                     toggleFavorite={toggleFavorite}
+                    handleOpenChat={handleOpenChat}
                 />
             )}
 
@@ -1174,6 +1190,14 @@ function RentEaseAppContent() {
                 onClose={() => setShowReportModal(false)}
                 listing={selectedListing}
             />
+
+            <ChatModal
+                isOpen={showChatModal}
+                onClose={() => setShowChatModal(false)}
+                listing={chatListing}
+                sellerId={chatListing?.user_id}
+            />
+
 
             {showLocationModal && (
                 <LocationPermissionModal
