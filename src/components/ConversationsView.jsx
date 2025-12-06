@@ -49,10 +49,6 @@ export default function ConversationsView({ onSelectChat }) {
                 .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
                 .order('updated_at', { ascending: false });
 
-            console.log('🔍 Fetching conversations for user:', user.id);
-            console.log('📊 Raw conversations data:', data);
-            console.log('❌ Fetch error:', error);
-
             if (error) throw error;
 
             // For each conversation, get the other user's profile
@@ -152,26 +148,6 @@ export default function ConversationsView({ onSelectChat }) {
             <div className="bg-white border-b sticky top-0 z-10">
                 <div className="p-4">
                     <h1 className="text-2xl font-bold text-gray-900 mb-4">Messages</h1>
-
-                    {/* DEBUG INFO */}
-                    <div className="bg-yellow-100 p-2 mb-2 text-xs font-mono rounded">
-                        <p>User: {user ? (user.user_metadata?.full_name || user.email || 'No Name') : 'Not logged in'}</p>
-                        <p className="text-[10px] text-gray-500">ID: {user ? user.id : '-'}</p>
-                        <p>Loading: {loading ? 'Yes' : 'No'}</p>
-                        <p>Conversations: {conversations.length}</p>
-                        <div className="flex gap-2 mt-1">
-                            <button onClick={async () => {
-                                const { data } = await supabase.from('conversations').select('*').eq('seller_id', user.id);
-                                console.log('As Seller:', data);
-                                alert(`Found ${data?.length} as seller`);
-                            }} className="bg-blue-500 text-white px-2 py-1 rounded">Check Seller</button>
-                            <button onClick={async () => {
-                                const { data } = await supabase.from('conversations').select('*').eq('buyer_id', user.id);
-                                console.log('As Buyer:', data);
-                                alert(`Found ${data?.length} as buyer`);
-                            }} className="bg-green-500 text-white px-2 py-1 rounded">Check Buyer</button>
-                        </div>
-                    </div>
 
                     {/* Search */}
                     <div className="relative">

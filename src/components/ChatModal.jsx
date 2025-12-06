@@ -302,7 +302,6 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
                         <div>
                             <h3 className="font-semibold text-gray-900">
                                 {sellerProfile?.full_name || 'Seller'}
-                                <span className="text-[10px] text-gray-400 ml-2 font-mono">({sellerId})</span>
                             </h3>
                             <p className="text-xs text-gray-500">
                                 {sellerOnline ? (
