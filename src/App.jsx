@@ -19,6 +19,7 @@ import KhoznaLogo from './components/KhoznaLogo';
 import LocationPermissionModal from './components/LocationPermissionModal';
 import Toast from './components/Toast';
 import ConversationsView from './components/ConversationsView';
+import ChatView from './components/ChatView';
 import { supabase } from './lib/supabase';
 
 // --- API Configuration ---
@@ -976,79 +977,16 @@ function RentEaseAppContent() {
             </div>
         );
     };
+
     const MessagesView = () => {
         const [selectedChat, setSelectedChat] = useState(null);
-        const [messageText, setMessageText] = useState('');
-        const messagesEndRef = useRef(null);
-
-        const scrollToBottom = () => {
-            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-        };
-
-        useEffect(() => {
-            scrollToBottom();
-        }, [selectedChat]);
 
         if (selectedChat) {
             return (
-                <div className="min-h-screen bg-gray-50 pb-24 flex flex-col">
-                    {/* Header */}
-                    <div className="bg-white px-4 py-4 border-b flex items-center gap-3 shadow-sm">
-                        <button
-                            onClick={() => setSelectedChat(null)}
-                            className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-                        >
-                            <ChevronLeft size={20} />
-                        </button>
-                        <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white font-bold shadow-sm">
-                            {selectedChat.name?.[0]?.toUpperCase() || 'U'}
-                        </div>
-                        <div className="flex-1">
-                            <h2 className="font-semibold text-gray-900">{selectedChat.name}</h2>
-                            <p className="text-xs text-gray-500">Active now</p>
-                        </div>
-                    </div>
-
-                    {/* Messages Container */}
-                    <div className="flex-1 p-4 space-y-4 overflow-y-auto">
-                        {/* Received Message */}
-                        <div className="flex justify-start animate-in fade-in slide-in-from-left duration-300">
-                            <div className="bg-white px-4 py-2 rounded-2xl rounded-tl-none shadow-sm max-w-[75%]">
-                                <p className="text-sm text-gray-800">{selectedChat.lastMessage || "Hi, is this still available?"}</p>
-                                <span className="text-xs text-gray-400 mt-1 block">{selectedChat.time || "10:30 AM"}</span>
-                            </div>
-                        </div>
-
-                        {/* Sent Message */}
-                        <div className="flex justify-end animate-in fade-in slide-in-from-right duration-300">
-                            <div className="bg-gradient-to-br from-sky-500 to-sky-600 text-white px-4 py-2 rounded-2xl rounded-tr-none shadow-sm max-w-[75%]">
-                                <p className="text-sm">Yes, it's available! Would you like to schedule a viewing?</p>
-                                <span className="text-xs text-sky-100 mt-1 block">Just now</span>
-                            </div>
-                        </div>
-                        <div ref={messagesEndRef} />
-                    </div>
-
-                    {/* Input */}
-                    <div className="bg-white border-t p-4 shadow-lg">
-                        <div className="flex gap-2 items-center">
-                            <input
-                                type="text"
-                                value={messageText}
-                                onChange={(e) => setMessageText(e.target.value)}
-                                placeholder="Type a message..."
-                                className="flex-1 px-4 py-3 bg-gray-100 rounded-full focus:outline-none focus:ring-2 focus:ring-sky-500 focus:bg-white transition-all"
-                                onKeyPress={(e) => e.key === 'Enter' && messageText.trim() && setMessageText('')}
-                            />
-                            <button
-                                className="p-3 bg-gradient-to-br from-sky-500 to-sky-600 text-white rounded-full hover:shadow-lg hover:scale-105 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                                disabled={!messageText.trim()}
-                            >
-                                <Send size={20} />
-                            </button>
-                        </div>
-                    </div>
-                </div>
+                <ChatView
+                    initialConversation={selectedChat}
+                    onBack={() => setSelectedChat(null)}
+                />
             );
         }
 

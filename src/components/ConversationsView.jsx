@@ -7,16 +7,14 @@ import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserPresence } from '../hooks/useUserPresence';
 import OnlineStatus from './OnlineStatus';
-import ChatModal from './ChatModal';
 
-export default function ConversationsView() {
+export default function ConversationsView({ onSelectChat }) {
     const { user } = useAuth();
     const { isUserOnline, getLastSeenText, getUserStatus } = useUserPresence(user?.id);
 
     const [conversations, setConversations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
-    const [selectedConversation, setSelectedConversation] = useState(null);
 
     // Fetch all conversations
     const fetchConversations = async () => {
@@ -135,7 +133,7 @@ export default function ConversationsView() {
     );
 
     return (
-        <div className="flex flex-col h-screen bg-gray-50">
+        <div className="flex flex-col h-full bg-gray-50">
             {/* Header */}
             <div className="bg-white border-b sticky top-0 z-10">
                 <div className="p-4">
@@ -176,7 +174,7 @@ export default function ConversationsView() {
                             return (
                                 <div
                                     key={conv.id}
-                                    onClick={() => setSelectedConversation(conv)}
+                                    onClick={() => onSelectChat && onSelectChat(conv)}
                                     className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
                                 >
                                     <div className="p-4 flex items-center gap-3">
@@ -240,16 +238,6 @@ export default function ConversationsView() {
                     </div>
                 )}
             </div>
-
-            {/* Chat Modal */}
-            {selectedConversation && (
-                <ChatModal
-                    isOpen={!!selectedConversation}
-                    onClose={() => setSelectedConversation(null)}
-                    listing={selectedConversation.listings}
-                    sellerId={selectedConversation.otherUser?.id}
-                />
-            )}
         </div>
     );
 }
