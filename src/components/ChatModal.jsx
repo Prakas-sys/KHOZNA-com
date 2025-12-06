@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { X, Send, Paperclip, Smile, MoreVertical, Edit2, Trash2, Search, Volume2, VolumeX, Check, CheckCheck, Reply, Download, Image as ImageIcon } from 'lucide-react';
+import { X, Send, Edit2, Trash2, Search, Volume2, VolumeX, Check, CheckCheck } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserPresence } from '../hooks/useUserPresence';
@@ -16,13 +16,10 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
     const [loading, setLoading] = useState(true);
     const messagesEndRef = useRef(null);
 
-    const [isTyping, setIsTyping] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [showSearch, setShowSearch] = useState(false);
     const [soundEnabled, setSoundEnabled] = useState(true);
     const [editingMessage, setEditingMessage] = useState(null);
-    const [replyingTo, setReplyingTo] = useState(null);
-    const typingTimeoutRef = useRef(null);
 
     const sellerStatus = getUserStatus(sellerId);
     const sellerOnline = isUserOnline(sellerId);
@@ -205,7 +202,6 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
             }
 
             setNewMessage('');
-            setReplyingTo(null);
         } catch (error) {
             console.error('Error sending message:', error);
             alert('Failed to send message');
@@ -323,16 +319,6 @@ export default function ChatModal({ isOpen, onClose, listing, sellerId }) {
                                 </div>
                             );
                         })
-                    )}
-                    {isTyping && (
-                        <div className="flex items-center gap-2 text-gray-500 text-sm">
-                            <div className="flex gap-1">
-                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                                <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                            </div>
-                            <span>Typing...</span>
-                        </div>
                     )}
                     <div ref={messagesEndRef} />
                 </div>
