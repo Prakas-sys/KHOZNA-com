@@ -32,7 +32,7 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
                     Find your next stay
                 </h1>
                 <p className="text-lg md:text-xl text-gray-600 mb-8">
-                    Search deals on Homes, hotels, and much more...
+                    Search for rental rooms, apartments, and houses across Nepal
                 </p>
 
                 {/* Search Bar */}

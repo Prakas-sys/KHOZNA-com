@@ -91,7 +91,7 @@ export default function ConversationsView({ onSelectChat }) {
         fetchConversations();
     }, [user]);
 
-    // Subscribe to new messages
+    // Subscribe to new messages and conversations
     useEffect(() => {
         if (!user) return;
 
@@ -103,6 +103,16 @@ export default function ConversationsView({ onSelectChat }) {
                 table: 'messages'
             }, () => {
                 fetchConversations(); // Refresh on any message change
+            })
+            .on('postgres_changes', {
+                event: '*',
+                schema: 'public',
+                table: 'conversations'
+            }, (payload) => {
+                // Only refresh if the conversation involves the current user
+                if (payload.new.buyer_id === user.id || payload.new.seller_id === user.id) {
+                    fetchConversations();
+                }
             })
             .subscribe();
 
