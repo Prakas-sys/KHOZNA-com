@@ -29,7 +29,7 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
         <section className="bg-gradient-to-b from-[#90E0EF] to-[#CAF0F8] pt-16 pb-16 px-4">
             <div className="max-w-4xl mx-auto text-center">
                 <h1 className="text-4xl md:text-6xl font-bold text-gray-800 mb-4">
-                    Find your next stay
+                    Find Rooms & Apartments for Rent in Nepal
                 </h1>
                 <p className="text-lg md:text-xl text-gray-600 mb-8">
                     Search for rental rooms, apartments, and houses across Nepal
