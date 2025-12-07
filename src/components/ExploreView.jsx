@@ -47,40 +47,7 @@ const ExploreView = ({
 }) => {
     const [showMap, setShowMap] = useState(false);
     const [showAutocomplete, setShowAutocomplete] = useState(false);
-    const [showNotifications, setShowNotifications] = useState(false);
-    const [notifications, setNotifications] = useState([]);
-    const [unreadCount, setUnreadCount] = useState(0);
 
-    // Fetch notifications
-    useEffect(() => {
-        if (user) {
-            fetchNotifications();
-        }
-    }, [user]);
-
-    const fetchNotifications = async () => {
-        if (!user) return;
-        const { data, error } = await supabase
-            .from('notifications')
-            .select('*')
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false })
-            .limit(10);
-
-        if (!error && data) {
-            setNotifications(data);
-            setUnreadCount(data.filter(n => !n.is_read).length);
-        }
-    };
-
-    const markAsRead = async (notificationId) => {
-        await supabase
-            .from('notifications')
-            .update({ is_read: true })
-            .eq('id', notificationId);
-
-        fetchNotifications();
-    };
 
     const propertyTypes = [
         { id: 'all', label: 'All', icon: Building },
