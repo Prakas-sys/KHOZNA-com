@@ -269,14 +269,25 @@ function RentEaseAppContent() {
 
 
 
-
-    const handleOpenChat = (listing) => {
+    const handleOpenChat = async (listing) => {
         if (!user) {
             setAuthMode('login');
             setShowAuthModal(true);
             return;
         }
-        setChatListing(listing);
+
+        // Fetch owner's profile
+        const { data: ownerProfile } = await supabase
+            .from('profiles')
+            .select('id, full_name, avatar_url')
+            .eq('id', listing.user_id)
+            .single();
+
+        // Attach profile to listing
+        setChatListing({
+            ...listing,
+            profiles: ownerProfile || { full_name: 'Property Owner' }
+        });
         setShowChatModal(true);
     };
 
