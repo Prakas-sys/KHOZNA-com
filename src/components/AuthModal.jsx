@@ -32,7 +32,7 @@ export default function AuthModal({ isOpen, onClose, mode: initialMode = 'login'
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: window.location.origin
+                    redirectTo: `${window.location.origin}/auth/callback`
                 }
             })
             if (error) throw error
@@ -182,8 +182,8 @@ export default function AuthModal({ isOpen, onClose, mode: initialMode = 'login'
                                 <button
                                     onClick={() => setAuthMethod('email')}
                                     className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${authMethod === 'email'
-                                            ? 'bg-white text-sky-600 shadow-sm'
-                                            : 'text-gray-600 hover:text-gray-900'
+                                        ? 'bg-white text-sky-600 shadow-sm'
+                                        : 'text-gray-600 hover:text-gray-900'
                                         }`}
                                 >
                                     <Mail size={16} className="inline mr-2" />
@@ -192,8 +192,8 @@ export default function AuthModal({ isOpen, onClose, mode: initialMode = 'login'
                                 <button
                                     onClick={() => setAuthMethod('phone')}
                                     className={`flex-1 py-2 px-4 rounded-md font-medium transition-colors ${authMethod === 'phone'
-                                            ? 'bg-white text-sky-600 shadow-sm'
-                                            : 'text-gray-600 hover:text-gray-900'
+                                        ? 'bg-white text-sky-600 shadow-sm'
+                                        : 'text-gray-600 hover:text-gray-900'
                                         }`}
                                 >
                                     <Phone size={16} className="inline mr-2" />
