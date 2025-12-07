@@ -32,7 +32,7 @@ export default function AuthModal({ isOpen, onClose, mode: initialMode = 'login'
             const { error } = await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
-                    redirectTo: `${window.location.origin}/auth/callback`
+                    redirectTo: 'https://khozna-com.vercel.app'
                 }
             })
             if (error) throw error
