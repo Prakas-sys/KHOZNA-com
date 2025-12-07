@@ -53,11 +53,12 @@ export default function ChatModal({ isOpen, onClose, listing }) {
     }, [conversation, user]);
 
     const initializeChat = async () => {
+        console.log('🔵 initializeChat START', { user, listing });
         try {
             setLoading(true);
 
             // Determine participants
-            const propertyOwnerId = listing.user_id;
+            console.log('🔵 Participants:', { propertyOwnerId, currentUserId: user.id });
             const currentUserId = user.id;
 
             // Property owner is always participant_1
