@@ -99,56 +99,9 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     };
 
     const verifyDocumentWithAI = async (file) => {
-        const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
-        if (!apiKey) {
-            console.warn("OpenRouter API Key not found. Skipping AI validation.");
-            return true;
-        }
-
-        try {
-            // Convert file to base64
-            const base64 = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.readAsDataURL(file);
-            });
-
-            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${apiKey}`,
-                    'Content-Type': 'application/json',
-                    'HTTP-Referer': window.location.origin,
-                    'X-Title': 'KHOZNA KYC Verification'
-                },
-                body: JSON.stringify({
-                    model: 'google/gemini-flash-1.5-8b',
-                    messages: [{
-                        role: 'user',
-                        content: [
-                            {
-                                type: 'text',
-                                text: 'You are a document verification AI for Nepal. Analyze this image. Is it a valid Nepalese Citizenship Card (Nagarikta) or Passport? It can be the front or back side. If it looks like a valid ID document, respond with "VALID". If it is a random photo, selfie, object, landscape, or clearly not an ID, respond with "INVALID". Only respond with one word: VALID or INVALID.'
-                            },
-                            {
-                                type: 'image_url',
-                                image_url: { url: base64 }
-                            }
-                        ]
-                    }]
-                })
-            });
-
-            if (!response.ok) throw new Error('AI Verification Failed');
-
-            const data = await response.json();
-            const result = data.choices?.[0]?.message?.content?.trim().toUpperCase();
-
-            return result === 'VALID';
-        } catch (error) {
-            console.error("AI Verification Error:", error);
-            throw new Error('Document verification failed. Please upload a valid citizenship document.');
-        }
+        // AI verification bypassed - documents will be manually reviewed by admin
+        console.log("Document uploaded for manual review");
+        return true;
     };
 
     const handleStep1Submit = async () => {
