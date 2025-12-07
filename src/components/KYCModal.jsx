@@ -98,53 +98,51 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
         return { frontUrl: frontData.publicUrl, backUrl: backData.publicUrl };
     };
 
-    const fileToGenerativePart = async (file) => {
-        const base64EncodedDataPromise = new Promise((resolve) => {
-            const reader = new FileReader();
-            reader.onloadend = () => resolve(reader.result.split(',')[1]);
-            reader.readAsDataURL(file);
-        });
-        return {
-            inlineData: { data: await base64EncodedDataPromise, mimeType: file.type },
-        };
-    };
-
     const verifyDocumentWithAI = async (file) => {
-        const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
+        const apiKey = import.meta.env.VITE_OPENROUTER_API_KEY;
         if (!apiKey) {
-            console.warn("Gemini API Key not found. Skipping AI validation (Dev Mode).");
+            console.warn("OpenRouter API Key not found. Skipping AI validation.");
             return true;
         }
 
-        const prompt = `
-You are a document verification AI for Nepal.
-Analyze this image. Is it a valid Nepalese Citizenship Card (Nagarikta) or Passport?
-It can be the front or back side.
-
-If it looks like a valid ID document, respond with "VALID".
-If it is a random photo, selfie, object, landscape, or clearly not an ID, respond with "INVALID".
-Only respond with one word: VALID or INVALID.
-`;
-
         try {
-            const imagePart = await fileToGenerativePart(file);
+            // Convert file to base64
+            const base64 = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onloadend = () => resolve(reader.result);
+                reader.readAsDataURL(file);
+            });
 
-            const response = await fetch(
-                `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-exp:generateContent?key=${apiKey}`,
-                {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        contents: [{
-                            parts: [{ text: prompt }, imagePart]
-                        }]
-                    }),
-                }
-            );
+            const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+                method: 'POST',
+                headers: {
+                    'Authorization': `Bearer ${apiKey}`,
+                    'Content-Type': 'application/json',
+                    'HTTP-Referer': window.location.origin,
+                    'X-Title': 'KHOZNA KYC Verification'
+                },
+                body: JSON.stringify({
+                    model: 'google/gemini-flash-1.5-8b',
+                    messages: [{
+                        role: 'user',
+                        content: [
+                            {
+                                type: 'text',
+                                text: 'You are a document verification AI for Nepal. Analyze this image. Is it a valid Nepalese Citizenship Card (Nagarikta) or Passport? It can be the front or back side. If it looks like a valid ID document, respond with "VALID". If it is a random photo, selfie, object, landscape, or clearly not an ID, respond with "INVALID". Only respond with one word: VALID or INVALID.'
+                            },
+                            {
+                                type: 'image_url',
+                                image_url: { url: base64 }
+                            }
+                        ]
+                    }]
+                })
+            });
 
             if (!response.ok) throw new Error('AI Verification Failed');
+
             const data = await response.json();
-            const result = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim().toUpperCase();
+            const result = data.choices?.[0]?.message?.content?.trim().toUpperCase();
 
             return result === 'VALID';
         } catch (error) {
