@@ -18,7 +18,13 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     const [otp, setOtp] = useState('');
     const [lastSentOtp, setLastSentOtp] = useState(''); // For testing/demo purposes
     const [resendCooldown, setResendCooldown] = useState(0);
-
+    const formatCitizenshipNumber = (value) => {
+        const numbers = value.replace(/\D/g, '');
+        if (numbers.length <= 2) return numbers;
+        if (numbers.length <= 4) return `${numbers.slice(0, 2)}-${numbers.slice(2)}`;
+        if (numbers.length <= 6) return `${numbers.slice(0, 2)}-${numbers.slice(2, 4)}-${numbers.slice(4)}`;
+        return `${numbers.slice(0, 2)}-${numbers.slice(2, 4)}-${numbers.slice(4, 6)}-${numbers.slice(6, 11)}`;
+    };
     // MOVED: if (!isOpen) return null; check is now at the bottom to prevent Hook errors
 
     useEffect(() => {
@@ -457,7 +463,12 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                                 <input
                                     type="text"
                                     value={citizenshipNumber}
-                                    onChange={(e) => setCitizenshipNumber(e.target.value)}
+                                    onChange={(e) => {
+                                        const formatted = formatCitizenshipNumber(e.target.value);
+                                        if (formatted.replace(/\D/g, '').length <= 11) {
+                                            setCitizenshipNumber(formatted);
+                                        }
+                                    }}
                                     placeholder="e.g. 12-34-56-78901"
                                     className="w-full px-4 py-3 border border-gray-300 rounded-xl outline-none focus:border-sky-500 focus:ring-2 focus:ring-sky-100"
                                 />
