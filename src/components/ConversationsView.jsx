@@ -1,100 +1,21 @@
-// src/components/ConversationsView.jsx
-// Shows list of all conversations for the Messages page
-
 import React, { useState, useEffect } from 'react';
-import { Send, Search } from 'lucide-react';
+import { Send, Search, MessageCircle } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { useUserPresence } from '../hooks/useUserPresence';
-import OnlineStatus from './OnlineStatus';
+import ChatModal from './ChatModal';
 
-export default function ConversationsView({ onSelectChat }) {
+export default function ConversationsView() {
     const { user } = useAuth();
-    const { isUserOnline, getLastSeenText, getUserStatus } = useUserPresence(user?.id);
-
     const [conversations, setConversations] = useState([]);
     const [loading, setLoading] = useState(true);
     const [searchQuery, setSearchQuery] = useState('');
-
-    // Fetch all conversations
-    const fetchConversations = async () => {
-        if (!user) return;
-
-        try {
-            setLoading(true);
-
-            // Get conversations where user is buyer or seller
-            const { data, error } = await supabase
-                .from('conversations')
-                .select(`
-                    id,
-                    listing_id,
-                    buyer_id,
-                    seller_id,
-                    created_at,
-                    updated_at,
-                    listings (
-                        id,
-                        title,
-                        photo_url
-                    ),
-                    messages (
-                        id,
-                        content,
-                        created_at,
-                        sender_id,
-                        read_at
-                    )
-                `)
-                .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
-                .order('updated_at', { ascending: false });
-
-            if (error) throw error;
-
-            // For each conversation, get the other user's profile
-            const conversationsWithProfiles = await Promise.all(
-                data.map(async (conv) => {
-                    const otherUserId = conv.buyer_id === user.id ? conv.seller_id : conv.buyer_id;
-
-                    const { data: profile } = await supabase
-                        .from('profiles')
-                        .select('id, full_name, avatar_url, phone')
-                        .eq('id', otherUserId)
-                        .single();
-
-                    // Get last message
-                    const lastMessage = conv.messages?.[conv.messages.length - 1];
-
-                    // Count unread messages
-                    const unreadCount = conv.messages?.filter(
-                        m => m.sender_id !== user.id && !m.read_at
-                    ).length || 0;
-
-                    return {
-                        ...conv,
-                        otherUser: profile,
-                        lastMessage,
-                        unreadCount
-                    };
-                })
-            );
-
-            setConversations(conversationsWithProfiles);
-        } catch (error) {
-            console.error('Error fetching conversations:', error);
-        } finally {
-            setLoading(false);
-        }
-    };
+    const [selectedConversation, setSelectedConversation] = useState(null);
 
     useEffect(() => {
+        if (!user) return;
         fetchConversations();
-    }, [user]);
 
-    // Subscribe to new messages and conversations
-    useEffect(() => {
-        if (!user) return;
-
+        // Real-time subscription for new messages
         const channel = supabase
             .channel('conversations_updates')
             .on('postgres_changes', {
@@ -102,17 +23,7 @@ export default function ConversationsView({ onSelectChat }) {
                 schema: 'public',
                 table: 'messages'
             }, () => {
-                fetchConversations(); // Refresh on any message change
-            })
-            .on('postgres_changes', {
-                event: '*',
-                schema: 'public',
-                table: 'conversations'
-            }, (payload) => {
-                // Only refresh if the conversation involves the current user
-                if (payload.new.buyer_id === user.id || payload.new.seller_id === user.id) {
-                    fetchConversations();
-                }
+                fetchConversations();
             })
             .subscribe();
 
@@ -121,8 +32,111 @@ export default function ConversationsView({ onSelectChat }) {
         };
     }, [user]);
 
-    // Format timestamp
+    const fetchConversations = async () => {
+        if (!user) return;
+
+        try {
+            setLoading(true);
+
+            // Get all conversations where user is a participant
+            const { data: convData, error: convError } = await supabase
+                .from('conversations')
+                .select(`
+                    id,
+                    listing_id,
+                    participant_1_id,
+                    participant_2_id,
+                    last_message_at,
+                    created_at
+                `)
+                .or(`participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`)
+                .order('last_message_at', { ascending: false });
+
+            if (convError) throw convError;
+
+            if (!convData || convData.length === 0) {
+                setConversations([]);
+                setLoading(false);
+                return;
+            }
+
+            // Get unique listing IDs
+            const listingIds = [...new Set(convData.map(c => c.listing_id))];
+
+            // Fetch listings
+            const { data: listingsData } = await supabase
+                .from('listings')
+                .select('id, title, image_url')
+                .in('id', listingIds);
+
+            const listingsMap = (listingsData || []).reduce((acc, l) => {
+                acc[l.id] = l;
+                return acc;
+            }, {});
+
+            // Get unique user IDs (other participants)
+            const userIds = convData.map(c =>
+                c.participant_1_id === user.id ? c.participant_2_id : c.participant_1_id
+            );
+
+            // Fetch profiles
+            const { data: profilesData } = await supabase
+                .from('profiles')
+                .select('id, full_name, avatar_url')
+                .in('id', userIds);
+
+            const profilesMap = (profilesData || []).reduce((acc, p) => {
+                acc[p.id] = p;
+                return acc;
+            }, {});
+
+            // Get last message for each conversation
+            const convIds = convData.map(c => c.id);
+            const { data: messagesData } = await supabase
+                .from('messages')
+                .select('id, conversation_id, content, created_at, sender_id, read_at')
+                .in('conversation_id', convIds)
+                .order('created_at', { ascending: false });
+
+            // Group messages by conversation and get the latest
+            const lastMessagesMap = {};
+            const unreadCountMap = {};
+
+            messagesData?.forEach(msg => {
+                if (!lastMessagesMap[msg.conversation_id]) {
+                    lastMessagesMap[msg.conversation_id] = msg;
+                }
+                // Count unread messages from other person
+                if (msg.sender_id !== user.id && !msg.read_at) {
+                    unreadCountMap[msg.conversation_id] = (unreadCountMap[msg.conversation_id] || 0) + 1;
+                }
+            });
+
+            // Combine everything
+            const enrichedConversations = convData.map(conv => {
+                const otherUserId = conv.participant_1_id === user.id
+                    ? conv.participant_2_id
+                    : conv.participant_1_id;
+
+                return {
+                    ...conv,
+                    listing: listingsMap[conv.listing_id] || { title: 'Property', image_url: null },
+                    otherUser: profilesMap[otherUserId] || { full_name: 'User', avatar_url: null },
+                    lastMessage: lastMessagesMap[conv.id] || null,
+                    unreadCount: unreadCountMap[conv.id] || 0
+                };
+            });
+
+            setConversations(enrichedConversations);
+        } catch (error) {
+            console.error('Error fetching conversations:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
     const formatTime = (timestamp) => {
+        if (!timestamp) return '';
         const date = new Date(timestamp);
         const now = new Date();
         const diff = now - date;
@@ -136,20 +150,27 @@ export default function ConversationsView({ onSelectChat }) {
         return date.toLocaleDateString();
     };
 
-    // Filter conversations by search
     const filteredConversations = conversations.filter(conv =>
         conv.otherUser?.full_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        conv.listings?.title?.toLowerCase().includes(searchQuery.toLowerCase())
+        conv.listing?.title?.toLowerCase().includes(searchQuery.toLowerCase())
     );
 
+    if (!user) {
+        return (
+            <div className="flex flex-col items-center justify-center h-full bg-gray-50 p-6">
+                <MessageCircle size={64} className="text-gray-300 mb-4" />
+                <h2 className="text-xl font-bold text-gray-900 mb-2">Sign in to view messages</h2>
+                <p className="text-gray-500 text-center">Log in to start chatting with property owners</p>
+            </div>
+        );
+    }
+
     return (
-        <div className="flex flex-col h-full bg-gray-50">
+        <div className="flex flex-col h-screen bg-gray-50 pb-20">
             {/* Header */}
             <div className="bg-white border-b sticky top-0 z-10">
                 <div className="p-4">
                     <h1 className="text-2xl font-bold text-gray-900 mb-4">Messages</h1>
-
-                    {/* Search */}
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
                         <input
@@ -177,77 +198,81 @@ export default function ConversationsView({ onSelectChat }) {
                     </div>
                 ) : (
                     <div className="divide-y">
-                        {filteredConversations.map((conv) => {
-                            const isOnline = isUserOnline(conv.otherUser?.id);
-                            const otherUserStatus = getUserStatus(conv.otherUser?.id);
+                        {filteredConversations.map((conv) => (
+                            <div
+                                key={conv.id}
+                                onClick={() => setSelectedConversation(conv)}
+                                className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
+                            >
+                                <div className="p-4 flex items-center gap-3">
+                                    {/* Avatar */}
+                                    <div className="flex-shrink-0">
+                                        {conv.otherUser?.avatar_url ? (
+                                            <img
+                                                src={conv.otherUser.avatar_url}
+                                                alt={conv.otherUser.full_name}
+                                                className="w-14 h-14 rounded-full object-cover"
+                                            />
+                                        ) : (
+                                            <div className="w-14 h-14 rounded-full bg-gradient-to-br from-sky-400 to-sky-600 flex items-center justify-center text-white font-bold text-lg">
+                                                {conv.otherUser?.full_name?.[0] || '?'}
+                                            </div>
+                                        )}
+                                    </div>
 
-                            return (
-                                <div
-                                    key={conv.id}
-                                    onClick={() => onSelectChat && onSelectChat(conv)}
-                                    className="bg-white hover:bg-gray-50 cursor-pointer transition-colors"
-                                >
-                                    <div className="p-4 flex items-center gap-3">
-                                        {/* Avatar */}
-                                        <div className="relative flex-shrink-0">
-                                            {conv.otherUser?.avatar_url ? (
-                                                <img
-                                                    src={conv.otherUser.avatar_url}
-                                                    alt={conv.otherUser.full_name}
-                                                    className="w-14 h-14 rounded-full object-cover"
-                                                />
-                                            ) : (
-                                                <div className="w-14 h-14 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold text-lg">
-                                                    {conv.otherUser?.full_name?.[0] || '?'}
+                                    {/* Conversation Info */}
+                                    <div className="flex-1 min-w-0">
+                                        <div className="flex items-center justify-between mb-1">
+                                            <h3 className="font-semibold text-gray-900 truncate">
+                                                {conv.otherUser?.full_name || 'Unknown User'}
+                                            </h3>
+                                            {conv.lastMessage && (
+                                                <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
+                                                    {formatTime(conv.lastMessage.created_at)}
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        <div className="flex items-center justify-between">
+                                            <p className="text-sm text-gray-600 truncate">
+                                                {conv.lastMessage?.content || 'No messages yet'}
+                                            </p>
+                                            {conv.unreadCount > 0 && (
+                                                <div className="flex-shrink-0 ml-2 bg-sky-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                                                    {conv.unreadCount}
                                                 </div>
                                             )}
-
-                                            {/* Online Status */}
-                                            <div className="absolute bottom-0 right-0">
-                                                <OnlineStatus
-                                                    isOnline={isOnline}
-                                                    lastSeen={otherUserStatus.lastSeen}
-                                                    size="sm"
-                                                />
-                                            </div>
                                         </div>
 
-                                        {/* Conversation Info */}
-                                        <div className="flex-1 min-w-0">
-                                            <div className="flex items-center justify-between mb-1">
-                                                <h3 className="font-semibold text-gray-900 truncate">
-                                                    {conv.otherUser?.full_name || 'Unknown User'}
-                                                </h3>
-                                                {conv.lastMessage && (
-                                                    <span className="text-xs text-gray-500 flex-shrink-0 ml-2">
-                                                        {formatTime(conv.lastMessage.created_at)}
-                                                    </span>
-                                                )}
-                                            </div>
-
-                                            <div className="flex items-center justify-between">
-                                                <p className="text-sm text-gray-600 truncate">
-                                                    {conv.lastMessage?.content || 'No messages yet'}
-                                                </p>
-                                                {conv.unreadCount > 0 && (
-                                                    <div className="flex-shrink-0 ml-2 bg-sky-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
-                                                        {conv.unreadCount}
-                                                    </div>
-                                                )}
-                                            </div>
-
-                                            {/* Property Title */}
-                                            <p className="text-xs text-gray-400 mt-1 truncate">
-                                                📍 {conv.listings?.title || 'Property'}
-                                            </p>
-                                        </div>
+                                        {/* Property Title */}
+                                        <p className="text-xs text-gray-400 mt-1 truncate">
+                                            📍 {conv.listing?.title || 'Property'}
+                                        </p>
                                     </div>
                                 </div>
-                            );
-                        })}
+                            </div>
+                        ))}
                     </div>
                 )}
             </div>
+
+            {/* Chat Modal */}
+            {selectedConversation && (
+                <ChatModal
+                    isOpen={!!selectedConversation}
+                    onClose={() => {
+                        setSelectedConversation(null);
+                        fetchConversations(); // Refresh list when closing
+                    }}
+                    listing={{
+                        ...selectedConversation.listing,
+                        user_id: selectedConversation.participant_1_id === user.id
+                            ? selectedConversation.participant_2_id
+                            : selectedConversation.participant_1_id,
+                        profiles: selectedConversation.otherUser
+                    }}
+                />
+            )}
         </div>
     );
 }
