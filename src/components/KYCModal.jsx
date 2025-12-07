@@ -152,10 +152,7 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                 return result === 'VALID';
             } catch (error) {
                 console.error("AI Verification Error:", error);
-                // If API fails (network, quota), we might want to fail open or closed. 
-                // For security, we should probably warn but allow manual review if it's just a network glitch.
-                // But if it's an invalid image, we want to block.
-                return true; // Fallback to allow if AI fails
+                throw new Error('Document verification failed. Please upload a valid citizenship document.');
             }
         };
 
