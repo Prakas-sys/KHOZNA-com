@@ -22,8 +22,7 @@ import ConversationsView from './components/ConversationsView';
 import ChatView from './components/ChatView';
 import { supabase } from './lib/supabase';
 
-// --- API Configuration ---
-const apiKey = import.meta.env.VITE_GEMINI_API_KEY || "";
+
 
 // --- Mock Data ---
 const LISTINGS = [
@@ -135,9 +134,7 @@ function RentEaseAppContent() {
     const [listingType, setListingType] = useState('rent'); // 'rent' or 'sale'
     const [bookingStep, setBookingStep] = useState(0);
 
-    const [showAIModal, setShowAIModal] = useState(false);
-    const [aiContent, setAiContent] = useState('');
-    const [isAiLoading, setIsAiLoading] = useState(false);
+
 
     const [showAuthModal, setShowAuthModal] = useState(false);
     const [authMode, setAuthMode] = useState('login');
