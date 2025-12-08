@@ -193,7 +193,21 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
     // Send message
     const handleSendMessage = async (e) => {
         e?.preventDefault();
-        if (!newMessage.trim() || !conversation) return;
+
+        if (!user) {
+            alert("Please log in to send a message.");
+            return;
+        }
+
+        if (!newMessage.trim()) return;
+
+        if (!conversation) {
+            console.error("No conversation initialized. User:", user?.id, "Listing:", listing?.id);
+            alert("Chat not ready yet. Please wait or reload.");
+            // Try initializing again?
+            initializeChat();
+            return;
+        }
 
         console.log('Attempting to send message...', { conversationId: conversation.id, userId: user.id });
 

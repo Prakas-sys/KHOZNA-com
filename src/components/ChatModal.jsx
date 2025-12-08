@@ -132,7 +132,19 @@ export default function ChatModal({ isOpen, onClose, listing }) {
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
-        if (!newMessage.trim() || !conversation) return;
+
+        if (!user) {
+            alert("Please log in to chat.");
+            return;
+        }
+
+        if (!newMessage.trim()) return;
+
+        if (!conversation) {
+            alert("Chat loading... please wait.");
+            initializeChat();
+            return;
+        }
 
         try {
             setSending(true);
