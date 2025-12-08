@@ -394,7 +394,7 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                                         </div>
 
                                         {/* Message actions */}
-                                        <div className={`absolute ${isOwn ? 'left-0' : 'right-0'} top-0 -translate-x-full group-hover:opacity-100 opacity-0 transition-opacity flex gap-1 px-2`}>
+                                        <div className={`absolute ${isOwn ? 'left-0' : 'right-0'} top-0 -translate-x-full flex gap-1 px-2`}>
                                             {isOwn && (
                                                 <>
                                                     <button
