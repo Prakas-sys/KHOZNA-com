@@ -114,48 +114,6 @@ const ExploreView = ({
             />
 
             <Hero
-                searchQuery={searchQuery}
-                setSearchQuery={setSearchQuery}
-                onSearch={handleSearch}
-            />
-
-            <div id="listings-section" className="max-w-7xl mx-auto px-4 py-12">
-                {/* Beautiful Rent/Sale Toggle */}
-                <div className="flex justify-center mb-12">
-                    <div className="relative inline-flex p-1.5 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full shadow-lg">
-                        {/* Background slider */}
-                        <div
-                            className={`absolute top-1.5 h-[calc(100%-12px)] w-[calc(50%-6px)] bg-gradient-to-br from-sky-400 to-sky-600 rounded-full shadow-xl transition-all duration-300 ease-out ${listingType === 'rent' ? 'left-1.5' : 'left-[calc(50%+1.5px)]'
-                                }`}
-                            style={{
-                                boxShadow: '0 8px 16px rgba(14, 165, 233, 0.4), inset 0 2px 4px rgba(255,255,255,0.3)'
-                            }}
-                        />
-
-                        {/* For Rent Button */}
-                        <button
-                            onClick={() => setListingType('rent')}
-                            className={`relative z-10 px-12 py-4 rounded-full text-lg font-bold transition-all duration-300 ${listingType === 'rent'
-                                    ? 'text-white scale-105'
-                                    : 'text-gray-600 hover:text-gray-800'
-                                }`}
-                        >
-                            For Rent
-                        </button>
-
-                        {/* For Sale Button */}
-                        <button
-                            onClick={() => setListingType('sale')}
-                            className={`relative z-10 px-12 py-4 rounded-full text-lg font-bold transition-all duration-300 ${listingType === 'sale'
-                                    ? 'text-white scale-105'
-                                    : 'text-gray-600 hover:text-gray-800'
-                                }`}
-                        >
-                            For Sale
-                        </button>
-                    </div>
-                </div>
-
                 {/* Listing Controls (Map Toggle) */}
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold text-gray-800">
@@ -276,7 +234,7 @@ const ExploreView = ({
 
 
             <SiteFooter />
-        </div>
+        </div >
     );
 };
 
