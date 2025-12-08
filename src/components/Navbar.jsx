@@ -16,34 +16,26 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                             </div>
                         </div>
 
-                        {/* Desktop Navigation - Airbnb Style: Icon on Top, Text Below */}
-                        <div className="hidden md:flex items-center gap-4">
-                            {/* House Button - Airbnb Style */}
-                            <button className="flex flex-col items-center gap-2 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all duration-200 cursor-pointer group border border-gray-200 hover:border-gray-300 hover:shadow-md">
-                                {/* Icon Container - EVEN BIGGER */}
-                                <div className="w-28 h-28 flex items-center justify-center bg-white rounded-xl transition-transform duration-200 group-hover:scale-105">
-                                    <img
-                                        src="/House PNG.png"
-                                        alt="House"
-                                        className="w-24 h-24 object-contain"
-                                    />
-                                </div>
-                                {/* Text Below */}
-                                <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">House</span>
+                        {/* Desktop Navigation - Clean Style: Just Icons and Text */}
+                        <div className="hidden md:flex items-center gap-8">
+                            {/* House - Clean */}
+                            <button className="flex flex-col items-center gap-2 transition-all duration-200 cursor-pointer group">
+                                <img
+                                    src="/House PNG.png"
+                                    alt="House"
+                                    className="w-24 h-24 object-contain transition-transform duration-200 group-hover:scale-110"
+                                />
+                                <span className="text-sm font-medium text-gray-700 group-hover:text-sky-600 transition-colors">House</span>
                             </button>
 
-                            {/* Apartment Button - Airbnb Style */}
-                            <button className="flex flex-col items-center gap-2 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all duration-200 cursor-pointer group border border-gray-200 hover:border-gray-300 hover:shadow-md">
-                                {/* Icon Container - EVEN BIGGER */}
-                                <div className="w-28 h-28 flex items-center justify-center bg-white rounded-xl transition-transform duration-200 group-hover:scale-105">
-                                    <img
-                                        src="/Apartment png.png"
-                                        alt="Apartment"
-                                        className="w-24 h-24 object-contain"
-                                    />
-                                </div>
-                                {/* Text Below */}
-                                <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">Apartment</span>
+                            {/* Apartment - Clean */}
+                            <button className="flex flex-col items-center gap-2 transition-all duration-200 cursor-pointer group">
+                                <img
+                                    src="/Apartment png.png"
+                                    alt="Apartment"
+                                    className="w-24 h-24 object-contain transition-transform duration-200 group-hover:scale-110"
+                                />
+                                <span className="text-sm font-medium text-gray-700 group-hover:text-sky-600 transition-colors">Apartment</span>
                             </button>
                         </div>
 
