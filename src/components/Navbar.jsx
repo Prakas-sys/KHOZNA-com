@@ -16,8 +16,8 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                             </div>
                         </div>
 
-                        {/* Desktop Navigation - Clean Style: Just Icons and Text */}
-                        <div className="hidden md:flex items-center gap-8">
+                        {/* Desktop Navigation - CENTERED Clean Style */}
+                        <div className="hidden md:flex items-center gap-12 absolute left-1/2 transform -translate-x-1/2">
                             {/* House - Clean */}
                             <button className="flex flex-col items-center gap-2 transition-all duration-200 cursor-pointer group">
                                 <img
