@@ -66,28 +66,35 @@ export default function ChatModal({ isOpen, onClose, listing }) {
             }
 
             // STEP 1: Find or create conversation
-            let { data: conv } = await supabase
-                .from("conversations")
-                .select("*")
-                .or(
-                    `and(participant_1_id.eq.${ownerId},participant_2_id.eq.${currentUserId}),
-           and(participant_1_id.eq.${currentUserId},participant_2_id.eq.${ownerId})`
-                )
-                .maybeSingle();
+            // SIMPLIFIED QUERY TO FIX 400 ERROR
+            const { data: potentialConvs, error: preciseError } = await supabase
+                .from('conversations')
+                .select('*')
+                .eq('listing_id', listing.id)
+                .or(`participant_1_id.eq.${currentUserId},participant_2_id.eq.${currentUserId}`);
+
+            if (preciseError) throw preciseError;
+
+            let conv = null;
+            if (potentialConvs && potentialConvs.length > 0) {
+                conv = potentialConvs.find(c =>
+                    (c.participant_1_id === currentUserId && c.participant_2_id === ownerId) ||
+                    (c.participant_1_id === ownerId && c.participant_2_id === currentUserId)
+                );
+            }
 
             if (!conv) {
                 const { data: newConv, error } = await supabase
                     .from("conversations")
                     .insert({
+                        listing_id: listing.id,
                         participant_1_id: ownerId,
                         participant_2_id: currentUserId,
-                        listing_id: listing.id,
                     })
                     .select()
                     .single();
 
                 if (error) throw error;
-
                 conv = newConv;
             }
 
@@ -129,21 +136,38 @@ export default function ChatModal({ isOpen, onClose, listing }) {
 
         try {
             setSending(true);
+            const content = newMessage.trim();
 
-            const { error } = await supabase.from("messages").insert({
+            // Optimistic Update
+            const processingId = 'temp-' + Date.now();
+            const tempMsg = {
+                id: processingId,
                 conversation_id: conversation.id,
                 sender_id: user.id,
-                content: newMessage.trim(),
-            });
+                content: content,
+                created_at: new Date().toISOString(),
+                is_read: false
+            };
+
+            setMessages(prev => [...prev, tempMsg]);
+            setNewMessage("");
+
+            const { data, error } = await supabase.from("messages").insert({
+                conversation_id: conversation.id,
+                sender_id: user.id,
+                content: content,
+            }).select().single();
 
             if (error) throw error;
+
+            // Replace temp with real
+            setMessages(prev => prev.map(m => m.id === processingId ? data : m));
 
             await supabase
                 .from("conversations")
                 .update({ last_message_at: new Date().toISOString() })
                 .eq("id", conversation.id);
 
-            setNewMessage("");
         } catch (err) {
             console.error("Send error:", err);
             alert("Failed to send message.");
