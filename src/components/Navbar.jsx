@@ -109,6 +109,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                             </div>
                         </div>
                     )}
+                </div>
             </nav>
             {/* Spacer to prevent content from going under fixed navbar */}
             <div className="h-24"></div>
