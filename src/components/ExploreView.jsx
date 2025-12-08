@@ -120,21 +120,11 @@ const ExploreView = ({
             />
 
             <div id="listings-section" className="max-w-7xl mx-auto px-4 py-12">
-                {/* Listing Controls (Map Toggle) */}
+                {/* Listing Controls (Map Toggle) - REMOVED */}
                 <div className="flex items-center justify-between mb-6">
                     <h2 className="text-2xl font-bold text-gray-800">
                         {listingType === 'rent' ? 'Properties for Rent' : 'Properties for Sale'}
                     </h2>
-
-                    <div className="flex gap-2">
-                        <button
-                            onClick={() => setShowMap(!showMap)}
-                            className={`p-2 rounded-full shadow-sm border transition-colors ${showMap ? 'bg-sky-600 text-white border-sky-600' : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'}`}
-                            title={showMap ? "Show List" : "Show Map"}
-                        >
-                            {showMap ? <List size={20} /> : <MapIcon size={20} />}
-                        </button>
-                    </div>
                 </div>
 
                 {/* Content Area (List or Map) */}
@@ -195,6 +185,16 @@ const ExploreView = ({
                                                 size={16}
                                                 className={favorites.includes(listing.id) ? "fill-red-500 text-red-500" : "text-gray-700"}
                                             />
+                                        </button>
+                                        {/* Map Icon - Top Left - RESTORED */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                // Could open map view or show location
+                                            }}
+                                            className="absolute top-3 left-3 p-2 rounded-full bg-sky-500/90 backdrop-blur-sm hover:bg-sky-600 transition-colors shadow-md"
+                                        >
+                                            <MapIcon size={16} className="text-white" />
                                         </button>
                                     </div>
                                     <div className="p-4">
