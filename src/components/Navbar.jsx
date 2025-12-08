@@ -19,7 +19,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                         {/* Desktop Navigation - CENTERED Clean Style */}
                         <div className="hidden md:flex items-center gap-12 absolute left-1/2 transform -translate-x-1/2">
                             {/* House - Clean */}
-                            <button className="flex flex-col items-center gap-2 transition-all duration-200 cursor-pointer group">
+                            <button className="flex flex-col items-center gap-1 transition-all duration-200 cursor-pointer group">
                                 <img
                                     src="/House PNG.png"
                                     alt="House"
@@ -29,7 +29,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                             </button>
 
                             {/* Apartment - Clean */}
-                            <button className="flex flex-col items-center gap-2 transition-all duration-200 cursor-pointer group">
+                            <button className="flex flex-col items-center gap-1 transition-all duration-200 cursor-pointer group">
                                 <img
                                     src="/Apartment png.png"
                                     alt="Apartment"
