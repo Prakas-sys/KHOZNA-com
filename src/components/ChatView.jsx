@@ -75,33 +75,35 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
             if (!currentConv) {
                 if (!listing) return;
 
-                // Check existing conversation - FIXED: using participant_1_id and participant_2_id
-                if (convError) {
-                    console.error('Error finding conversation:', convError);
-                    // Don't throw here, try to create new one or handle gracefully
-                }
-
-                // Robust filtering in JS if SQL is tricky with complex ORs
-                // Use the precise query for the specific pair of users on this specific listing
-                const { data: preciseConv, error: preciseError } = await supabase
+                // SIMPLIFIED QUERY TO FIX 400 ERROR
+                // 1. Fetch all conversations for this listing involved with this user
+                // 2. Filter in JS to find the specific pair
+                const { data: potentialConvs, error: preciseError } = await supabase
                     .from('conversations')
                     .select('*')
                     .eq('listing_id', listing.id)
-                    .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${effectiveSellerId}),and(participant_1_id.eq.${effectiveSellerId},participant_2_id.eq.${user.id})`)
-                    .maybeSingle();
+                    .or(`participant_1_id.eq.${user.id},participant_2_id.eq.${user.id}`);
 
                 if (preciseError) throw preciseError;
 
-                let existingConv = preciseConv;
+                let existingConv = null;
+                if (potentialConvs && potentialConvs.length > 0) {
+                    existingConv = potentialConvs.find(c =>
+                        (c.participant_1_id === user.id && c.participant_2_id === effectiveSellerId) ||
+                        (c.participant_1_id === effectiveSellerId && c.participant_2_id === user.id)
+                    );
+                }
 
                 if (!existingConv) {
-                    // Create new conversation - FIXED: using participant_1_id and participant_2_id
+                    // Create new conversation
+                    console.log('Creating new conversation for', { user: user.id, seller: effectiveSellerId, listing: listing.id });
+
                     const { data: newConv, error: createError } = await supabase
                         .from('conversations')
                         .insert({
                             listing_id: listing.id,
                             participant_1_id: user.id,
-                            participant_2_id: sellerId
+                            participant_2_id: effectiveSellerId
                         })
                         .select()
                         .single();
