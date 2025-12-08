@@ -154,6 +154,50 @@ function RentEaseAppContent() {
     const [currentReelIndex, setCurrentReelIndex] = useState(0);
     const [loadingListings, setLoadingListings] = useState(true);
     const [toast, setToast] = useState(null);
+    const [unreadCount, setUnreadCount] = useState(0);
+
+    // --- Unread Messages Badge Logic ---
+    useEffect(() => {
+        if (!user) {
+            setUnreadCount(0);
+            return;
+        }
+
+        const fetchUnreadCount = async () => {
+            try {
+                // RLS ensures we only count messages in our conversations
+                const { count, error } = await supabase
+                    .from('messages')
+                    .select('id', { count: 'exact', head: true })
+                    .eq('is_read', false)
+                    .neq('sender_id', user.id); // Only count messages sent by others
+
+                if (!error) {
+                    setUnreadCount(count || 0);
+                }
+            } catch (err) {
+                console.error('Error fetching unread count:', err);
+            }
+        };
+
+        fetchUnreadCount();
+
+        // Subscribe to real-time changes to update badge immediately
+        const channel = supabase.channel('global_unread_messages')
+            .on('postgres_changes', {
+                event: '*', // Listen to INSERT (new msg) and UPDATE (read status change)
+                schema: 'public',
+                table: 'messages'
+            }, () => {
+                // Simply refetch the count on any change for accuracy
+                fetchUnreadCount();
+            })
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
+    }, [user]);
 
     useEffect(() => {
         const handleShowOtpToast = (e) => {
@@ -1085,9 +1129,16 @@ function RentEaseAppContent() {
 
                     <div
                         onClick={() => setView('messages')}
-                        className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'messages' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
+                        className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'messages' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors relative`}
                     >
-                        <Send size={24} strokeWidth={view === 'messages' ? 2.5 : 2} />
+                        <div className="relative">
+                            <Send size={24} strokeWidth={view === 'messages' ? 2.5 : 2} />
+                            {unreadCount > 0 && (
+                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center border-2 border-white shadow-sm animate-pulse">
+                                    {unreadCount > 99 ? '99+' : unreadCount}
+                                </span>
+                            )}
+                        </div>
                         <span className={`text-[10px] ${view === 'messages' ? 'font-semibold' : 'font-medium'}`}>Messages</span>
                     </div>
 

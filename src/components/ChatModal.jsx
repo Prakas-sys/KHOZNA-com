@@ -56,12 +56,23 @@ export default function ChatModal({ isOpen, onClose, listing }) {
         try {
             setLoading(true);
 
-            const ownerId = listing.user_id;
-            const currentUserId = user.id;
+            const ownerId = listing?.user_id;
+            const currentUserId = user?.id;
+
+            console.log("🚀 InitChat Starting:", {
+                listingId: listing?.id,
+                ownerId,
+                currentUserId,
+                listingObj: listing
+            });
+
+            if (!listing) {
+                throw new Error("Listing data is missing completely.");
+            }
 
             if (!ownerId || !currentUserId) {
-                console.error("Missing user IDs");
-                alert("Cannot start chat: Missing user information.");
+                console.error("Missing user IDs", { ownerId, currentUserId });
+                alert(`Cannot start chat. Missing Info: Owner=${ownerId}, You=${currentUserId}`);
                 return;
             }
 
@@ -122,9 +133,11 @@ export default function ChatModal({ isOpen, onClose, listing }) {
                 .single();
 
             setOtherUser(profile);
+
         } catch (err) {
-            console.error("Chat init error:", err);
-            alert("Could not load chat.");
+            console.error("Chat init CRITICAL ERROR:", err);
+            // SHOW THE REAL ERROR TO THE USER
+            alert(`Debug Error: ${err.message || JSON.stringify(err)}`);
         } finally {
             setLoading(false);
         }

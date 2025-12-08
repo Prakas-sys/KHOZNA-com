@@ -140,6 +140,26 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
         }
     }, [user, listing, initialConversation]);
 
+    // Mark as read when messages are loaded
+    useEffect(() => {
+        const markAsRead = async () => {
+            if (!messages.length || !user || !conversation) return;
+
+            const unreadIds = messages
+                .filter(m => !m.is_read && m.sender_id !== user.id)
+                .map(m => m.id);
+
+            if (unreadIds.length > 0) {
+                await supabase
+                    .from('messages')
+                    .update({ is_read: true })
+                    .in('id', unreadIds);
+            }
+        };
+
+        markAsRead();
+    }, [messages, user, conversation]);
+
     useEffect(() => {
         if (effectiveSellerId) {
             fetchSellerProfile();
