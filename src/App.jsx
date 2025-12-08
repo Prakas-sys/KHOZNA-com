@@ -162,6 +162,8 @@ function RentEaseAppContent() {
 
         const fetchUnreadCount = async () => {
             try {
+                console.log('🔴 Fetching unread count for user:', user.id);
+
                 // RLS ensures we only count messages in our conversations
                 const { count, error } = await supabase
                     .from('messages')
@@ -169,11 +171,16 @@ function RentEaseAppContent() {
                     .eq('is_read', false)
                     .neq('sender_id', user.id); // Only count messages sent by others
 
-                if (!error) {
+                console.log('🔴 Unread count result:', { count, error });
+
+                if (error) {
+                    console.error('🔴 Error fetching unread count:', error);
+                } else {
+                    console.log('🔴 Setting unread count to:', count);
                     setUnreadCount(count || 0);
                 }
             } catch (err) {
-                console.error('Error fetching unread count:', err);
+                console.error('🔴 Critical error fetching unread count:', err);
             }
         };
 
@@ -185,7 +192,8 @@ function RentEaseAppContent() {
                 event: '*', // Listen to INSERT (new msg) and UPDATE (read status change)
                 schema: 'public',
                 table: 'messages'
-            }, () => {
+            }, (payload) => {
+                console.log('🔴 Message change detected, refetching count:', payload);
                 // Simply refetch the count on any change for accuracy
                 fetchUnreadCount();
             })
