@@ -80,8 +80,8 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                     .from('conversations')
                     .select('*')
                     .eq('listing_id', listing.id)
-                    .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${sellerId}),and(participant_1_id.eq.${sellerId},participant_2_id.eq.${user.id})`);
-
+                    .or(`participant_1_id.eq.${user.id},participant_1_id.eq.${sellerId}`)
+                    .or(`participant_2_id.eq.${sellerId},participant_2_id.eq.${user.id}`)
                 if (convError) throw convError;
 
                 let existingConv = existingConvs && existingConvs.length > 0 ? existingConvs[0] : null;
@@ -292,8 +292,8 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                                         {/* Message bubble */}
                                         <div
                                             className={`px-4 py-2 rounded-2xl ${isOwn
-                                                    ? 'bg-sky-500 text-white rounded-tr-none'
-                                                    : 'bg-white text-gray-900 rounded-tl-none border border-gray-100 shadow-sm'
+                                                ? 'bg-sky-500 text-white rounded-tr-none'
+                                                : 'bg-white text-gray-900 rounded-tl-none border border-gray-100 shadow-sm'
                                                 }`}
                                         >
                                             <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
