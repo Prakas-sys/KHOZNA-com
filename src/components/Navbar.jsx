@@ -21,11 +21,11 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                             {/* House Button - Airbnb Style */}
                             <button className="flex flex-col items-center gap-2 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all duration-200 cursor-pointer group border border-gray-200 hover:border-gray-300 hover:shadow-md">
                                 {/* Icon Container - BIGGER */}
-                                <div className="w-16 h-16 flex items-center justify-center bg-white rounded-xl transition-transform duration-200 group-hover:scale-105">
+                                <div className="w-24 h-24 flex items-center justify-center bg-white rounded-xl transition-transform duration-200 group-hover:scale-105">
                                     <img
                                         src="/House PNG.png"
                                         alt="House"
-                                        className="w-12 h-12 object-contain"
+                                        className="w-20 h-20 object-contain"
                                     />
                                 </div>
                                 {/* Text Below */}
@@ -35,11 +35,11 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                             {/* Apartment Button - Airbnb Style */}
                             <button className="flex flex-col items-center gap-2 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all duration-200 cursor-pointer group border border-gray-200 hover:border-gray-300 hover:shadow-md">
                                 {/* Icon Container - BIGGER */}
-                                <div className="w-16 h-16 flex items-center justify-center bg-white rounded-xl transition-transform duration-200 group-hover:scale-105">
+                                <div className="w-24 h-24 flex items-center justify-center bg-white rounded-xl transition-transform duration-200 group-hover:scale-105">
                                     <img
                                         src="/Apartment png.png"
                                         alt="Apartment"
-                                        className="w-12 h-12 object-contain"
+                                        className="w-20 h-20 object-contain"
                                     />
                                 </div>
                                 {/* Text Below */}
