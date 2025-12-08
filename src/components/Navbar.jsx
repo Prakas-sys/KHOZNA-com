@@ -16,39 +16,35 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                             </div>
                         </div>
 
-                        {/* Desktop Navigation - Professional 8-Point Grid System */}
-                        <div className="hidden md:flex items-center gap-8">
-                            {/* House - Golden Ratio Proportions */}
-                            <div className="flex items-center gap-3 px-6 py-3 rounded-2xl hover:bg-sky-50 transition-all duration-300 cursor-pointer group border-2 border-transparent hover:border-sky-100 hover:shadow-lg" style={{
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                            }}>
-                                <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md group-hover:shadow-xl transition-all duration-300 group-hover:scale-110" style={{
-                                    boxShadow: '0 4px 12px rgba(14, 165, 233, 0.15)'
-                                }}>
+                        {/* Desktop Navigation - Airbnb Style: Icon on Top, Text Below */}
+                        <div className="hidden md:flex items-center gap-4">
+                            {/* House Button - Airbnb Style */}
+                            <button className="flex flex-col items-center gap-2 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all duration-200 cursor-pointer group border border-gray-200 hover:border-gray-300 hover:shadow-md">
+                                {/* Icon Container - BIGGER */}
+                                <div className="w-16 h-16 flex items-center justify-center bg-white rounded-xl transition-transform duration-200 group-hover:scale-105">
                                     <img
                                         src="/House PNG.png"
                                         alt="House"
-                                        className="w-8 h-8 object-contain transition-transform duration-300 group-hover:scale-110"
+                                        className="w-12 h-12 object-contain"
                                     />
                                 </div>
-                                <span className="text-base font-semibold text-gray-700 group-hover:text-sky-600 transition-colors duration-300">House</span>
-                            </div>
+                                {/* Text Below */}
+                                <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">House</span>
+                            </button>
 
-                            {/* Apartment - Golden Ratio Proportions */}
-                            <div className="flex items-center gap-3 px-6 py-3 rounded-2xl hover:bg-sky-50 transition-all duration-300 cursor-pointer group border-2 border-transparent hover:border-sky-100 hover:shadow-lg" style={{
-                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
-                            }}>
-                                <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md group-hover:shadow-xl transition-all duration-300 group-hover:scale-110" style={{
-                                    boxShadow: '0 4px 12px rgba(14, 165, 233, 0.15)'
-                                }}>
+                            {/* Apartment Button - Airbnb Style */}
+                            <button className="flex flex-col items-center gap-2 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all duration-200 cursor-pointer group border border-gray-200 hover:border-gray-300 hover:shadow-md">
+                                {/* Icon Container - BIGGER */}
+                                <div className="w-16 h-16 flex items-center justify-center bg-white rounded-xl transition-transform duration-200 group-hover:scale-105">
                                     <img
                                         src="/Apartment png.png"
                                         alt="Apartment"
-                                        className="w-8 h-8 object-contain transition-transform duration-300 group-hover:scale-110"
+                                        className="w-12 h-12 object-contain"
                                     />
                                 </div>
-                                <span className="text-base font-semibold text-gray-700 group-hover:text-sky-600 transition-colors duration-300">Apartment</span>
-                            </div>
+                                {/* Text Below */}
+                                <span className="text-sm font-medium text-gray-700 group-hover:text-gray-900">Apartment</span>
+                            </button>
                         </div>
 
                         {/* Desktop Right Side */}
