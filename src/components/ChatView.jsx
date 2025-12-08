@@ -2,12 +2,9 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Send, Paperclip, Smile, MoreVertical, Edit2, Trash2, Search, Volume2, VolumeX, Check, CheckCheck, Reply, Download, ChevronLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
-import { useUserPresence } from '../hooks/useUserPresence';
-import OnlineStatus from './OnlineStatus';
 
 export default function ChatView({ listing, sellerId, initialConversation, onBack }) {
     const { user } = useAuth();
-    const { isUserOnline, getLastSeenText, getUserStatus } = useUserPresence(user?.id);
     const [sellerProfile, setSellerProfile] = useState(null);
     const [conversation, setConversation] = useState(initialConversation || null);
     const [messages, setMessages] = useState([]);
@@ -15,29 +12,13 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
     const [sending, setSending] = useState(false);
     const [loading, setLoading] = useState(true);
     const messagesEndRef = useRef(null);
-
-    // Premium Features State
-    const [isTyping, setIsTyping] = useState(false);
-    const [unreadCount, setUnreadCount] = useState(0);
-    const [showReactions, setShowReactions] = useState(null);
-    const [searchQuery, setSearchQuery] = useState('');
-    const [showSearch, setShowSearch] = useState(false);
-    const [soundEnabled, setSoundEnabled] = useState(true);
     const [editingMessage, setEditingMessage] = useState(null);
     const [replyingTo, setReplyingTo] = useState(null);
-    const [uploadingFile, setUploadingFile] = useState(false);
-    const fileInputRef = useRef(null);
-    const typingTimeoutRef = useRef(null);
-
-    const reactions = ['👍', '❤️', '😂', '😮', '😢', '😡'];
-    const reactionMap = { '👍': 'like', '❤️': 'love', '😂': 'laugh', '😮': 'wow', '😢': 'sad', '😡': 'angry' };
 
     // Determine effective sellerId
-    const effectiveSellerId = sellerId || (conversation ? (conversation.buyer_id === user?.id ? conversation.seller_id : conversation.buyer_id) : null);
-
-    // Get seller's online status
-    const sellerStatus = getUserStatus(effectiveSellerId);
-    const sellerOnline = isUserOnline(effectiveSellerId);
+    const effectiveSellerId = sellerId || (conversation ?
+        (conversation.participant_1_id === user?.id ? conversation.participant_2_id : conversation.participant_1_id)
+        : null);
 
     // Auto-scroll to bottom
     const scrollToBottom = () => {
@@ -47,18 +28,6 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
     useEffect(() => {
         scrollToBottom();
     }, [messages]);
-
-    // Play notification sound
-    const playNotificationSound = () => {
-        if (!soundEnabled) return;
-        try {
-            const audio = new Audio('/notification.mp3');
-            audio.volume = 0.5;
-            audio.play().catch(() => { });
-        } catch (error) {
-            console.log('Could not play sound');
-        }
-    };
 
     // Format timestamp
     const formatTime = (timestamp) => {
@@ -80,12 +49,6 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
     // Fetch seller profile data
     const fetchSellerProfile = async () => {
         if (!effectiveSellerId) return;
-
-        // If we already have profile in conversation object, use it (optimization)
-        if (initialConversation?.otherUser && initialConversation.otherUser.id === effectiveSellerId) {
-            setSellerProfile(initialConversation.otherUser);
-            return;
-        }
 
         try {
             const { data, error } = await supabase
@@ -110,26 +73,27 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
             let currentConv = conversation;
 
             if (!currentConv) {
-                if (!listing) return; // Need listing to create/find conversation if not provided
+                if (!listing) return;
 
-                // Check existing conversation
-                let { data: existingConv, error: convError } = await supabase
+                // Check existing conversation - FIXED: using participant_1_id and participant_2_id
+                const { data: existingConvs, error: convError } = await supabase
                     .from('conversations')
                     .select('*')
                     .eq('listing_id', listing.id)
-                    .eq('buyer_id', user.id)
-                    .single();
+                    .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${sellerId}),and(participant_1_id.eq.${sellerId},participant_2_id.eq.${user.id})`);
 
-                if (convError && convError.code !== 'PGRST116') throw convError;
+                if (convError) throw convError;
+
+                let existingConv = existingConvs && existingConvs.length > 0 ? existingConvs[0] : null;
 
                 if (!existingConv) {
-                    // Create new conversation
+                    // Create new conversation - FIXED: using participant_1_id and participant_2_id
                     const { data: newConv, error: createError } = await supabase
                         .from('conversations')
                         .insert({
                             listing_id: listing.id,
-                            buyer_id: user.id,
-                            seller_id: sellerId
+                            participant_1_id: user.id,
+                            participant_2_id: sellerId
                         })
                         .select()
                         .single();
@@ -141,18 +105,10 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                 setConversation(currentConv);
             }
 
-            // Fetch messages with reactions
+            // Fetch messages
             const { data: messagesData, error: messagesError } = await supabase
                 .from('messages')
-                .select(`
-                    *,
-                    message_reactions (
-                        id,
-                        reaction,
-                        user_id,
-                        created_at
-                    )
-                `)
+                .select('*')
                 .eq('conversation_id', currentConv.id)
                 .order('created_at', { ascending: true });
 
@@ -160,19 +116,9 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
 
             setMessages(messagesData || []);
 
-            // Mark messages as read
-            await supabase.rpc('mark_messages_as_read', {
-                conversation_uuid: currentConv.id
-            });
-
-            // Get unread count
-            const { data: count } = await supabase.rpc('get_unread_count', {
-                conversation_uuid: currentConv.id
-            });
-            setUnreadCount(count || 0);
-
         } catch (error) {
-            console.error('Error initializing chat:', error);
+            console.error('Chat init error:', error);
+            alert('Could not load chat. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -182,7 +128,7 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
         if (user) {
             initializeChat();
         }
-    }, [user, listing, initialConversation]); // Re-run if these change
+    }, [user, listing, initialConversation]);
 
     useEffect(() => {
         if (effectiveSellerId) {
@@ -190,14 +136,11 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
         }
     }, [effectiveSellerId, initialConversation]);
 
-    // 🔥 REALTIME SUBSCRIPTIONS
+    // REALTIME SUBSCRIPTIONS
     useEffect(() => {
         if (!conversation) return;
 
-        const channel = supabase.channel(`chat-${conversation.id}`);
-
-        // Subscribe to new messages
-        channel
+        const channel = supabase.channel(`chat-${conversation.id}`)
             .on('postgres_changes', {
                 event: 'INSERT',
                 schema: 'public',
@@ -206,21 +149,14 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
             }, async (payload) => {
                 console.log('💬 New message:', payload);
 
-                // Fetch message with reactions
                 const { data } = await supabase
                     .from('messages')
-                    .select(`*, message_reactions (*)`)
+                    .select('*')
                     .eq('id', payload.new.id)
                     .single();
 
                 setMessages(prev => [...prev, data]);
-
-                // Play sound if from other user
-                if (payload.new.sender_id !== user.id) {
-                    playNotificationSound();
-                }
             })
-            // Subscribe to message updates (edits/deletes)
             .on('postgres_changes', {
                 event: 'UPDATE',
                 schema: 'public',
@@ -229,7 +165,7 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
             }, async (payload) => {
                 const { data } = await supabase
                     .from('messages')
-                    .select(`*, message_reactions (*)`)
+                    .select('*')
                     .eq('id', payload.new.id)
                     .single();
 
@@ -237,76 +173,20 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                     m.id === data.id ? data : m
                 ));
             })
-            // Subscribe to reactions
-            .on('postgres_changes', {
-                event: '*',
-                schema: 'public',
-                table: 'message_reactions'
-            }, async (payload) => {
-                // Refresh message reactions
-                const messageId = payload.new?.message_id || payload.old?.message_id;
-                if (!messageId) return;
-
-                const { data } = await supabase
-                    .from('messages')
-                    .select(`*, message_reactions (*)`)
-                    .eq('id', messageId)
-                    .single();
-
-                setMessages(prev => prev.map(m =>
-                    m.id === data.id ? data : m
-                ));
-            })
-            // Subscribe to typing indicators
-            .on('broadcast', { event: 'typing' }, (payload) => {
-                if (payload.payload.userId !== user.id) {
-                    setIsTyping(true);
-                    setTimeout(() => setIsTyping(false), 3000);
-                }
-            })
             .subscribe();
 
         return () => {
             channel.unsubscribe();
         };
-    }, [conversation, user, soundEnabled]);
-
-    // Handle typing indicator broadcast
-    const handleTyping = () => {
-        if (!conversation) return;
-
-        const channel = supabase.channel(`chat-${conversation.id}`);
-        channel.send({
-            type: 'broadcast',
-            event: 'typing',
-            payload: { userId: user.id }
-        });
-
-        // Clear previous timeout
-        if (typingTimeoutRef.current) {
-            clearTimeout(typingTimeoutRef.current);
-        }
-
-        // Set new timeout
-        typingTimeoutRef.current = setTimeout(() => {
-            // Typing stopped
-        }, 1000);
-    };
+    }, [conversation, user]);
 
     // Send message
     const handleSendMessage = async (e) => {
         e?.preventDefault();
-        if ((!newMessage.trim() && !replyingTo) || !conversation) return;
+        if (!newMessage.trim() || !conversation) return;
 
         try {
             setSending(true);
-
-            const messageData = {
-                conversation_id: conversation.id,
-                sender_id: user.id,
-                content: editingMessage ? newMessage.trim() : newMessage.trim(),
-                reply_to_id: replyingTo?.id || null
-            };
 
             if (editingMessage) {
                 // Update existing message
@@ -324,7 +204,12 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                 // Insert new message
                 const { error } = await supabase
                     .from('messages')
-                    .insert(messageData);
+                    .insert({
+                        conversation_id: conversation.id,
+                        sender_id: user.id,
+                        content: newMessage.trim(),
+                        reply_to_id: replyingTo?.id || null
+                    });
 
                 if (error) throw error;
             }
@@ -333,43 +218,9 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
             setReplyingTo(null);
         } catch (error) {
             console.error('Error sending message:', error);
-            alert('Failed to send message');
+            alert('Failed to send message: ' + error.message);
         } finally {
             setSending(false);
-        }
-    };
-
-    // Add reaction
-    const handleAddReaction = async (messageId, emoji) => {
-        try {
-            const reactionType = reactionMap[emoji];
-
-            // Check if already reacted
-            const message = messages.find(m => m.id === messageId);
-            const existingReaction = message.message_reactions?.find(
-                r => r.user_id === user.id && r.reaction === reactionType
-            );
-
-            if (existingReaction) {
-                // Remove reaction
-                await supabase
-                    .from('message_reactions')
-                    .delete()
-                    .eq('id', existingReaction.id);
-            } else {
-                // Add reaction
-                await supabase
-                    .from('message_reactions')
-                    .insert({
-                        message_id: messageId,
-                        user_id: user.id,
-                        reaction: reactionType
-                    });
-            }
-
-            setShowReactions(null);
-        } catch (error) {
-            console.error('Error adding reaction:', error);
         }
     };
 
@@ -380,66 +231,12 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
         try {
             await supabase
                 .from('messages')
-                .update({
-                    is_deleted: true,
-                    deleted_at: new Date().toISOString()
-                })
+                .delete()
                 .eq('id', messageId);
         } catch (error) {
             console.error('Error deleting message:', error);
         }
     };
-
-    // File upload
-    const handleFileUpload = async (e) => {
-        const file = e.target.files?.[0];
-        if (!file) return;
-
-        try {
-            setUploadingFile(true);
-
-            // Upload to Supabase Storage
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Math.random()}.${fileExt}`;
-            const filePath = `chat-attachments/${conversation.id}/${fileName}`;
-
-            const { error: uploadError } = await supabase.storage
-                .from('attachments')
-                .upload(filePath, file);
-
-            if (uploadError) throw uploadError;
-
-            // Get public URL
-            const { data: { publicUrl } } = supabase.storage
-                .from('attachments')
-                .getPublicUrl(filePath);
-
-            // Send message with attachment
-            await supabase
-                .from('messages')
-                .insert({
-                    conversation_id: conversation.id,
-                    sender_id: user.id,
-                    content: file.type.startsWith('image/') ? '' : file.name,
-                    attachment_url: publicUrl,
-                    attachment_type: file.type,
-                    attachment_name: file.name
-                });
-
-        } catch (error) {
-            console.error('Error uploading file:', error);
-            alert('Failed to upload file');
-        } finally {
-            setUploadingFile(false);
-        }
-    };
-
-    // Filtered messages for search
-    const filteredMessages = searchQuery
-        ? messages.filter(m =>
-            m.content?.toLowerCase().includes(searchQuery.toLowerCase())
-        )
-        : messages;
 
     return (
         <div className="flex flex-col h-full bg-gray-50">
@@ -451,64 +248,19 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                             <ChevronLeft size={24} />
                         </button>
                     )}
-                    <div className="relative">
-                        <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold">
-                            {sellerProfile?.full_name?.[0] || listing?.profiles?.full_name?.[0] || 'S'}
-                        </div>
-                        {/* Online Status Indicator */}
-                        <div className="absolute -bottom-1 -right-1">
-                            <OnlineStatus
-                                isOnline={sellerOnline}
-                                lastSeen={sellerStatus.lastSeen}
-                                size="sm"
-                            />
-                        </div>
+                    <div className="w-10 h-10 rounded-full bg-sky-100 flex items-center justify-center text-sky-600 font-bold">
+                        {sellerProfile?.full_name?.[0] || 'S'}
                     </div>
                     <div>
                         <h3 className="font-semibold text-gray-900">
-                            {sellerProfile?.full_name || listing?.profiles?.full_name || 'Seller'}
+                            {sellerProfile?.full_name || 'Seller'}
                         </h3>
                         <p className="text-xs text-gray-500">
-                            {sellerOnline ? (
-                                <span className="text-green-600 font-medium">● Online</span>
-                            ) : (
-                                <span>{getLastSeenText(effectiveSellerId)}</span>
-                            )}
+                            {listing?.title || 'Property Chat'}
                         </p>
                     </div>
                 </div>
-                <div className="flex items-center gap-1">
-                    <button
-                        onClick={() => setShowSearch(!showSearch)}
-                        className="p-2 hover:bg-gray-100 rounded-full"
-                    >
-                        <Search size={20} className="text-gray-600" />
-                    </button>
-                    <button
-                        onClick={() => setSoundEnabled(!soundEnabled)}
-                        className="p-2 hover:bg-gray-100 rounded-full"
-                    >
-                        {soundEnabled ? (
-                            <Volume2 size={20} className="text-gray-600" />
-                        ) : (
-                            <VolumeX size={20} className="text-gray-400" />
-                        )}
-                    </button>
-                </div>
             </div>
-
-            {/* Search Bar */}
-            {showSearch && (
-                <div className="p-3 bg-white border-b">
-                    <input
-                        type="text"
-                        value={searchQuery}
-                        onChange={(e) => setSearchQuery(e.target.value)}
-                        placeholder="Search messages..."
-                        className="w-full px-4 py-2 border rounded-lg outline-none focus:border-sky-500"
-                    />
-                </div>
-            )}
 
             {/* Messages */}
             <div className="flex-1 overflow-y-auto p-4 space-y-3">
@@ -516,19 +268,18 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                     <div className="flex items-center justify-center h-full">
                         <div className="animate-spin w-8 h-8 border-4 border-sky-500 border-t-transparent rounded-full"></div>
                     </div>
-                ) : filteredMessages.length === 0 ? (
+                ) : messages.length === 0 ? (
                     <div className="flex flex-col items-center justify-center h-full text-gray-400">
                         <Send size={48} className="mb-2" />
-                        <p>{searchQuery ? 'No messages found' : 'No messages yet. Start the conversation!'}</p>
+                        <p>No messages yet. Start the conversation!</p>
                     </div>
                 ) : (
-                    filteredMessages.map((msg) => {
+                    messages.map((msg) => {
                         const isOwn = msg.sender_id === user.id;
-                        const isDeleted = msg.is_deleted;
 
                         return (
                             <div key={msg.id} className={`flex ${isOwn ? 'justify-end' : 'justify-start'}`}>
-                                <div className={`max-w-[75%] ${isOwn ? 'items-end' : 'items-start'} flex flex-col gap-1`}>
+                                <div className={`max-w-[75%] flex flex-col gap-1`}>
                                     {/* Reply indicator */}
                                     {msg.reply_to_id && (
                                         <div className="text-xs text-gray-500 italic px-3">
@@ -541,46 +292,20 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                                         {/* Message bubble */}
                                         <div
                                             className={`px-4 py-2 rounded-2xl ${isOwn
-                                                ? 'bg-sky-500 text-white rounded-tr-none'
-                                                : 'bg-white text-gray-900 rounded-tl-none border border-gray-100 shadow-sm'
-                                                } ${isDeleted ? 'italic opacity-60' : ''}`}
+                                                    ? 'bg-sky-500 text-white rounded-tr-none'
+                                                    : 'bg-white text-gray-900 rounded-tl-none border border-gray-100 shadow-sm'
+                                                }`}
                                         >
-                                            {isDeleted ? (
-                                                <span className="text-sm">This message was deleted</span>
-                                            ) : (
-                                                <>
-                                                    {/* Image attachment */}
-                                                    {msg.attachment_url && msg.attachment_type?.startsWith('image/') && (
-                                                        <img
-                                                            src={msg.attachment_url}
-                                                            alt={msg.attachment_name}
-                                                            className="rounded-lg mb-2 max-w-full"
-                                                        />
-                                                    )}
-                                                    {/* File attachment */}
-                                                    {msg.attachment_url && !msg.attachment_type?.startsWith('image/') && (
-                                                        <a
-                                                            href={msg.attachment_url}
-                                                            download
-                                                            className={`flex items-center gap-2 p-2 rounded-lg mb-2 ${isOwn ? 'bg-white/20' : 'bg-gray-100'}`}
-                                                        >
-                                                            <Paperclip size={16} />
-                                                            <span className="text-sm">{msg.attachment_name}</span>
-                                                            <Download size={14} />
-                                                        </a>
-                                                    )}
-                                                    <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
-                                                    {msg.edited_at && (
-                                                        <span className="text-xs opacity-70 block mt-1">(edited)</span>
-                                                    )}
-                                                </>
+                                            <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                                            {msg.edited_at && (
+                                                <span className="text-xs opacity-70 block mt-1">(edited)</span>
                                             )}
 
-                                            {/* Timestamp & Read status */}
+                                            {/* Timestamp */}
                                             <span className={`text-[10px] mt-1 block text-right ${isOwn ? 'text-sky-100' : 'text-gray-400'}`}>
                                                 {formatTime(msg.created_at)}
                                                 {isOwn && (
-                                                    msg.read_at ? (
+                                                    msg.is_read ? (
                                                         <CheckCheck size={12} className="inline ml-1 text-sky-200" />
                                                     ) : (
                                                         <Check size={12} className="inline ml-1" />
@@ -590,95 +315,38 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                                         </div>
 
                                         {/* Message actions */}
-                                        {!isDeleted && (
-                                            <div className={`absolute ${isOwn ? 'left-0' : 'right-0'} top-0 -translate-x-full group-hover:opacity-100 opacity-0 transition-opacity flex gap-1 px-2`}>
-                                                <button
-                                                    onClick={() => setShowReactions(showReactions === msg.id ? null : msg.id)}
-                                                    className="p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
-                                                >
-                                                    <Smile size={14} className="text-gray-600" />
-                                                </button>
-                                                {isOwn && (
-                                                    <>
-                                                        <button
-                                                            onClick={() => {
-                                                                setEditingMessage(msg);
-                                                                setNewMessage(msg.content);
-                                                            }}
-                                                            className="p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
-                                                        >
-                                                            <Edit2 size={14} className="text-gray-600" />
-                                                        </button>
-                                                        <button
-                                                            onClick={() => handleDeleteMessage(msg.id)}
-                                                            className="p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
-                                                        >
-                                                            <Trash2 size={14} className="text-red-500" />
-                                                        </button>
-                                                    </>
-                                                )}
-                                                <button
-                                                    onClick={() => setReplyingTo(msg)}
-                                                    className="p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
-                                                >
-                                                    <Reply size={14} className="text-gray-600" />
-                                                </button>
-                                            </div>
-                                        )}
-
-                                        {/* Reaction picker */}
-                                        {showReactions === msg.id && (
-                                            <div className={`absolute bottom-full mb-2 bg-white rounded-lg shadow-lg p-2 flex gap-1 z-10 ${isOwn ? 'right-0' : 'left-0'}`}>
-                                                {reactions.map((emoji) => (
+                                        <div className={`absolute ${isOwn ? 'left-0' : 'right-0'} top-0 -translate-x-full group-hover:opacity-100 opacity-0 transition-opacity flex gap-1 px-2`}>
+                                            {isOwn && (
+                                                <>
                                                     <button
-                                                        key={emoji}
-                                                        onClick={() => handleAddReaction(msg.id, emoji)}
-                                                        className="text-xl hover:scale-125 transition-transform"
+                                                        onClick={() => {
+                                                            setEditingMessage(msg);
+                                                            setNewMessage(msg.content);
+                                                        }}
+                                                        className="p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
                                                     >
-                                                        {emoji}
+                                                        <Edit2 size={14} className="text-gray-600" />
                                                     </button>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {/* Reactions display */}
-                                    {msg.message_reactions && msg.message_reactions.length > 0 && (
-                                        <div className="flex gap-1 flex-wrap px-2">
-                                            {Object.entries(
-                                                msg.message_reactions.reduce((acc, r) => {
-                                                    const emoji = Object.keys(reactionMap).find(k => reactionMap[k] === r.reaction);
-                                                    if (!acc[emoji]) acc[emoji] = [];
-                                                    acc[emoji].push(r);
-                                                    return acc;
-                                                }, {})
-                                            ).map(([emoji, reactions]) => (
-                                                <div
-                                                    key={emoji}
-                                                    className="flex items-center gap-1 px-2 py-0.5 bg-white border border-gray-100 shadow-sm rounded-full text-xs"
-                                                >
-                                                    <span>{emoji}</span>
-                                                    <span className="font-medium text-gray-600">{reactions.length}</span>
-                                                </div>
-                                            ))}
+                                                    <button
+                                                        onClick={() => handleDeleteMessage(msg.id)}
+                                                        className="p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
+                                                    >
+                                                        <Trash2 size={14} className="text-red-500" />
+                                                    </button>
+                                                </>
+                                            )}
+                                            <button
+                                                onClick={() => setReplyingTo(msg)}
+                                                className="p-1 bg-white rounded-full shadow-md hover:bg-gray-100"
+                                            >
+                                                <Reply size={14} className="text-gray-600" />
+                                            </button>
                                         </div>
-                                    )}
+                                    </div>
                                 </div>
                             </div>
                         );
                     })
-                )}
-
-                {/* Typing indicator */}
-                {isTyping && (
-                    <div className="flex items-center gap-2 text-gray-500 text-sm px-4">
-                        <div className="flex gap-1">
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.1s' }}></div>
-                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0.2s' }}></div>
-                        </div>
-                        <span>Typing...</span>
-                    </div>
                 )}
 
                 <div ref={messagesEndRef} />
@@ -711,45 +379,33 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
             )}
 
             {/* Input */}
-            <form onSubmit={handleSendMessage} className="p-4 bg-white border-t flex items-center gap-2">
-                <input
-                    type="file"
-                    ref={fileInputRef}
-                    onChange={handleFileUpload}
-                    className="hidden"
-                    accept="image/*,.pdf,.doc,.docx"
-                />
-                <button
-                    type="button"
-                    onClick={() => fileInputRef.current?.click()}
-                    disabled={uploadingFile}
-                    className="p-2 hover:bg-gray-100 rounded-full disabled:opacity-50"
-                >
-                    {uploadingFile ? (
-                        <div className="animate-spin w-5 h-5 border-2 border-sky-500 border-t-transparent rounded-full"></div>
-                    ) : (
-                        <Paperclip size={20} className="text-gray-600" />
-                    )}
-                </button>
+            <div className="p-4 bg-white border-t flex items-center gap-2">
                 <input
                     type="text"
                     value={newMessage}
-                    onChange={(e) => {
-                        setNewMessage(e.target.value);
-                        handleTyping();
+                    onChange={(e) => setNewMessage(e.target.value)}
+                    onKeyPress={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            handleSendMessage();
+                        }
                     }}
                     placeholder="Type a message..."
                     className="flex-1 px-4 py-2 bg-gray-100 border-none rounded-full outline-none focus:ring-2 focus:ring-sky-500"
                     disabled={sending}
                 />
                 <button
-                    type="submit"
-                    disabled={sending || (!newMessage.trim() && !editingMessage)}
+                    onClick={handleSendMessage}
+                    disabled={sending || !newMessage.trim()}
                     className="w-10 h-10 bg-sky-500 text-white rounded-full flex items-center justify-center hover:bg-sky-600 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-sky-200"
                 >
-                    <Send size={18} />
+                    {sending ? (
+                        <div className="animate-spin w-5 h-5 border-2 border-white border-t-transparent rounded-full"></div>
+                    ) : (
+                        <Send size={18} />
+                    )}
                 </button>
-            </form>
+            </div>
         </div>
     );
 }
