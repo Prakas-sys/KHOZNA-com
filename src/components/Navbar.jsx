@@ -16,34 +16,38 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                             </div>
                         </div>
 
-                        {/* Desktop Navigation - Beautiful Icons */}
-                        <div className="hidden md:flex items-center gap-6">
-                            {/* House */}
-                            <div className="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-sky-50 transition-all cursor-pointer group border-2 border-transparent hover:border-sky-200 hover:shadow-md">
-                                <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm group-hover:shadow-md transition-all group-hover:scale-110" style={{
-                                    boxShadow: '0 2px 8px rgba(14, 165, 233, 0.2)'
+                        {/* Desktop Navigation - Professional 8-Point Grid System */}
+                        <div className="hidden md:flex items-center gap-8">
+                            {/* House - Golden Ratio Proportions */}
+                            <div className="flex items-center gap-3 px-6 py-3 rounded-2xl hover:bg-sky-50 transition-all duration-300 cursor-pointer group border-2 border-transparent hover:border-sky-100 hover:shadow-lg" style={{
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                            }}>
+                                <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md group-hover:shadow-xl transition-all duration-300 group-hover:scale-110" style={{
+                                    boxShadow: '0 4px 12px rgba(14, 165, 233, 0.15)'
                                 }}>
                                     <img
                                         src="/House PNG.png"
                                         alt="House"
-                                        className="w-7 h-7 object-contain"
+                                        className="w-8 h-8 object-contain transition-transform duration-300 group-hover:scale-110"
                                     />
                                 </div>
-                                <span className="text-gray-800 font-semibold group-hover:text-sky-600 transition-colors">House</span>
+                                <span className="text-base font-semibold text-gray-700 group-hover:text-sky-600 transition-colors duration-300">House</span>
                             </div>
 
-                            {/* Apartment */}
-                            <div className="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-sky-50 transition-all cursor-pointer group border-2 border-transparent hover:border-sky-200 hover:shadow-md">
-                                <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm group-hover:shadow-md transition-all group-hover:scale-110" style={{
-                                    boxShadow: '0 2px 8px rgba(14, 165, 233, 0.2)'
+                            {/* Apartment - Golden Ratio Proportions */}
+                            <div className="flex items-center gap-3 px-6 py-3 rounded-2xl hover:bg-sky-50 transition-all duration-300 cursor-pointer group border-2 border-transparent hover:border-sky-100 hover:shadow-lg" style={{
+                                transition: 'all 0.3s cubic-bezier(0.4, 0, 0.2, 1)'
+                            }}>
+                                <div className="w-12 h-12 flex items-center justify-center bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-md group-hover:shadow-xl transition-all duration-300 group-hover:scale-110" style={{
+                                    boxShadow: '0 4px 12px rgba(14, 165, 233, 0.15)'
                                 }}>
                                     <img
                                         src="/Apartment png.png"
                                         alt="Apartment"
-                                        className="w-7 h-7 object-contain"
+                                        className="w-8 h-8 object-contain transition-transform duration-300 group-hover:scale-110"
                                     />
                                 </div>
-                                <span className="text-gray-800 font-semibold group-hover:text-sky-600 transition-colors">Apartment</span>
+                                <span className="text-base font-semibold text-gray-700 group-hover:text-sky-600 transition-colors duration-300">Apartment</span>
                             </div>
                         </div>
 
