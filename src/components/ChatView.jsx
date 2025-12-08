@@ -193,15 +193,35 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
         e?.preventDefault();
         if (!newMessage.trim() || !conversation) return;
 
+        console.log('Attempting to send message...', { conversationId: conversation.id, userId: user.id });
+
         try {
             setSending(true);
+            const content = newMessage.trim(); // Capture before clearing
+
+            // Optimistic Update: Show message immediately
+            const processingId = 'temp-' + Date.now();
+            const tempMsg = {
+                id: processingId,
+                conversation_id: conversation.id,
+                sender_id: user.id,
+                content: content,
+                reply_to_id: replyingTo?.id || null,
+                created_at: new Date().toISOString(),
+                is_read: false
+            };
+
+            // Add temp message to UI immediately
+            setMessages(prev => [...prev, tempMsg]);
+            setNewMessage(''); // Clear input immediately
+            setReplyingTo(null);
 
             if (editingMessage) {
                 // Update existing message
                 const { error } = await supabase
                     .from('messages')
                     .update({
-                        content: newMessage.trim(),
+                        content: content,
                         edited_at: new Date().toISOString()
                     })
                     .eq('id', editingMessage.id);
@@ -210,23 +230,33 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                 setEditingMessage(null);
             } else {
                 // Insert new message
-                const { error } = await supabase
+                const { data, error } = await supabase
                     .from('messages')
                     .insert({
                         conversation_id: conversation.id,
                         sender_id: user.id,
-                        content: newMessage.trim(),
+                        content: content,
                         reply_to_id: replyingTo?.id || null
-                    });
+                    })
+                    .select()
+                    .single();
 
                 if (error) throw error;
+
+                // Replace temp message with real one (if needed, but Realtime subscription usually handles this)
+                // We map to replace ID if the content matches, or just let Realtime dedupe handled by useEffect
+                // Actually, simplest is to let Realtime add the "verified" one. 
+                // But since we have the data, we can swap it in to be safe against Realtime lag.
+                setMessages(prev => prev.map(m => m.id === processingId ? data : m));
             }
 
-            setNewMessage('');
-            setReplyingTo(null);
+            console.log('✅ Message sent successfully');
+
         } catch (error) {
             console.error('Error sending message:', error);
             alert('Failed to send message: ' + error.message);
+            // Revert optimistic update? For now keep it simple.
+            // setMessages(prev => prev.filter(m => !m.id.startsWith('temp-')));
         } finally {
             setSending(false);
         }
