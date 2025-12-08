@@ -61,6 +61,7 @@ export default function ChatModal({ isOpen, onClose, listing }) {
 
             if (!ownerId || !currentUserId) {
                 console.error("Missing user IDs");
+                alert("Cannot start chat: Missing user information.");
                 return;
             }
 
@@ -203,8 +204,8 @@ export default function ChatModal({ isOpen, onClose, listing }) {
                                     <div className="max-w-[70%]">
                                         <div
                                             className={`px-4 py-2 rounded-2xl ${isOwn
-                                                    ? "bg-sky-600 text-white rounded-tr-none"
-                                                    : "bg-white text-gray-900 rounded-tl-none shadow-sm"
+                                                ? "bg-sky-600 text-white rounded-tr-none"
+                                                : "bg-white text-gray-900 rounded-tl-none shadow-sm"
                                                 }`}
                                         >
                                             <p className="text-sm">{msg.content}</p>

@@ -130,6 +130,8 @@ export default function ConversationsView() {
             setConversations(enrichedConversations);
         } catch (error) {
             console.error('Error fetching conversations:', error);
+            // Optional: You could add a toast here if you had access to the toast function
+            // alert('Failed to load messages. Please check your connection.'); 
         } finally {
             setLoading(false);
         }

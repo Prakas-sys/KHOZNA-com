@@ -76,15 +76,23 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                 if (!listing) return;
 
                 // Check existing conversation - FIXED: using participant_1_id and participant_2_id
-                const { data: existingConvs, error: convError } = await supabase
+                if (convError) {
+                    console.error('Error finding conversation:', convError);
+                    // Don't throw here, try to create new one or handle gracefully
+                }
+
+                // Robust filtering in JS if SQL is tricky with complex ORs
+                // Use the precise query for the specific pair of users on this specific listing
+                const { data: preciseConv, error: preciseError } = await supabase
                     .from('conversations')
                     .select('*')
                     .eq('listing_id', listing.id)
-                    .or(`participant_1_id.eq.${user.id},participant_1_id.eq.${sellerId}`)
-                    .or(`participant_2_id.eq.${sellerId},participant_2_id.eq.${user.id}`)
-                if (convError) throw convError;
+                    .or(`and(participant_1_id.eq.${user.id},participant_2_id.eq.${effectiveSellerId}),and(participant_1_id.eq.${effectiveSellerId},participant_2_id.eq.${user.id})`)
+                    .maybeSingle();
 
-                let existingConv = existingConvs && existingConvs.length > 0 ? existingConvs[0] : null;
+                if (preciseError) throw preciseError;
+
+                let existingConv = preciseConv;
 
                 if (!existingConv) {
                     // Create new conversation - FIXED: using participant_1_id and participant_2_id

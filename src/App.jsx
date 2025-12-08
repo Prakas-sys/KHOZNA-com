@@ -245,7 +245,29 @@ function RentEaseAppContent() {
         }
     };
 
+    // Check Supabase connection/RLS on mount
     useEffect(() => {
+        const checkSystemHealth = async () => {
+            try {
+                // Try to fetch one public row (or just check connection)
+                // We'll try to read from 'listings' as it should be public.
+                const { error } = await supabase.from('listings').select('count', { count: 'exact', head: true });
+                if (error) {
+                    console.error('⚠️ Database connection issue:', error);
+                    setToast({
+                        message: 'Database connection issue. Check your internet or Supabase RLS policies.',
+                        type: 'error',
+                        duration: 5000
+                    });
+                } else {
+                    console.log('✅ Supabase connected successfully.');
+                }
+            } catch (err) {
+                console.error('Critical Database Error:', err);
+            }
+        };
+
+        checkSystemHealth();
         fetchListings();
     }, []);
 
