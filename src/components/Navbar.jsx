@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Globe, Menu, User, X, MessageCircle } from 'lucide-react';
+import { Menu, User, X, MessageCircle } from 'lucide-react';
 
 const Navbar = ({ user, onPostProperty, onProfileClick }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -47,7 +47,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                             >
                                 Become a Host
                             </button>
-                            
+
                             {/* Message Icon - Rectangle Type UI (Insta style) */}
                             <button className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors border border-transparent hover:border-gray-200">
                                 <MessageCircle size={22} className="text-gray-700" />
@@ -65,7 +65,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                         </div>
 
                         {/* Mobile Menu Button - Left aligned on mobile */}
-                        <button 
+                        <button
                             className="md:hidden p-2 rounded-full hover:bg-gray-100"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         >
