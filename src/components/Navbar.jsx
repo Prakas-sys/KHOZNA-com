@@ -8,7 +8,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
         <>
             <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-                    <div className="flex justify-between items-center h-20">
+                    <div className="flex justify-between items-center h-28">{/* Increased from h-20 to h-28 */}
                         {/* Logo - Marvel Style */}
                         <div className="flex items-center cursor-pointer">
                             <div className="border-2 border-[#00A8E8] px-3 py-0.5 rounded">
@@ -20,12 +20,12 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                         <div className="hidden md:flex items-center gap-4">
                             {/* House Button - Airbnb Style */}
                             <button className="flex flex-col items-center gap-2 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all duration-200 cursor-pointer group border border-gray-200 hover:border-gray-300 hover:shadow-md">
-                                {/* Icon Container - BIGGER */}
-                                <div className="w-24 h-24 flex items-center justify-center bg-white rounded-xl transition-transform duration-200 group-hover:scale-105">
+                                {/* Icon Container - EVEN BIGGER */}
+                                <div className="w-28 h-28 flex items-center justify-center bg-white rounded-xl transition-transform duration-200 group-hover:scale-105">
                                     <img
                                         src="/House PNG.png"
                                         alt="House"
-                                        className="w-20 h-20 object-contain"
+                                        className="w-24 h-24 object-contain"
                                     />
                                 </div>
                                 {/* Text Below */}
@@ -34,12 +34,12 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
 
                             {/* Apartment Button - Airbnb Style */}
                             <button className="flex flex-col items-center gap-2 px-6 py-4 rounded-2xl hover:bg-gray-100 transition-all duration-200 cursor-pointer group border border-gray-200 hover:border-gray-300 hover:shadow-md">
-                                {/* Icon Container - BIGGER */}
-                                <div className="w-24 h-24 flex items-center justify-center bg-white rounded-xl transition-transform duration-200 group-hover:scale-105">
+                                {/* Icon Container - EVEN BIGGER */}
+                                <div className="w-28 h-28 flex items-center justify-center bg-white rounded-xl transition-transform duration-200 group-hover:scale-105">
                                     <img
                                         src="/Apartment png.png"
                                         alt="Apartment"
-                                        className="w-20 h-20 object-contain"
+                                        className="w-24 h-24 object-contain"
                                     />
                                 </div>
                                 {/* Text Below */}
@@ -116,8 +116,8 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                     </div>
                 )}
             </nav>
-            {/* Spacer to prevent content from going under fixed navbar */}
-            <div className="h-20"></div>
+            {/* Spacer to prevent content from going under fixed navbar - INCREASED */}
+            <div className="h-28"></div>{/* Increased from h-20 to h-28 */}
         </>
     );
 };
