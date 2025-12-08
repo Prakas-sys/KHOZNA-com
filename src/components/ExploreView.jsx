@@ -120,76 +120,47 @@ const ExploreView = ({
             />
 
             <div id="listings-section" className="max-w-7xl mx-auto px-4 py-12">
-                {/* Destinations Section */}
-                <div className="mb-12">
-                    <h2 className="text-3xl md:text-4xl font-bold text-gray-800 mb-8">Explore nearby stays</h2>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        {[
-                            {
-                                name: 'Kathmandu, Nepal',
-                                properties: 856,
-                                image: '/kathmandu.jpg'
-                            },
-                            {
-                                name: 'Pokhara, Nepal',
-                                properties: 423,
-                                image: '/pokhara.jpg'
-                            },
-                            {
-                                name: 'Chitwan, Nepal',
-                                properties: 187,
-                                image: '/chitwan.jpg'
-                            },
-                            {
-                                name: 'Lumbini, Nepal',
-                                properties: 97,
-                                image: '/lumbini.jpg'
-                            }
-                        ].map((dest) => (
-                            <div
-                                key={dest.name}
-                                onClick={() => {
-                                    setSearchQuery(dest.name.split(',')[0]);
-                                    handleSearch();
-                                }}
-                                className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
-                            >
-                                <img
-                                    src={dest.image}
-                                    alt={dest.name}
-                                    className="w-full h-48 object-cover"
-                                />
-                                <div className="p-4">
-                                    <h3 className="font-semibold text-gray-800 text-lg">{dest.name}</h3>
-                                    <p className="text-gray-500 text-sm">{dest.properties} properties</p>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-                </div>
+                {/* Beautiful Rent/Sale Toggle */}
+                <div className="flex justify-center mb-12">
+                    <div className="relative inline-flex p-1.5 bg-gradient-to-br from-gray-200 to-gray-300 rounded-full shadow-lg">
+                        {/* Background slider */}
+                        <div
+                            className={`absolute top-1.5 h-[calc(100%-12px)] w-[calc(50%-6px)] bg-gradient-to-br from-sky-400 to-sky-600 rounded-full shadow-xl transition-all duration-300 ease-out ${listingType === 'rent' ? 'left-1.5' : 'left-[calc(50%+1.5px)]'
+                                }`}
+                            style={{
+                                boxShadow: '0 8px 16px rgba(14, 165, 233, 0.4), inset 0 2px 4px rgba(255,255,255,0.3)'
+                            }}
+                        />
 
-                {/* Listing Controls (Rent/Sale, Sort, Map Toggle) */}
-                <div className="flex items-center justify-between mb-6">
-                    <div className="flex gap-2">
+                        {/* For Rent Button */}
                         <button
                             onClick={() => setListingType('rent')}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${listingType === 'rent'
-                                ? 'bg-sky-500 text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            className={`relative z-10 px-12 py-4 rounded-full text-lg font-bold transition-all duration-300 ${listingType === 'rent'
+                                    ? 'text-white scale-105'
+                                    : 'text-gray-600 hover:text-gray-800'
                                 }`}
                         >
                             For Rent
                         </button>
+
+                        {/* For Sale Button */}
                         <button
                             onClick={() => setListingType('sale')}
-                            className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${listingType === 'sale'
-                                ? 'bg-sky-500 text-white'
-                                : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                            className={`relative z-10 px-12 py-4 rounded-full text-lg font-bold transition-all duration-300 ${listingType === 'sale'
+                                    ? 'text-white scale-105'
+                                    : 'text-gray-600 hover:text-gray-800'
                                 }`}
                         >
                             For Sale
                         </button>
                     </div>
+                </div>
+
+                {/* Listing Controls (Map Toggle) */}
+                <div className="flex items-center justify-between mb-6">
+                    <h2 className="text-2xl font-bold text-gray-800">
+                        {listingType === 'rent' ? 'Properties for Rent' : 'Properties for Sale'}
+                    </h2>
 
                     <div className="flex gap-2">
                         <button
