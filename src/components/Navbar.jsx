@@ -16,11 +16,35 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                             </div>
                         </div>
 
-                        {/* Desktop Navigation */}
-                        <div className="hidden md:flex items-center gap-8">
-                            <a href="#" className="text-gray-800 hover:text-[#00A8E8] transition font-medium">Places to stay</a>
-                            <a href="#" className="text-gray-800 hover:text-[#00A8E8] transition font-medium">Experiences</a>
-                            <a href="#" className="text-gray-800 hover:text-[#00A8E8] transition font-medium">Online Experiences</a>
+                        {/* Desktop Navigation - Beautiful Icons */}
+                        <div className="hidden md:flex items-center gap-6">
+                            {/* House */}
+                            <div className="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-sky-50 transition-all cursor-pointer group border-2 border-transparent hover:border-sky-200 hover:shadow-md">
+                                <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm group-hover:shadow-md transition-all group-hover:scale-110" style={{
+                                    boxShadow: '0 2px 8px rgba(14, 165, 233, 0.2)'
+                                }}>
+                                    <img
+                                        src="/House PNG.png"
+                                        alt="House"
+                                        className="w-7 h-7 object-contain"
+                                    />
+                                </div>
+                                <span className="text-gray-800 font-semibold group-hover:text-sky-600 transition-colors">House</span>
+                            </div>
+
+                            {/* Apartment */}
+                            <div className="flex items-center gap-2 px-4 py-2 rounded-xl hover:bg-sky-50 transition-all cursor-pointer group border-2 border-transparent hover:border-sky-200 hover:shadow-md">
+                                <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm group-hover:shadow-md transition-all group-hover:scale-110" style={{
+                                    boxShadow: '0 2px 8px rgba(14, 165, 233, 0.2)'
+                                }}>
+                                    <img
+                                        src="/Apartment png.png"
+                                        alt="Apartment"
+                                        className="w-7 h-7 object-contain"
+                                    />
+                                </div>
+                                <span className="text-gray-800 font-semibold group-hover:text-sky-600 transition-colors">Apartment</span>
+                            </div>
                         </div>
 
                         {/* Desktop Right Side */}
@@ -59,9 +83,26 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                 {isMobileMenuOpen && (
                     <div className="md:hidden bg-white border-t border-gray-100">
                         <div className="px-4 py-4 space-y-3">
-                            <a href="#" className="block text-gray-800 hover:text-[#00A8E8] font-medium py-2">Places to stay</a>
-                            <a href="#" className="block text-gray-800 hover:text-[#00A8E8] font-medium py-2">Experiences</a>
-                            <a href="#" className="block text-gray-800 hover:text-[#00A8E8] font-medium py-2">Online Experiences</a>
+                            {/* House - Mobile */}
+                            <div className="flex items-center gap-3 p-3 hover:bg-sky-50 rounded-lg transition-all border-2 border-transparent hover:border-sky-200">
+                                <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm" style={{
+                                    boxShadow: '0 2px 8px rgba(14, 165, 233, 0.2)'
+                                }}>
+                                    <img src="/House PNG.png" alt="House" className="w-7 h-7 object-contain" />
+                                </div>
+                                <span className="text-gray-800 font-semibold">House</span>
+                            </div>
+
+                            {/* Apartment - Mobile */}
+                            <div className="flex items-center gap-3 p-3 hover:bg-sky-50 rounded-lg transition-all border-2 border-transparent hover:border-sky-200">
+                                <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm" style={{
+                                    boxShadow: '0 2px 8px rgba(14, 165, 233, 0.2)'
+                                }}>
+                                    <img src="/Apartment png.png" alt="Apartment" className="w-7 h-7 object-contain" />
+                                </div>
+                                <span className="text-gray-800 font-semibold">Apartment</span>
+                            </div>
+
                             <button
                                 onClick={() => {
                                     onPostProperty();
