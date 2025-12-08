@@ -8,7 +8,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
         <>
             <nav className="bg-white shadow-sm fixed w-full top-0 z-50">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-                    <div className="flex justify-between items-center h-20">{/* Back to h-20 */}
+                    <div className="flex justify-between items-center h-28">{/* Increased height for big icons */}
                         {/* Logo - Marvel Style */}
                         <div className="flex items-center cursor-pointer">
                             <div className="border-2 border-[#00A8E8] px-3 py-0.5 rounded">
@@ -16,26 +16,26 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                             </div>
                         </div>
 
-                        {/* Desktop Navigation - CENTERED, SMALLER */}
+                        {/* Desktop Navigation - CENTERED, BIG ICONS */}
                         <div className="hidden md:flex items-center gap-12 absolute left-1/2 transform -translate-x-1/2">
-                            {/* House - Clean & Smaller */}
+                            {/* House - BIG & Tight */}
                             <button className="flex flex-col items-center gap-0 transition-all duration-200 cursor-pointer group">
                                 <img
                                     src="/House PNG.png"
                                     alt="House"
-                                    className="w-12 h-12 object-contain transition-transform duration-200 group-hover:scale-110"
+                                    className="w-24 h-24 object-contain transition-transform duration-200 group-hover:scale-110"
                                 />
-                                <span className="text-sm font-medium text-gray-700 group-hover:text-sky-600 transition-colors">House</span>
+                                <span className="text-sm font-medium text-gray-700 group-hover:text-sky-600 transition-colors -mt-2">House</span>
                             </button>
 
-                            {/* Apartment - Clean & Smaller */}
+                            {/* Apartment - BIG & Tight */}
                             <button className="flex flex-col items-center gap-0 transition-all duration-200 cursor-pointer group">
                                 <img
                                     src="/Apartment png.png"
                                     alt="Apartment"
-                                    className="w-12 h-12 object-contain transition-transform duration-200 group-hover:scale-110"
+                                    className="w-24 h-24 object-contain transition-transform duration-200 group-hover:scale-110"
                                 />
-                                <span className="text-sm font-medium text-gray-700 group-hover:text-sky-600 transition-colors">Apartment</span>
+                                <span className="text-sm font-medium text-gray-700 group-hover:text-sky-600 transition-colors -mt-2">Apartment</span>
                             </button>
                         </div>
 
@@ -109,7 +109,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                 )}
             </nav>
             {/* Spacer to prevent content from going under fixed navbar */}
-            <div className="h-20"></div>{/* Back to h-20 */}
+            <div className="h-28"></div>{/* Back to h-20 */}
         </>
     );
 };
