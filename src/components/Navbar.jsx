@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Globe, Menu, User, X } from 'lucide-react';
+import { Globe, Menu, User, X, MessageCircle } from 'lucide-react';
 
 const Navbar = ({ user, onPostProperty, onProfileClick }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
