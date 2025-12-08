@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Menu, User, X, MessageCircle } from 'lucide-react';
 
-const Navbar = ({ user, onPostProperty, onProfileClick }) => {
+const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySelect, selectedCategory }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     return (
@@ -19,23 +19,29 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                         {/* Desktop Navigation - CENTERED, BALANCED ICONS, FIXED GRID */}
                         <div className="hidden md:flex items-center justify-center gap-12 absolute left-1/2 transform -translate-x-1/2">
                             {/* House - Balanced Size */}
-                            <button className="w-32 flex flex-col items-center gap-1 transition-all duration-200 cursor-pointer group">
+                            <button
+                                onClick={() => onCategorySelect('house')}
+                                className="w-32 flex flex-col items-center gap-1 transition-all duration-200 cursor-pointer group"
+                            >
                                 <img
                                     src="/House PNG.png"
                                     alt="House"
-                                    className="w-16 h-16 object-contain transition-transform duration-200 group-hover:scale-110"
+                                    className={`w-16 h-16 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'house' ? 'scale-110' : ''}`}
                                 />
-                                <span className="text-sm font-medium text-gray-700 group-hover:text-sky-600 transition-colors -mt-1">House</span>
+                                <span className={`text-sm font-medium transition-colors -mt-1 ${selectedCategory === 'house' ? 'text-sky-600' : 'text-gray-700 group-hover:text-sky-600'}`}>House</span>
                             </button>
 
                             {/* Apartment - Balanced Size */}
-                            <button className="w-32 flex flex-col items-center gap-1 transition-all duration-200 cursor-pointer group">
+                            <button
+                                onClick={() => onCategorySelect('apartment')}
+                                className="w-32 flex flex-col items-center gap-1 transition-all duration-200 cursor-pointer group"
+                            >
                                 <img
                                     src="/Apartment png.png"
                                     alt="Apartment"
-                                    className="w-16 h-16 object-contain transition-transform duration-200 group-hover:scale-110"
+                                    className={`w-16 h-16 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'apartment' ? 'scale-110' : ''}`}
                                 />
-                                <span className="text-sm font-medium text-gray-700 group-hover:text-sky-600 transition-colors -mt-1">Apartment</span>
+                                <span className={`text-sm font-medium transition-colors -mt-1 ${selectedCategory === 'apartment' ? 'text-sky-600' : 'text-gray-700 group-hover:text-sky-600'}`}>Apartment</span>
                             </button>
                         </div>
 
@@ -49,7 +55,10 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                             </button>
 
                             {/* Message Icon - Rectangle Type UI (Insta style) */}
-                            <button className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors border border-transparent hover:border-gray-200">
+                            <button
+                                onClick={() => onNavigate && onNavigate('messages')}
+                                className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors border border-transparent hover:border-gray-200"
+                            >
                                 <MessageCircle size={22} className="text-gray-700" />
                             </button>
 
@@ -78,23 +87,35 @@ const Navbar = ({ user, onPostProperty, onProfileClick }) => {
                         <div className="md:hidden bg-white border-t border-gray-100">
                             <div className="px-4 py-4 space-y-3">
                                 {/* House - Mobile */}
-                                <div className="flex items-center gap-3 p-3 hover:bg-sky-50 rounded-lg transition-all border-2 border-transparent hover:border-sky-200">
+                                <div
+                                    onClick={() => {
+                                        onCategorySelect('house');
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className={`flex items-center gap-3 p-3 rounded-lg transition-all border-2 cursor-pointer ${selectedCategory === 'house' ? 'bg-sky-50 border-sky-200' : 'hover:bg-sky-50 border-transparent hover:border-sky-200'}`}
+                                >
                                     <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm" style={{
                                         boxShadow: '0 2px 8px rgba(14, 165, 233, 0.2)'
                                     }}>
                                         <img src="/House PNG.png" alt="House" className="w-7 h-7 object-contain" />
                                     </div>
-                                    <span className="text-gray-800 font-semibold">House</span>
+                                    <span className={`font-semibold ${selectedCategory === 'house' ? 'text-sky-600' : 'text-gray-800'}`}>House</span>
                                 </div>
 
                                 {/* Apartment - Mobile */}
-                                <div className="flex items-center gap-3 p-3 hover:bg-sky-50 rounded-lg transition-all border-2 border-transparent hover:border-sky-200">
+                                <div
+                                    onClick={() => {
+                                        onCategorySelect('apartment');
+                                        setIsMobileMenuOpen(false);
+                                    }}
+                                    className={`flex items-center gap-3 p-3 rounded-lg transition-all border-2 cursor-pointer ${selectedCategory === 'apartment' ? 'bg-sky-50 border-sky-200' : 'hover:bg-sky-50 border-transparent hover:border-sky-200'}`}
+                                >
                                     <div className="w-10 h-10 flex items-center justify-center bg-white rounded-lg shadow-sm" style={{
                                         boxShadow: '0 2px 8px rgba(14, 165, 233, 0.2)'
                                     }}>
                                         <img src="/Apartment png.png" alt="Apartment" className="w-7 h-7 object-contain" />
                                     </div>
-                                    <span className="text-gray-800 font-semibold">Apartment</span>
+                                    <span className={`font-semibold ${selectedCategory === 'apartment' ? 'text-sky-600' : 'text-gray-800'}`}>Apartment</span>
                                 </div>
 
                                 <button

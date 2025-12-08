@@ -42,7 +42,9 @@ const ExploreView = ({
     handleCardClick,
     favorites,
     toggleFavorite,
-    handleOpenChat
+    toggleFavorite,
+    handleOpenChat,
+    onNavigate
 }) => {
     const [showMap, setShowMap] = useState(false);
     const [showAutocomplete, setShowAutocomplete] = useState(false);
@@ -98,16 +100,15 @@ const ExploreView = ({
             <Navbar
                 user={user}
                 onPostProperty={handlePostProperty}
+                onNavigate={onNavigate}
+                onCategorySelect={setSelectedPropertyType}
+                selectedCategory={selectedPropertyType}
                 onProfileClick={() => {
                     if (!user) {
                         setAuthMode('login');
                         setShowAuthModal(true);
                     } else {
-                        // If user is logged in, maybe show a dropdown or navigate to profile
-                        // For now, let's just log or alert, or maybe trigger the profile view via parent if possible
-                        // But ExploreView doesn't control 'view' state of App.jsx directly other than via callbacks if provided.
-                        // We can use a simple alert or console log for now as the Profile is accessible via Bottom Nav.
-                        console.log("Profile clicked");
+                        onNavigate('profile');
                     }
                 }}
             />
