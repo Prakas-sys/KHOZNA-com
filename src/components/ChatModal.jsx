@@ -143,6 +143,25 @@ export default function ChatModal({ isOpen, onClose, listing }) {
         }
     };
 
+    // Mark as read when messages load
+    useEffect(() => {
+        const markAsRead = async () => {
+            if (!messages.length || !user || !conversation) return;
+
+            const unreadIds = messages
+                .filter(m => !m.is_read && m.sender_id !== user.id)
+                .map(m => m.id);
+
+            if (unreadIds.length > 0) {
+                await supabase
+                    .from('messages')
+                    .update({ is_read: true })
+                    .in('id', unreadIds);
+            }
+        };
+        markAsRead();
+    }, [messages, user, conversation]);
+
     const handleSendMessage = async (e) => {
         e.preventDefault();
 
