@@ -169,7 +169,7 @@ function RentEaseAppContent() {
                     .from('messages')
                     .select('id', { count: 'exact', head: true })
                     .eq('is_read', false)
-                    .neq('sender_id', user.id); // Only count messages sent by others
+                    .not('sender_id', 'eq', user.id); // Only count messages sent by others
 
                 console.log('🔴 Unread count result:', { count, error });
 
