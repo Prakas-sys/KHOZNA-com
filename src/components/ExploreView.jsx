@@ -186,6 +186,7 @@ const ExploreView = ({
                                             alt={listing.title}
                                             className="w-full h-44 object-cover"
                                         />
+                                        {/* Heart Icon - Top Right */}
                                         <button
                                             onClick={(e) => toggleFavorite(e, listing.id)}
                                             className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-colors shadow-sm"
@@ -195,11 +196,25 @@ const ExploreView = ({
                                                 className={favorites.includes(listing.id) ? "fill-red-500 text-red-500" : "text-gray-700"}
                                             />
                                         </button>
+                                        {/* Map Icon - Top Left - BRAND COLOR */}
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                // Could open map view or show location
+                                            }}
+                                            className="absolute top-3 left-3 p-2 rounded-full bg-sky-500/90 backdrop-blur-sm hover:bg-sky-600 transition-colors shadow-md"
+                                        >
+                                            <MapIcon size={16} className="text-white" />
+                                        </button>
                                     </div>
                                     <div className="p-4">
                                         <h3 className="font-semibold text-gray-800 text-lg truncate">{listing.title}</h3>
-                                        <p className="text-gray-500 text-sm mb-2">{listing.location}</p>
-                                        <div className="flex items-baseline gap-1">
+                                        {/* Location with Icon */}
+                                        <div className="flex items-center gap-1 text-gray-500 text-sm mb-2">
+                                            <MapPin size={14} className="text-sky-500" />
+                                            <span>{listing.location}</span>
+                                        </div>
+                                        <div className="flex items-baseline gap-1 mb-3">
                                             <span className="font-bold text-gray-900">Rs. {listing.price.toLocaleString()}</span>
                                             <span className="text-gray-500 text-sm">/ month</span>
                                         </div>
