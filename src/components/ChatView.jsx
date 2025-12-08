@@ -185,7 +185,12 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                     .eq('id', payload.new.id)
                     .single();
 
-                setMessages(prev => [...prev, data]);
+                // Prevent duplicates - only add if not already in messages
+                setMessages(prev => {
+                    const exists = prev.some(m => m.id === data.id);
+                    if (exists) return prev;
+                    return [...prev, data];
+                });
             })
             .on('postgres_changes', {
                 event: 'UPDATE',

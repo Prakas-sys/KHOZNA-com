@@ -42,7 +42,12 @@ export default function ChatModal({ isOpen, onClose, listing }) {
                     filter: `conversation_id=eq.${conversation.id}`,
                 },
                 (payload) => {
-                    setMessages((prev) => [...prev, payload.new]);
+                    // Prevent duplicates
+                    setMessages((prev) => {
+                        const exists = prev.some(m => m.id === payload.new.id);
+                        if (exists) return prev;
+                        return [...prev, payload.new];
+                    });
                 }
             )
             .subscribe();
