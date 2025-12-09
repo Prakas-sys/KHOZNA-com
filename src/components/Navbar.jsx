@@ -16,7 +16,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySe
                             </div>
                         </div>
 
-                        {/* Center Illustrations - MAXIMIZED ICONS */}
+                        {/* Center Illustrations - MAXIMIZED ICONS within h-16 */}
                         <div className="hidden md:flex items-center justify-center gap-6 absolute left-1/2 transform -translate-x-1/2 h-full">
                             <button
                                 onClick={() => onCategorySelect('house')}
