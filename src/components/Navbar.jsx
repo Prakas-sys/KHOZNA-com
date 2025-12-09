@@ -54,13 +54,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySe
                                 Become a Host
                             </button>
 
-                            {/* Message Icon - Rectangle Type UI (Insta style) */}
-                            <button
-                                onClick={() => onNavigate && onNavigate('messages')}
-                                className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 rounded-lg transition-colors border border-transparent hover:border-gray-200"
-                            >
-                                <MessageCircle size={22} className="text-gray-700" />
-                            </button>
+
 
                             <button
                                 onClick={onProfileClick}
