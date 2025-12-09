@@ -38,10 +38,17 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
                 {/* Search Bar */}
                 <div className="relative max-w-3xl mx-auto">
                     <div className="bg-white rounded-full shadow-lg p-1.5 flex items-center">
-                        <div className="flex-1 flex items-center px-6">
+                        <div className="flex-1 flex items-center px-4">
+                            <div className="mr-3 flex items-center justify-center">
+                                <img
+                                    src="/Hom icon.png"
+                                    alt="Home"
+                                    className="w-5 h-5 object-contain opacity-50"
+                                />
+                            </div>
                             <input
                                 type="text"
-                                placeholder="Popular destinations"
+                                placeholder="Search here..."
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && onSearch()}
