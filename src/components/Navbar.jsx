@@ -8,63 +8,63 @@ const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySe
         <>
             <nav className="bg-white shadow-sm fixed w-full top-0 z-50 transition-all duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-                    <div className="flex justify-between items-center h-20">
+                    <div className="flex justify-between items-center h-16">
                         {/* Logo */}
                         <div className="flex items-center cursor-pointer shrink-0">
-                            <div className="border-2 border-[#00A8E8] px-3 py-0.5 rounded">
-                                <span className="text-xl font-black text-[#00A8E8] tracking-wider">KHOZNA</span>
+                            <div className="border-2 border-[#00A8E8] px-2 py-0.5 rounded">
+                                <span className="text-lg font-black text-[#00A8E8] tracking-wider">KHOZNA</span>
                             </div>
                         </div>
 
-                        {/* Center Illustrations - BIG ICONS */}
-                        <div className="hidden md:flex items-center justify-center gap-12 absolute left-1/2 transform -translate-x-1/2 h-full">
+                        {/* Center Illustrations - BIG ICONS, CLOSED GAP */}
+                        <div className="hidden md:flex items-center justify-center gap-6 absolute left-1/2 transform -translate-x-1/2 h-full">
                             <button
                                 onClick={() => onCategorySelect('house')}
-                                className="group flex flex-col items-center justify-center gap-0.5 h-full px-4 cursor-pointer relative"
+                                className="group flex flex-col items-center justify-center gap-0.5 h-full px-3 cursor-pointer relative"
                             >
                                 <img
                                     src="/House PNG.png"
                                     alt="House"
-                                    className={`w-12 h-12 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'house' ? 'scale-110' : ''}`}
+                                    className={`w-10 h-10 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'house' ? 'scale-110' : ''}`}
                                 />
-                                <span className={`text-xs font-semibold transition-colors ${selectedCategory === 'house' ? 'text-sky-600' : 'text-gray-600 group-hover:text-black'}`}>House</span>
+                                <span className={`text-[11px] font-bold transition-colors ${selectedCategory === 'house' ? 'text-sky-600' : 'text-gray-600 group-hover:text-black'}`}>House</span>
                                 {selectedCategory === 'house' && (
-                                    <div className="absolute bottom-0 w-full h-1 bg-black rounded-t-full" />
+                                    <div className="absolute bottom-0 w-full h-0.5 bg-black rounded-t-full" />
                                 )}
                             </button>
 
                             <button
                                 onClick={() => onCategorySelect('apartment')}
-                                className="group flex flex-col items-center justify-center gap-0.5 h-full px-4 cursor-pointer relative"
+                                className="group flex flex-col items-center justify-center gap-0.5 h-full px-3 cursor-pointer relative"
                             >
                                 <img
                                     src="/Apartment png.png"
                                     alt="Apartment"
-                                    className={`w-12 h-12 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'apartment' ? 'scale-110' : ''}`}
+                                    className={`w-10 h-10 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'apartment' ? 'scale-110' : ''}`}
                                 />
-                                <span className={`text-xs font-semibold transition-colors ${selectedCategory === 'apartment' ? 'text-sky-600' : 'text-gray-600 group-hover:text-black'}`}>Apartment</span>
+                                <span className={`text-[11px] font-bold transition-colors ${selectedCategory === 'apartment' ? 'text-sky-600' : 'text-gray-600 group-hover:text-black'}`}>Apartment</span>
                                 {selectedCategory === 'apartment' && (
-                                    <div className="absolute bottom-0 w-full h-1 bg-black rounded-t-full" />
+                                    <div className="absolute bottom-0 w-full h-0.5 bg-black rounded-t-full" />
                                 )}
                             </button>
                         </div>
 
                         {/* Right Side */}
-                        <div className="hidden md:flex items-center space-x-4 shrink-0">
+                        <div className="hidden md:flex items-center space-x-3 shrink-0">
                             <button
                                 onClick={onPostProperty}
-                                className="text-gray-800 hover:text-[#00A8E8] text-sm font-medium transition px-4 py-2 rounded-full hover:bg-gray-100"
+                                className="text-gray-800 hover:text-[#00A8E8] text-xs font-bold transition px-3 py-1.5 rounded-full hover:bg-gray-100"
                             >
                                 Become a Host
                             </button>
 
                             <button
                                 onClick={onProfileClick}
-                                className="flex items-center space-x-2 border border-gray-300 rounded-full px-3 py-2 hover:shadow-md transition ml-2"
+                                className="flex items-center space-x-2 border border-gray-300 rounded-full px-2 py-1.5 hover:shadow-md transition ml-1"
                             >
-                                <Menu className="w-5 h-5 text-gray-600" />
-                                <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center">
-                                    <User size={18} className="text-white" />
+                                <Menu className="w-4 h-4 text-gray-600" />
+                                <div className="w-7 h-7 bg-gray-500 rounded-full flex items-center justify-center">
+                                    <User size={16} className="text-white" />
                                 </div>
                             </button>
                         </div>
@@ -74,7 +74,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySe
                             className="md:hidden p-2 rounded-full hover:bg-gray-100"
                             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                         >
-                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                            {isMobileMenuOpen ? <X size={20} /> : <Menu size={20} />}
                         </button>
                     </div>
 
@@ -121,7 +121,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySe
                 </div>
             </nav>
             {/* Spacer */}
-            <div className="h-20"></div>
+            <div className="h-16"></div>
         </>
     );
 };
