@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from "react";
-import { X, Send, Check, CheckCheck } from "lucide-react";
+import { X, Send, Check, CheckCheck, Trash2, Image as ImageIcon, Loader2 } from "lucide-react";
 import { supabase } from "../lib/supabase";
 import { useAuth } from "../contexts/AuthContext";
 
@@ -12,6 +12,8 @@ export default function ChatModal({ isOpen, onClose, listing }) {
     const [newMessage, setNewMessage] = useState("");
     const [loading, setLoading] = useState(true);
     const [sending, setSending] = useState(false);
+    const [uploading, setUploading] = useState(false);
+    const fileInputRef = useRef(null);
 
     const messagesEndRef = useRef(null);
 
@@ -225,6 +227,66 @@ export default function ChatModal({ isOpen, onClose, listing }) {
         }
     };
 
+    const handleDeleteMessage = async (messageId) => {
+        if (!window.confirm("Delete this message?")) return;
+
+        // Optimistic remove
+        setMessages(prev => prev.filter(m => m.id !== messageId));
+
+        try {
+            const { error } = await supabase
+                .from('messages')
+                .delete()
+                .eq('id', messageId);
+
+            if (error) throw error;
+        } catch (err) {
+            console.error("Delete error:", err);
+            alert("Failed to delete message");
+            initializeChat(); // Revert on failure
+        }
+    };
+
+    const handleFileUpload = async (e) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        try {
+            setUploading(true);
+            const fileExt = file.name.split('.').pop();
+            const fileName = `${Date.now()}-${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const filePath = `chat_uploads/${conversation.id}/${fileName}`;
+
+            const { error: uploadError } = await supabase.storage
+                .from('chat-uploads')
+                .upload(filePath, file);
+
+            if (uploadError) throw uploadError;
+
+            const { data: { publicUrl } } = supabase.storage
+                .from('chat-uploads')
+                .getPublicUrl(filePath);
+
+            // Send message with image
+            const { error: msgError } = await supabase.from('messages').insert({
+                conversation_id: conversation.id,
+                sender_id: user.id,
+                content: '📷 Image',
+                file_url: publicUrl,
+                file_type: 'image'
+            });
+
+            if (msgError) throw msgError;
+
+        } catch (err) {
+            console.error("Upload error:", err);
+            alert("Failed to upload image. Make sure 'chat-uploads' bucket exists.");
+        } finally {
+            setUploading(false);
+            if (fileInputRef.current) fileInputRef.current.value = '';
+        }
+    };
+
     if (!isOpen) return null;
 
     return (
@@ -274,13 +336,32 @@ export default function ChatModal({ isOpen, onClose, listing }) {
                                     key={msg.id}
                                     className={`flex ${isOwn ? "justify-end" : "justify-start"}`}
                                 >
-                                    <div className="max-w-[70%]">
+                                    <div className="max-w-[70%] group relative">
+                                        {isOwn && (
+                                            <button
+                                                onClick={() => handleDeleteMessage(msg.id)}
+                                                className="absolute -left-8 top-1/2 -translate-y-1/2 p-1.5 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity bg-white shadow-sm rounded-full"
+                                                title="Delete message"
+                                            >
+                                                <Trash2 size={14} />
+                                            </button>
+                                        )}
                                         <div
                                             className={`px-4 py-2 rounded-2xl ${isOwn
                                                 ? "bg-sky-600 text-white rounded-tr-none"
                                                 : "bg-white text-gray-900 rounded-tl-none shadow-sm"
                                                 }`}
                                         >
+                                            {msg.file_url ? (
+                                                <div className="mb-2">
+                                                    <img
+                                                        src={msg.file_url}
+                                                        alt="Attachment"
+                                                        className="rounded-lg max-h-48 object-cover border-2 border-white/20"
+                                                        loading="lazy"
+                                                    />
+                                                </div>
+                                            ) : null}
                                             <p className="text-sm">{msg.content}</p>
                                         </div>
                                     </div>
@@ -297,6 +378,21 @@ export default function ChatModal({ isOpen, onClose, listing }) {
                     onSubmit={handleSendMessage}
                     className="p-4 border-t bg-white flex items-center gap-2"
                 >
+                    <input
+                        type="file"
+                        ref={fileInputRef}
+                        onChange={handleFileUpload}
+                        accept="image/*"
+                        className="hidden"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploading || loading}
+                        className="p-3 text-gray-400 hover:text-sky-600 hover:bg-sky-50 rounded-full transition-colors"
+                    >
+                        {uploading ? <Loader2 size={20} className="animate-spin" /> : <ImageIcon size={20} />}
+                    </button>
                     <input
                         type="text"
                         value={newMessage}
