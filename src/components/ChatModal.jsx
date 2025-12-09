@@ -405,9 +405,10 @@ export default function ChatModal({ isOpen, onClose, listing }) {
                     <button
                         type="submit"
                         disabled={sending || loading || !newMessage.trim()}
-                        className="p-3 bg-sky-600 text-white rounded-full hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
+                        className="px-6 py-3 bg-[#00A8E8] text-white rounded-full hover:bg-[#0077B6] font-bold transition-all disabled:opacity-50 flex items-center gap-2 shadow-sm"
                     >
-                        <Send size={20} />
+                        <span>Send</span>
+                        <Send size={18} />
                     </button>
                 </form>
             </div>
