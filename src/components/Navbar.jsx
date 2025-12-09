@@ -5,11 +5,10 @@ const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySe
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
     return (
-
         <>
             <nav className="bg-white shadow-sm fixed w-full top-0 z-50 transition-all duration-300">
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
-                    <div className="flex justify-between items-center h-24">
+                    <div className="flex justify-between items-center h-20">
                         {/* Logo */}
                         <div className="flex items-center cursor-pointer shrink-0">
                             <div className="border-2 border-[#00A8E8] px-3 py-0.5 rounded">
@@ -26,9 +25,9 @@ const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySe
                                 <img
                                     src="/House PNG.png"
                                     alt="House"
-                                    className={`w-14 h-14 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'house' ? 'scale-110' : ''}`}
+                                    className={`w-12 h-12 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'house' ? 'scale-110' : ''}`}
                                 />
-                                <span className={`text-[13px] font-semibold transition-colors ${selectedCategory === 'house' ? 'text-sky-600' : 'text-gray-600 group-hover:text-black'}`}>House</span>
+                                <span className={`text-xs font-semibold transition-colors ${selectedCategory === 'house' ? 'text-sky-600' : 'text-gray-600 group-hover:text-black'}`}>House</span>
                                 {selectedCategory === 'house' && (
                                     <div className="absolute bottom-0 w-full h-1 bg-black rounded-t-full" />
                                 )}
@@ -41,9 +40,9 @@ const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySe
                                 <img
                                     src="/Apartment png.png"
                                     alt="Apartment"
-                                    className={`w-14 h-14 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'apartment' ? 'scale-110' : ''}`}
+                                    className={`w-12 h-12 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'apartment' ? 'scale-110' : ''}`}
                                 />
-                                <span className={`text-[13px] font-semibold transition-colors ${selectedCategory === 'apartment' ? 'text-sky-600' : 'text-gray-600 group-hover:text-black'}`}>Apartment</span>
+                                <span className={`text-xs font-semibold transition-colors ${selectedCategory === 'apartment' ? 'text-sky-600' : 'text-gray-600 group-hover:text-black'}`}>Apartment</span>
                                 {selectedCategory === 'apartment' && (
                                     <div className="absolute bottom-0 w-full h-1 bg-black rounded-t-full" />
                                 )}
@@ -122,7 +121,7 @@ const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySe
                 </div>
             </nav>
             {/* Spacer */}
-            <div className="h-24"></div>
+            <div className="h-20"></div>
         </>
     );
 };
