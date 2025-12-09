@@ -37,30 +37,23 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
 
                 {/* Search Bar */}
                 <div className="relative max-w-3xl mx-auto">
-                    <div className="bg-white rounded-full shadow-lg p-2 flex items-center">
-                        <div className="flex-1 flex items-center px-4">
-                            <div className="mr-3 flex items-center justify-center">
-                                <img
-                                    src="/Hom icon.png"
-                                    alt="Home"
-                                    className="w-5 h-5 object-contain"
-                                />
-                            </div>
+                    <div className="bg-white rounded-full shadow-lg p-1.5 flex items-center">
+                        <div className="flex-1 flex items-center px-6">
                             <input
                                 type="text"
-                                placeholder="Where to stay?"
+                                placeholder="Popular destinations"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                                 onKeyPress={(e) => e.key === 'Enter' && onSearch()}
                                 onFocus={() => searchQuery && setShowSuggestions(true)}
-                                className="w-full outline-none text-gray-700 placeholder-gray-400 bg-transparent"
+                                className="w-full outline-none text-gray-700 placeholder-gray-400 bg-transparent text-lg"
                             />
                         </div>
                         <button
                             onClick={onSearch}
-                            className="bg-[#00A8E8] text-white px-8 py-3 rounded-full hover:bg-[#0077B6] transition font-medium"
+                            className="bg-[#00A8E8] w-12 h-12 rounded-full flex items-center justify-center hover:bg-[#0077B6] transition shadow-md shrink-0"
                         >
-                            Search
+                            <Search className="text-white w-6 h-6" strokeWidth={3} />
                         </button>
                     </div>
 
