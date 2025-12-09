@@ -16,18 +16,18 @@ const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySe
                             </div>
                         </div>
 
-                        {/* Center Illustrations - BIG ICONS, CLOSED GAP */}
+                        {/* Center Illustrations - MAXIMIZED ICONS */}
                         <div className="hidden md:flex items-center justify-center gap-6 absolute left-1/2 transform -translate-x-1/2 h-full">
                             <button
                                 onClick={() => onCategorySelect('house')}
-                                className="group flex flex-col items-center justify-center gap-0.5 h-full px-3 cursor-pointer relative"
+                                className="group flex flex-col items-center justify-center gap-0 h-full px-3 cursor-pointer relative"
                             >
                                 <img
                                     src="/House PNG.png"
                                     alt="House"
-                                    className={`w-10 h-10 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'house' ? 'scale-110' : ''}`}
+                                    className={`w-14 h-14 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'house' ? 'scale-110' : ''}`}
                                 />
-                                <span className={`text-[11px] font-bold transition-colors ${selectedCategory === 'house' ? 'text-sky-600' : 'text-gray-600 group-hover:text-black'}`}>House</span>
+                                <span className={`text-[10px] font-bold -mt-1 transition-colors ${selectedCategory === 'house' ? 'text-sky-600' : 'text-gray-600 group-hover:text-black'}`}>House</span>
                                 {selectedCategory === 'house' && (
                                     <div className="absolute bottom-0 w-full h-0.5 bg-black rounded-t-full" />
                                 )}
@@ -35,14 +35,14 @@ const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySe
 
                             <button
                                 onClick={() => onCategorySelect('apartment')}
-                                className="group flex flex-col items-center justify-center gap-0.5 h-full px-3 cursor-pointer relative"
+                                className="group flex flex-col items-center justify-center gap-0 h-full px-3 cursor-pointer relative"
                             >
                                 <img
                                     src="/Apartment png.png"
                                     alt="Apartment"
-                                    className={`w-10 h-10 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'apartment' ? 'scale-110' : ''}`}
+                                    className={`w-14 h-14 object-contain transition-transform duration-200 group-hover:scale-110 ${selectedCategory === 'apartment' ? 'scale-110' : ''}`}
                                 />
-                                <span className={`text-[11px] font-bold transition-colors ${selectedCategory === 'apartment' ? 'text-sky-600' : 'text-gray-600 group-hover:text-black'}`}>Apartment</span>
+                                <span className={`text-[10px] font-bold -mt-1 transition-colors ${selectedCategory === 'apartment' ? 'text-sky-600' : 'text-gray-600 group-hover:text-black'}`}>Apartment</span>
                                 {selectedCategory === 'apartment' && (
                                     <div className="absolute bottom-0 w-full h-0.5 bg-black rounded-t-full" />
                                 )}
