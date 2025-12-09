@@ -1112,7 +1112,7 @@ function RentEaseAppContent() {
 
             {/* Bottom Navigation */}
             {(view === 'explore' || view === 'profile' || view === 'reels' || view === 'messages') && (
-                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 flex justify-between items-center z-50 h-[70px] shadow-lg md:hidden">
+                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-2 flex justify-between items-center z-50 h-[70px] shadow-lg">
                     <div
                         onClick={() => setView('explore')}
                         className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'explore' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
