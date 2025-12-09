@@ -41,7 +41,7 @@ const Hero = ({ searchQuery, setSearchQuery, onSearch }) => {
                         <div className="flex-1 flex items-center px-4">
                             <div className="mr-3 flex items-center justify-center">
                                 <img
-                                    src="/Hom icon.png"
+                                    src="/Hom-icon.png"
                                     alt="Home"
                                     className="w-5 h-5 object-contain opacity-50"
                                 />
