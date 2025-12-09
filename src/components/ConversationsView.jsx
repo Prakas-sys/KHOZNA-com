@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Send, Search, MessageCircle } from 'lucide-react';
+import { Send, Search, MessageCircle, Trash2 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { useAuth } from '../contexts/AuthContext';
 import ChatModal from './ChatModal';
@@ -137,6 +137,26 @@ export default function ConversationsView() {
         }
     };
 
+    const handleDeleteConversation = async (e, conversationId) => {
+        e.stopPropagation();
+        if (!window.confirm('Are you sure you want to delete this chat? This cannot be undone.')) return;
+
+        try {
+            const { error } = await supabase
+                .from('conversations')
+                .delete()
+                .eq('id', conversationId);
+
+            if (error) throw error;
+
+            // Optimistic update
+            setConversations(prev => prev.filter(c => c.id !== conversationId));
+        } catch (error) {
+            console.error('Error deleting conversation:', error);
+            alert('Failed to delete conversation. Please try again.');
+        }
+    };
+
     const formatTime = (timestamp) => {
         if (!timestamp) return '';
         const date = new Date(timestamp);
@@ -250,7 +270,17 @@ export default function ConversationsView() {
                                         <p className="text-xs text-gray-400 mt-1 truncate">
                                             📍 {conv.listing?.title || 'Property'}
                                         </p>
+
                                     </div>
+
+                                    {/* Delete Button */}
+                                    <button
+                                        onClick={(e) => handleDeleteConversation(e, conv.id)}
+                                        className="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-full transition-colors"
+                                        title="Delete conversation"
+                                    >
+                                        <Trash2 size={18} />
+                                    </button>
                                 </div>
                             </div>
                         ))}
@@ -259,22 +289,24 @@ export default function ConversationsView() {
             </div>
 
             {/* Chat Modal */}
-            {selectedConversation && (
-                <ChatModal
-                    isOpen={!!selectedConversation}
-                    onClose={() => {
-                        setSelectedConversation(null);
-                        fetchConversations(); // Refresh list when closing
-                    }}
-                    listing={{
-                        ...selectedConversation.listing,
-                        user_id: selectedConversation.participant_1_id === user.id
-                            ? selectedConversation.participant_2_id
-                            : selectedConversation.participant_1_id,
-                        profiles: selectedConversation.otherUser
-                    }}
-                />
-            )}
-        </div>
+            {
+                selectedConversation && (
+                    <ChatModal
+                        isOpen={!!selectedConversation}
+                        onClose={() => {
+                            setSelectedConversation(null);
+                            fetchConversations(); // Refresh list when closing
+                        }}
+                        listing={{
+                            ...selectedConversation.listing,
+                            user_id: selectedConversation.participant_1_id === user.id
+                                ? selectedConversation.participant_2_id
+                                : selectedConversation.participant_1_id,
+                            profiles: selectedConversation.otherUser
+                        }}
+                    />
+                )
+            }
+        </div >
     );
 }
