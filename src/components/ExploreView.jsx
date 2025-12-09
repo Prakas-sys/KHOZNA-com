@@ -43,7 +43,6 @@ const ExploreView = ({
     handleCardClick,
     favorites,
     toggleFavorite,
-    toggleFavorite,
     handleOpenChat,
     onNavigate
 }) => {
