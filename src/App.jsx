@@ -6,7 +6,7 @@ import {
     Home, Film, PlusCircle, Send, Sparkles, X, BellDot,
     SlidersHorizontal, Building, Building2, HomeIcon, Briefcase, UserCircle2,
     Edit, Trash2, MessageCircle, ChevronRight, Play, Pause, Shield, Flag, Phone,
-    Settings, CreditCard, HelpCircle, Camera, Lock, LogOut as LogoutIcon, MessageSquare
+    Settings, CreditCard, HelpCircle, Camera, Lock, LogOut as LogoutIcon, MessageSquare, MoreVertical
 } from 'lucide-react';
 import { useAuth, AuthProvider } from './contexts/AuthContext';
 import AuthModal from './components/AuthModal';
@@ -600,7 +600,8 @@ function RentEaseAppContent() {
         const [profileName, setProfileName] = useState(user?.user_metadata?.full_name || '');
         const [userListings, setUserListings] = useState([]);
         const [showMyListings, setShowMyListings] = useState(false);
-        const [showKYCDetails, setShowKYCDetails] = useState(false);
+        const [activeMenuId, setActiveMenuId] = useState(null);
+
         const fileInputRef = useRef(null);
 
         // Use kycMap if available, otherwise fetch or use null. 
@@ -914,12 +915,51 @@ function RentEaseAppContent() {
                                     <p className="text-gray-500 text-center py-10">No listings yet.</p>
                                 ) : (
                                     userListings.map(listing => (
-                                        <div key={listing.id} className="flex gap-4 p-4 bg-gray-50 rounded-xl">
+                                        <div key={listing.id} className="relative flex gap-4 p-4 bg-gray-50 rounded-xl">
                                             <img src={listing.image_url || listing.image} alt={listing.title} className="w-20 h-20 rounded-lg object-cover" />
                                             <div className="flex-1">
-                                                <h3 className="font-semibold">{listing.title}</h3>
-                                                <p className="text-sm text-gray-500">₹{listing.price.toLocaleString()}</p>
-                                                <button onClick={() => handleDeleteListing(listing.id)} className="text-red-500 text-sm mt-2">Delete</button>
+                                                <h3 className="font-semibold text-gray-900">{listing.title}</h3>
+                                                <p className="text-sm text-gray-500">Rs. {listing.price.toLocaleString()}</p>
+                                            </div>
+
+                                            {/* Three Dots Menu */}
+                                            <div className="relative">
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setActiveMenuId(activeMenuId === listing.id ? null : listing.id);
+                                                    }}
+                                                    className="p-2 hover:bg-gray-200 rounded-full transition-colors"
+                                                >
+                                                    <MoreVertical size={20} className="text-gray-500" />
+                                                </button>
+
+                                                {activeMenuId === listing.id && (
+                                                    <div className="absolute right-0 top-10 w-40 bg-white rounded-xl shadow-xl border border-gray-100 z-50 overflow-hidden transform origin-top-right">
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                alert("Edit functionality to be implemented.");
+                                                                setActiveMenuId(null);
+                                                            }}
+                                                            className="w-full text-left px-4 py-3 hover:bg-gray-50 flex items-center gap-3 text-gray-700 text-sm font-medium"
+                                                        >
+                                                            <Edit size={16} />
+                                                            <span>Edit</span>
+                                                        </button>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                handleDeleteListing(listing.id);
+                                                                setActiveMenuId(null);
+                                                            }}
+                                                            className="w-full text-left px-4 py-3 hover:bg-red-50 flex items-center gap-3 text-red-600 border-t border-gray-50 text-sm font-medium"
+                                                        >
+                                                            <Trash2 size={16} />
+                                                            <span>Delete</span>
+                                                        </button>
+                                                    </div>
+                                                )}
                                             </div>
                                         </div>
                                     ))
