@@ -6,7 +6,7 @@ import {
     Home, Film, PlusCircle, Send, Sparkles, X, BellDot,
     SlidersHorizontal, Building, Building2, HomeIcon, Briefcase, UserCircle2,
     Edit, Trash2, MessageCircle, ChevronRight, Play, Pause, Shield, Flag, Phone,
-    Settings, CreditCard, HelpCircle, Camera, Lock, LogOut as LogoutIcon, MessageSquare
+    Settings, CreditCard, HelpCircle, Camera, Lock, LogOut as LogoutIcon, MessageSquareDots
 } from 'lucide-react';
 import { useAuth, AuthProvider } from './contexts/AuthContext';
 import AuthModal from './components/AuthModal';
@@ -1143,7 +1143,7 @@ function RentEaseAppContent() {
                         className={`flex flex-col items-center gap-1 cursor-pointer ${view === 'messages' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors relative`}
                     >
                         <div className="relative">
-                            <MessageSquare size={24} strokeWidth={view === 'messages' ? 2.5 : 2} />
+                            <MessageSquareDots size={24} strokeWidth={view === 'messages' ? 2.5 : 2} />
                             {unreadCount > 0 && (
                                 <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center border-2 border-white shadow-sm animate-pulse">
                                     {unreadCount > 99 ? '99+' : unreadCount}
