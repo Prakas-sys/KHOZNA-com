@@ -196,7 +196,7 @@ const ExploreView = ({
                                         >
                                             <MapIcon size={16} className="text-white" />
                                         </button>
-                                        
+
                                         {/* Type Badge */}
                                         <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-white text-[10px] font-medium uppercase tracking-wide">
                                             Available Now
@@ -210,7 +210,7 @@ const ExploreView = ({
                                                 <span>4.5</span>
                                             </div>
                                         </div>
-                                        
+
                                         <div className="flex items-center text-gray-500 text-xs mb-2">
                                             <MapPin className="w-3 h-3 mr-1" />
                                             <span className="truncate">{listing.location}</span>
@@ -218,17 +218,22 @@ const ExploreView = ({
 
                                         <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">
                                             <div>
-                                                 <p className="text-[10px] text-gray-400 font-medium">Price</p>
-                                                 <p className="text-sky-600 font-black text-sm">Rs. {listing.price.toLocaleString()}<span className="text-gray-400 font-normal text-[10px]">/mo</span></p>
+                                                <p className="text-[10px] text-gray-400 font-medium">Price</p>
+                                                <p className="text-sky-600 font-black text-sm">Rs. {listing.price.toLocaleString()}<span className="text-gray-400 font-normal text-[10px]">/mo</span></p>
                                             </div>
-                                            <button 
+                                            <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     handleOpenChat(listing);
                                                 }}
                                                 className="bg-sky-50 text-sky-600 px-3 py-1.5 rounded-full text-[10px] font-bold hover:bg-sky-100 transition flex items-center gap-1"
                                             >
-                                                Book Now
+                                                {listing.category === 'hostel' ? 'Book Now' : (
+                                                    <>
+                                                        <MessageCircle size={12} />
+                                                        <span>Contact</span>
+                                                    </>
+                                                )}
                                             </button>
                                         </div>
                                     </div>
