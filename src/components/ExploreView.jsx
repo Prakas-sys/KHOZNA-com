@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
     UserCircle2, BellDot, LogOut, Heart, Star, Map as MapIcon, MessageCircle,
-    Building, Building2, HomeIcon, Briefcase
+    Building, Building2, HomeIcon, Briefcase, MapPin, Search
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
