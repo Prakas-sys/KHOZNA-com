@@ -121,9 +121,9 @@ const ExploreView = ({
 
             <div id="listings-section" className="max-w-7xl mx-auto px-4 py-12">
                 {/* Listing Controls (Map Toggle) - REMOVED */}
-                <div className="flex items-center justify-between mb-6">
-                    <h2 className="text-2xl font-bold text-gray-800">
-                        {listingType === 'rent' ? 'Properties for Rent' : 'Properties for Sale'}
+                <div className="flex items-center justify-between mb-4">
+                    <h2 className="text-xl md:text-2xl font-black text-gray-800">
+                        Available Now
                     </h2>
                 </div>
 
@@ -163,23 +163,23 @@ const ExploreView = ({
                             </MapContainer>
                         </div>
                     ) : filteredListings.length > 0 ? (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                        <div className="flex overflow-x-auto pb-6 gap-4 -mx-4 px-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-4 md:gap-6 scrollbar-hide snap-x">
                             {filteredListings.map(listing => (
                                 <div
                                     key={listing.id}
                                     onClick={() => handleCardClick(listing)}
-                                    className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer"
+                                    className="min-w-[280px] w-[280px] md:w-full md:min-w-0 shrink-0 bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition cursor-pointer snap-center border border-gray-100"
                                 >
                                     <div className="relative">
                                         <img
                                             src={listing.image_url || listing.image}
                                             alt={listing.title}
-                                            className="w-full h-44 object-cover"
+                                            className="w-full h-40 md:h-44 object-cover"
                                         />
                                         {/* Heart Icon - Top Right */}
                                         <button
                                             onClick={(e) => toggleFavorite(e, listing.id)}
-                                            className="absolute top-3 right-3 p-2 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-colors shadow-sm"
+                                            className="absolute top-3 right-3 p-1.5 rounded-full bg-white/90 backdrop-blur-sm hover:bg-white transition-colors shadow-sm"
                                         >
                                             <Heart
                                                 size={16}
@@ -192,34 +192,45 @@ const ExploreView = ({
                                                 e.stopPropagation();
                                                 // Could open map view or show location
                                             }}
-                                            className="absolute top-3 left-3 p-2 rounded-full bg-sky-500/90 backdrop-blur-sm hover:bg-sky-600 transition-colors shadow-md"
+                                            className="absolute top-3 left-3 p-1.5 rounded-full bg-sky-500/90 backdrop-blur-sm hover:bg-sky-600 transition-colors shadow-md"
                                         >
                                             <MapIcon size={16} className="text-white" />
                                         </button>
-                                    </div>
-                                    <div className="p-4">
-                                        <h3 className="font-semibold text-gray-800 text-lg truncate">{listing.title}</h3>
-                                        {/* Location with Icon */}
-                                        <div className="flex items-center gap-1 text-gray-500 text-sm mb-2">
-                                            <MapPin size={14} className="text-sky-500" />
-                                            <span>{listing.location}</span>
+                                        
+                                        {/* Type Badge */}
+                                        <div className="absolute bottom-2 left-2 bg-black/60 backdrop-blur-md px-2 py-0.5 rounded text-white text-[10px] font-medium uppercase tracking-wide">
+                                            Available Now
                                         </div>
-                                        <div className="flex items-baseline gap-1 mb-3">
-                                            <span className="font-bold text-gray-900">Rs. {listing.price.toLocaleString()}</span>
-                                            <span className="text-gray-500 text-sm">/ month</span>
+                                    </div>
+                                    <div className="p-3">
+                                        <div className="flex justify-between items-start mb-1">
+                                            <h3 className="font-bold text-gray-900 text-sm md:text-base line-clamp-1 flex-1">{listing.title}</h3>
+                                            <div className="flex items-center gap-1 text-gray-500 text-xs shrink-0 ml-2">
+                                                <Star className="w-3 h-3 fill-orange-400 text-orange-400" />
+                                                <span>4.5</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="flex items-center text-gray-500 text-xs mb-2">
+                                            <MapPin className="w-3 h-3 mr-1" />
+                                            <span className="truncate">{listing.location}</span>
                                         </div>
 
-                                        {/* Contact Button */}
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                handleOpenChat(listing);
-                                            }}
-                                            className="mt-3 w-full bg-green-500 text-white py-2 px-4 rounded-lg font-semibold hover:bg-green-600 transition-colors flex items-center justify-center gap-2"
-                                        >
-                                            <MessageCircle size={16} />
-                                            Contact
-                                        </button>
+                                        <div className="flex items-center justify-between mt-2 pt-2 border-t border-gray-50">
+                                            <div>
+                                                 <p className="text-[10px] text-gray-400 font-medium">Price</p>
+                                                 <p className="text-sky-600 font-black text-sm">Rs. {listing.price.toLocaleString()}<span className="text-gray-400 font-normal text-[10px]">/mo</span></p>
+                                            </div>
+                                            <button 
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleOpenChat(listing);
+                                                }}
+                                                className="bg-sky-50 text-sky-600 px-3 py-1.5 rounded-full text-[10px] font-bold hover:bg-sky-100 transition flex items-center gap-1"
+                                            >
+                                                Book Now
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             ))}
