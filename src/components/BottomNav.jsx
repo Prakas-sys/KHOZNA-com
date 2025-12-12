@@ -2,78 +2,75 @@ import React from 'react';
 import { Play, Plus, User } from 'lucide-react';
 
 const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
+    const navItems = [
+        { id: 'explore', label: 'Explore', type: 'image', src: '/nav search icon.png' },
+        { id: 'reels', label: 'Reels', type: 'icon', icon: Play },
+        { id: 'add', label: '', type: 'icon', icon: Plus, isSpecial: true },
+        { id: 'messages', label: 'Message', type: 'image', src: '/nav message.png' },
+        { id: 'profile', label: 'Profile', type: 'icon', icon: User }
+    ];
+
     return (
-        <div className="fixed bottom-0 left-0 w-full z-50 pointer-events-none">
-            {/* Background container with rounded corners and shadow */}
-            <div className="bg-white rounded-t-[35px] shadow-[0_-5px_25px_rgba(0,0,0,0.08)] pb-safe pt-2 px-5 pointer-events-auto h-[90px] flex items-end pb-5">
-                <div className="flex justify-between items-end w-full px-1">
+        <div className="fixed bottom-0 left-0 right-0 z-50 pointer-events-none">
+            <div className="bg-white rounded-t-3xl shadow-[0_-5px_20px_rgba(0,0,0,0.1)] px-6 py-3 pointer-events-auto pb-safe">
+                <div className="flex items-center justify-between max-w-md mx-auto">
+                    {navItems.map((item) => {
+                        const isActive = currentView === item.id;
 
-                    {/* Explore - Custom Icon */}
-                    <button
-                        onClick={() => onNavigate('explore')}
-                        className={`flex flex-col items-center gap-1.5 transition-all duration-200 w-14 ${currentView === 'explore' ? 'text-[#00A8E8]' : 'text-gray-400'
-                            }`}
-                    >
-                        <img
-                            src="/nav search icon.png"
-                            alt="Explore"
-                            className={`w-[28px] h-[28px] object-contain transition-all ${currentView === 'explore' ? 'brightness-100 scale-110' : 'grayscale opacity-50'
-                                }`}
-                        />
-                        <span className={`text-[11px] tracking-wide ${currentView === 'explore' ? 'font-bold' : 'font-medium'}`}>Explore</span>
-                    </button>
+                        // Handle Special Add Button
+                        if (item.isSpecial) {
+                            return (
+                                <button
+                                    key={item.id}
+                                    onClick={onPostProperty}
+                                    className="relative -mt-12 group"
+                                >
+                                    <div className="w-16 h-16 bg-[#00A8E8] rounded-full flex items-center justify-center shadow-lg shadow-sky-200 hover:scale-105 transition-transform active:scale-95">
+                                        <item.icon size={32} className="text-white" strokeWidth={3} />
+                                    </div>
+                                </button>
+                            );
+                        }
 
-                    {/* Reels - Filled Circle Look */}
-                    <button
-                        onClick={() => onNavigate('reels')}
-                        className={`flex flex-col items-center gap-1.5 transition-all duration-200 w-14 ${currentView === 'reels' ? 'text-[#00A8E8]' : 'text-gray-400'
-                            }`}
-                    >
-                        <div className={`w-[28px] h-[28px] rounded-full flex items-center justify-center transition-all ${currentView === 'reels' ? 'bg-[#00A8E8] shadow-md shadow-sky-200' : 'bg-gray-400'
-                            }`}>
-                            <Play size={12} className="fill-white text-white ml-0.5" />
-                        </div>
-                        <span className={`text-[11px] tracking-wide ${currentView === 'reels' ? 'font-bold' : 'font-medium'}`}>Reels</span>
-                    </button>
+                        // Handle Regular Items
+                        return (
+                            <button
+                                key={item.id}
+                                onClick={() => onNavigate(item.id)}
+                                className="flex flex-col items-center justify-center transition-all w-12"
+                            >
+                                {item.type === 'image' ? (
+                                    <img
+                                        src={item.src}
+                                        alt={item.label}
+                                        className="w-7 h-7 mb-1 object-contain transition-all"
+                                        style={{
+                                            // If active, apply the user's specific filter to turn it blue. If inactive, grayscale it.
+                                            filter: isActive
+                                                ? 'invert(47%) sepia(96%) saturate(1845%) hue-rotate(177deg) brightness(98%) contrast(101%)'
+                                                : 'grayscale(100%) opacity(0.5)'
+                                        }}
+                                    />
+                                ) : (
+                                    <item.icon
+                                        size={28}
+                                        strokeWidth={isActive ? 2.5 : 2}
+                                        className={`mb-1 transition-all ${isActive ? 'text-[#00A8E8] fill-[#00A8E8]/10' : 'text-gray-400 opacity-50'
+                                            }`}
+                                    />
+                                )}
 
-                    {/* Add Button - Floating & Large - NO STROKE - Perfectly Centered Pop-up */}
-                    <div className="relative -top-10 mx-1">
-                        <button
-                            onClick={onPostProperty}
-                            className="bg-[#00A8E8] text-white w-[72px] h-[72px] rounded-full flex items-center justify-center shadow-lg shadow-[#00A8E8]/30 hover:scale-105 transition-transform duration-200 active:scale-95"
-                        >
-                            <Plus size={36} strokeWidth={3} />
-                        </button>
-                    </div>
-
-                    {/* Messages - Custom Icon */}
-                    <button
-                        onClick={() => onNavigate('messages')}
-                        className={`flex flex-col items-center gap-1.5 transition-all duration-200 w-14 ${currentView === 'messages' ? 'text-[#00A8E8]' : 'text-gray-400'
-                            }`}
-                    >
-                        <img
-                            src="/nav message.png"
-                            alt="Message"
-                            className={`w-[26px] h-[26px] object-contain transition-all ${currentView === 'messages' ? 'brightness-100 scale-110' : 'grayscale opacity-50'
-                                }`}
-                        />
-                        <span className={`text-[11px] tracking-wide ${currentView === 'messages' ? 'font-bold' : 'font-medium'}`}>Message</span>
-                    </button>
-
-                    {/* Profile - Filled Circle Look */}
-                    <button
-                        onClick={() => onNavigate('profile')}
-                        className={`flex flex-col items-center gap-1.5 transition-all duration-200 w-14 ${currentView === 'profile' ? 'text-[#00A8E8]' : 'text-gray-400'
-                            }`}
-                    >
-                        <div className={`w-[28px] h-[28px] rounded-full flex items-center justify-center overflow-hidden transition-all ${currentView === 'profile' ? 'bg-[#00A8E8] shadow-md shadow-sky-200' : 'bg-gray-400'
-                            }`}>
-                            <User size={28} className="fill-white text-white translate-y-1" />
-                        </div>
-                        <span className={`text-[11px] tracking-wide ${currentView === 'profile' ? 'font-bold' : 'font-medium'}`}>Profile</span>
-                    </button>
-
+                                <span
+                                    className={`text-[10px] transition-all font-medium ${isActive
+                                            ? 'text-[#00A8E8]'
+                                            : 'text-gray-400'
+                                        }`}
+                                >
+                                    {item.label}
+                                </span>
+                            </button>
+                        );
+                    })}
                 </div>
             </div>
         </div>
