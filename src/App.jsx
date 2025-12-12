@@ -1151,58 +1151,7 @@ function RentEaseAppContent() {
             {view === 'reels' && <ReelsView />}
             {view === 'messages' && <MessagesView />}
 
-            {/* Bottom Navigation */}
-            {(view === 'explore' || view === 'profile' || view === 'reels' || view === 'messages') && (
-                <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 shadow-[0_-5px_10px_rgba(0,0,0,0.02)] z-50 h-[80px] grid grid-cols-5 items-center pb-2">
-                    <div
-                        onClick={() => setView('explore')}
-                        className={`flex flex-col items-center justify-center gap-1 cursor-pointer h-full ${view === 'explore' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
-                    >
-                        <Search size={24} strokeWidth={view === 'explore' ? 2.5 : 2} />
-                        <span className={`text-[11px] ${view === 'explore' ? 'font-bold' : 'font-medium'}`}>Explore</span>
-                    </div>
 
-                    <div
-                        onClick={() => setView('reels')}
-                        className={`flex flex-col items-center justify-center gap-1 cursor-pointer h-full ${view === 'reels' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
-                    >
-                        <Film size={24} strokeWidth={view === 'reels' ? 2.5 : 2} />
-                        <span className={`text-[11px] ${view === 'reels' ? 'font-bold' : 'font-medium'}`}>Reels</span>
-                    </div>
-
-                    <div className="relative h-full flex items-center justify-center">
-                        <button
-                            onClick={handlePostProperty}
-                            className="absolute -top-6 w-14 h-14 bg-[#00A8E8] rounded-full flex items-center justify-center text-white shadow-xl shadow-sky-200 hover:scale-105 transition-transform active:scale-95 border-4 border-white"
-                        >
-                            <PlusCircle size={28} strokeWidth={2.5} />
-                        </button>
-                    </div>
-
-                    <div
-                        onClick={() => setView('messages')}
-                        className={`flex flex-col items-center justify-center gap-1 cursor-pointer h-full ${view === 'messages' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors relative`}
-                    >
-                        <div className="relative">
-                            <MessageSquare size={24} strokeWidth={view === 'messages' ? 2.5 : 2} />
-                            {unreadCount > 0 && (
-                                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center border-2 border-white shadow-sm animate-pulse">
-                                    {unreadCount > 99 ? '99+' : unreadCount}
-                                </span>
-                            )}
-                        </div>
-                        <span className={`text-[11px] ${view === 'messages' ? 'font-bold' : 'font-medium'}`}>Messages</span>
-                    </div>
-
-                    <div
-                        onClick={() => setView('profile')}
-                        className={`flex flex-col items-center justify-center gap-1 cursor-pointer h-full ${view === 'profile' ? 'text-sky-500' : 'text-gray-400 hover:text-sky-500'} transition-colors`}
-                    >
-                        <UserCircle2 size={24} strokeWidth={view === 'profile' ? 2.5 : 2} />
-                        <span className={`text-[11px] ${view === 'profile' ? 'font-bold' : 'font-medium'}`}>Profile</span>
-                    </div>
-                </div>
-            )}
 
             {/* Auth Modal */}
             <AuthModal
@@ -1272,13 +1221,6 @@ function RentEaseAppContent() {
                     type={toast.type}
                     duration={toast.duration}
                     onClose={() => setToast(null)}
-                />
-            )}
-
-            {showChatModal && (
-                <ChatModal
-                    listing={chatListing}
-                    onClose={() => setShowChatModal(false)}
                 />
             )}
 

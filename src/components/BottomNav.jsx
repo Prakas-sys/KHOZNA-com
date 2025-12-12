@@ -1,45 +1,66 @@
 import React from 'react';
-import { Search, PlayCircle, Plus, MessageSquare, User } from 'lucide-react';
+import { Search, Play, Plus, MessageSquare, UserCircle2 } from 'lucide-react';
 
 const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
-    const navItems = [
-        { id: 'explore', label: 'Explore', icon: Search },
-        { id: 'reels', label: 'Reels', icon: PlayCircle },
-        { id: 'add', label: '', icon: Plus, isAction: true }, // Special action button
-        { id: 'messages', label: 'Message', icon: MessageSquare },
-        { id: 'profile', label: 'Profile', icon: User },
-    ];
-
     return (
-        <div className="fixed bottom-0 left-0 w-full bg-white border-t border-gray-200 pb-safe pt-2 px-6 z-50">
-            <div className="flex justify-between items-end pb-3">
-                {navItems.map((item) => {
-                    const isActive = currentView === item.id;
+        <div className="fixed bottom-0 left-0 w-full z-50 pointer-events-none">
+            {/* Background container with rounded corners and shadow */}
+            <div className="bg-white rounded-t-[35px] shadow-[0_-5px_20px_rgba(0,0,0,0.08)] pb-safe pt-4 px-6 pointer-events-auto h-[90px] flex items-end pb-6">
+                <div className="flex justify-between items-end w-full px-2">
 
-                    if (item.isAction) {
-                        return (
-                            <button
-                                key={item.id}
-                                onClick={onPostProperty}
-                                className="relative -top-5 bg-[#00A8E8] text-white w-14 h-14 rounded-full flex items-center justify-center shadow-lg shadow-sky-200 hover:scale-105 transition active:scale-95"
-                            >
-                                <Plus size={28} strokeWidth={2.5} />
-                            </button>
-                        );
-                    }
+                    {/* Explore */}
+                    <button
+                        onClick={() => onNavigate('explore')}
+                        className={`flex flex-col items-center gap-1.5 transition-colors w-12 ${currentView === 'explore' ? 'text-[#00A8E8]' : 'text-gray-400'
+                            }`}
+                    >
+                        <Search size={26} strokeWidth={currentView === 'explore' ? 2.5 : 2} />
+                        <span className="text-[11px] font-medium tracking-wide">Explore</span>
+                    </button>
 
-                    return (
+                    {/* Reels */}
+                    <button
+                        onClick={() => onNavigate('reels')}
+                        className={`flex flex-col items-center gap-1.5 transition-colors w-12 ${currentView === 'reels' ? 'text-[#00A8E8]' : 'text-gray-400'
+                            }`}
+                    >
+                        <div className={`w-7 h-7 rounded-full border-[2.5px] flex items-center justify-center ${currentView === 'reels' ? 'border-[#00A8E8] text-[#00A8E8]' : 'border-gray-400 text-gray-400'} p-0.5`}>
+                            <Play size={12} className="fill-current ml-0.5" />
+                        </div>
+                        <span className="text-[11px] font-medium tracking-wide">Reels</span>
+                    </button>
+
+                    {/* Add Button - Floating & Large */}
+                    <div className="relative -top-8 mx-2">
                         <button
-                            key={item.id}
-                            onClick={() => onNavigate(item.id)}
-                            className={`flex flex-col items-center gap-1 transition-colors ${isActive ? 'text-[#00A8E8]' : 'text-gray-400'
-                                }`}
+                            onClick={onPostProperty}
+                            className="bg-[#00A8E8] text-white w-[70px] h-[70px] rounded-full flex items-center justify-center shadow-xl shadow-sky-200 hover:scale-105 transition active:scale-95 ring-[6px] ring-white"
                         >
-                            <item.icon size={24} strokeWidth={isActive ? 2.5 : 2} />
-                            <span className="text-[10px] font-medium">{item.label}</span>
+                            <Plus size={38} strokeWidth={3} />
                         </button>
-                    );
-                })}
+                    </div>
+
+                    {/* Messages */}
+                    <button
+                        onClick={() => onNavigate('messages')}
+                        className={`flex flex-col items-center gap-1.5 transition-colors w-12 ${currentView === 'messages' ? 'text-[#00A8E8]' : 'text-gray-400'
+                            }`}
+                    >
+                        <MessageSquare size={24} strokeWidth={currentView === 'messages' ? 2.5 : 2} className={currentView === 'messages' ? 'fill-sky-100' : ''} />
+                        <span className="text-[11px] font-medium tracking-wide">Message</span>
+                    </button>
+
+                    {/* Profile */}
+                    <button
+                        onClick={() => onNavigate('profile')}
+                        className={`flex flex-col items-center gap-1.5 transition-colors w-12 ${currentView === 'profile' ? 'text-[#00A8E8]' : 'text-gray-400'
+                            }`}
+                    >
+                        <UserCircle2 size={26} strokeWidth={currentView === 'profile' ? 2.5 : 2} className={currentView === 'profile' ? 'fill-sky-100' : ''} />
+                        <span className="text-[11px] font-medium tracking-wide">Profile</span>
+                    </button>
+
+                </div>
             </div>
         </div>
     );
