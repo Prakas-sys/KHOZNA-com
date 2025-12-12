@@ -118,11 +118,7 @@ const Button = ({ children, onClick, variant = "primary", className = "", icon: 
 // --- Main Application Component ---
 
 export default function RentEaseApp() {
-    return (
-        <AuthProvider>
-            <RentEaseAppContent />
-        </AuthProvider>
-    );
+    return <RentEaseAppContent />;
 }
 
 function RentEaseAppContent() {
