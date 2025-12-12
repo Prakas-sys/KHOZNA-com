@@ -1,13 +1,13 @@
 import React from 'react';
-import { Play, Plus, User } from 'lucide-react';
+import { Play, Plus, User, Search, MessageSquare } from 'lucide-react';
 
 const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
     const navItems = [
-        { id: 'explore', label: 'Explore', type: 'image', src: '/nav search icon.png' },
-        { id: 'reels', label: 'Reels', type: 'icon', icon: Play },
+        { id: 'explore', label: 'Explore', icon: Search },
+        { id: 'reels', label: 'Reels', icon: Play },
         { id: 'add', label: '', type: 'special', icon: Plus },
-        { id: 'messages', label: 'Message', type: 'image', src: '/nav message.png' },
-        { id: 'profile', label: 'Profile', type: 'icon', icon: User }
+        { id: 'messages', label: 'Message', icon: MessageSquare },
+        { id: 'profile', label: 'Profile', icon: User }
     ];
 
     return (
@@ -34,46 +34,20 @@ const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
                         );
                     }
 
-                    // Lucide Icons (Reels, Profile) - Standardized
-                    if (item.type === 'icon') {
-                        return (
-                            <button
-                                key={item.id}
-                                onClick={() => onNavigate(item.id)}
-                                className="flex flex-col items-center justify-center gap-1 min-w-[60px] h-full pt-2"
-                            >
-                                <item.icon
-                                    size={24}
-                                    strokeWidth={isActive ? 2.5 : 2}
-                                    color={isActive ? activeColor : inactiveColor}
-                                    className="transition-colors duration-200"
-                                />
-                                <span className={`text-[10px] font-medium tracking-wide ${isActive ? 'text-[#00A8E8]' : 'text-gray-500'
-                                    }`}>
-                                    {item.label}
-                                </span>
-                            </button>
-                        );
-                    }
-
-                    // Image Icons (Explore, Message) - Standardized
+                    // Standard Icons
                     return (
                         <button
                             key={item.id}
                             onClick={() => onNavigate(item.id)}
-                            className="flex flex-col items-center justify-center gap-1 min-w-[60px] h-full pt-2"
+                            className="flex flex-col items-center justify-center gap-1 min-w-[60px] h-full pt-2 group"
                         >
-                            <img
-                                src={item.src}
-                                alt={item.label}
-                                className="w-[24px] h-[24px] object-contain transition-all duration-200"
-                                style={{
-                                    filter: isActive
-                                        ? 'invert(47%) sepia(96%) saturate(1845%) hue-rotate(177deg) brightness(98%) contrast(101%)' // Matches #00A8E8
-                                        : 'grayscale(100%) opacity(0.6)' // Matches gray-500 look
-                                }}
+                            <item.icon
+                                size={24}
+                                strokeWidth={isActive ? 2.5 : 2}
+                                color={isActive ? activeColor : inactiveColor}
+                                className="transition-colors duration-200 group-hover:text-gray-900"
                             />
-                            <span className={`text-[10px] font-medium tracking-wide ${isActive ? 'text-[#00A8E8]' : 'text-gray-500'
+                            <span className={`text-[10px] font-medium tracking-wide transition-colors duration-200 ${isActive ? 'text-[#00A8E8]' : 'text-gray-500 group-hover:text-gray-900'
                                 }`}>
                                 {item.label}
                             </span>
