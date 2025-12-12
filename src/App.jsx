@@ -20,6 +20,7 @@ import LocationPermissionModal from './components/LocationPermissionModal';
 import Toast from './components/Toast';
 import ConversationsView from './components/ConversationsView';
 import ChatView from './components/ChatView';
+import BottomNav from './components/BottomNav';
 import { supabase } from './lib/supabase';
 
 
@@ -1273,6 +1274,22 @@ function RentEaseAppContent() {
                     onClose={() => setToast(null)}
                 />
             )}
+
+            {showChatModal && (
+                <ChatModal
+                    listing={chatListing}
+                    onClose={() => setShowChatModal(false)}
+                />
+            )}
+
+            <BottomNav
+                currentView={view}
+                onNavigate={(v) => {
+                    setView(v);
+                    if (v === 'explore') setSelectedListing(null);
+                }}
+                onPostProperty={handlePostProperty}
+            />
         </div>
     );
 }
