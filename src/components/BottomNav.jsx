@@ -1,5 +1,5 @@
 import React from 'react';
-import { PlayCircle, Plus, User, Search, MessageSquare } from 'lucide-react';
+import { PlayCircle, Plus, CircleUser, Search, MessageSquare } from 'lucide-react';
 
 const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
     const navItems = [
@@ -7,7 +7,7 @@ const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
         { id: 'reels', label: 'Reels', icon: PlayCircle },
         { id: 'add', label: '', type: 'special', icon: Plus },
         { id: 'messages', label: 'Message', icon: MessageSquare },
-        { id: 'profile', label: 'Profile', icon: User }
+        { id: 'profile', label: 'Profile', icon: CircleUser }
     ];
 
     return (
