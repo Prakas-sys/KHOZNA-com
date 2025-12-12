@@ -1,10 +1,10 @@
 import React from 'react';
-import { Play, Plus, User, Search, MessageSquare } from 'lucide-react';
+import { PlayCircle, Plus, User, Search, MessageSquare } from 'lucide-react';
 
 const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
     const navItems = [
         { id: 'explore', label: 'Explore', icon: Search },
-        { id: 'reels', label: 'Reels', icon: Play },
+        { id: 'reels', label: 'Reels', icon: PlayCircle },
         { id: 'add', label: '', type: 'special', icon: Plus },
         { id: 'messages', label: 'Message', icon: MessageSquare },
         { id: 'profile', label: 'Profile', icon: User }
@@ -16,7 +16,7 @@ const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
                 {navItems.map((item) => {
                     const isActive = currentView === item.id;
                     const activeColor = '#00A8E8';
-                    const inactiveColor = '#6B7280'; // gray-500
+                    const inactiveColor = '#9CA3AF'; // gray-400
 
                     // Special Add Button
                     if (item.type === 'special') {
@@ -34,7 +34,7 @@ const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
                         );
                     }
 
-                    // Standard Icons
+                    // Standard Icons (Explore, Reels, Message, Profile)
                     return (
                         <button
                             key={item.id}
@@ -42,12 +42,12 @@ const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
                             className="flex flex-col items-center justify-center gap-1 min-w-[60px] h-full pt-2 group"
                         >
                             <item.icon
-                                size={24}
+                                size={26} // Requested 26px size
                                 strokeWidth={isActive ? 2.5 : 2}
                                 color={isActive ? activeColor : inactiveColor}
-                                className="transition-colors duration-200 group-hover:text-gray-900"
+                                className="transition-all duration-200 group-hover:scale-110 group-hover:text-gray-600"
                             />
-                            <span className={`text-[10px] font-medium tracking-wide transition-colors duration-200 ${isActive ? 'text-[#00A8E8]' : 'text-gray-500 group-hover:text-gray-900'
+                            <span className={`text-[10px] font-medium tracking-wide transition-colors duration-200 ${isActive ? 'text-[#00A8E8]' : 'text-gray-400 group-hover:text-gray-600'
                                 }`}>
                                 {item.label}
                             </span>
