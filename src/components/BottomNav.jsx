@@ -1,5 +1,5 @@
 import React from 'react';
-import { Search, PlayCircle, Plus, MessageSquare, UserCircle } from 'lucide-react';
+import { PlayCircle, Plus, UserCircle } from 'lucide-react';
 
 const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
     return (
@@ -8,13 +8,17 @@ const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
             <div className="bg-white rounded-t-[30px] shadow-[0_-4px_20px_rgba(0,0,0,0.06)] pb-safe pt-3 px-6 pointer-events-auto h-[85px] flex items-end pb-5">
                 <div className="flex justify-between items-end w-full px-2">
 
-                    {/* Explore */}
+                    {/* Explore - Custom Icon */}
                     <button
                         onClick={() => onNavigate('explore')}
                         className={`flex flex-col items-center gap-1.5 transition-colors w-12 ${currentView === 'explore' ? 'text-[#00A8E8]' : 'text-gray-400'
                             }`}
                     >
-                        <Search size={26} strokeWidth={currentView === 'explore' ? 2.5 : 2} />
+                        <img
+                            src="/nav search icon.png"
+                            alt="Explore"
+                            className={`w-[26px] h-[26px] object-contain ${currentView === 'explore' ? 'brightness-100' : 'grayscale opacity-60'}`} // Simple active/inactive effect
+                        />
                         <span className="text-[11px] font-medium tracking-wide">Explore</span>
                     </button>
 
@@ -38,13 +42,17 @@ const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
                         </button>
                     </div>
 
-                    {/* Messages */}
+                    {/* Messages - Custom Icon */}
                     <button
                         onClick={() => onNavigate('messages')}
                         className={`flex flex-col items-center gap-1.5 transition-colors w-12 ${currentView === 'messages' ? 'text-[#00A8E8]' : 'text-gray-400'
                             }`}
                     >
-                        <MessageSquare size={26} strokeWidth={currentView === 'messages' ? 2.5 : 2} />
+                        <img
+                            src="/nav message.png"
+                            alt="Message"
+                            className={`w-[26px] h-[26px] object-contain ${currentView === 'messages' ? 'brightness-100' : 'grayscale opacity-60'}`}
+                        />
                         <span className="text-[11px] font-medium tracking-wide">Message</span>
                     </button>
 
