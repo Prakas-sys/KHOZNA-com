@@ -12,7 +12,7 @@ const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
 
     return (
         <div className="fixed bottom-0 left-0 w-full z-50 bg-white border-t border-gray-200 shadow-sm h-[65px] pb-safe">
-            <div className="flex items-center justify-between w-full h-full max-w-lg mx-auto px-4">
+            <div className="flex items-center justify-between w-full h-full px-6 md:px-12">
                 {navItems.map((item) => {
                     const isActive = currentView === item.id;
                     const activeColor = '#00A8E8';

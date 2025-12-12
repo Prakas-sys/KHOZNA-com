@@ -83,12 +83,12 @@ const ExploreView = ({
                         <div className="w-10 h-10 border-4 border-[#00A8E8] border-t-transparent rounded-full animate-spin"></div>
                     </div>
                 ) : filteredListings.length > 0 ? (
-                    <div className="flex overflow-x-auto pb-8 gap-4 px-1 -mx-4 md:mx-0 md:px-0 md:grid md:grid-cols-2 lg:grid-cols-3 scrollbar-hide snap-x">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 pb-24">
                         {filteredListings.map(listing => (
                             <div
                                 key={listing.id}
                                 onClick={() => handleCardClick(listing)}
-                                className="min-w-[300px] w-[300px] md:w-full shrink-0 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden snap-center group hover:shadow-md transition-all duration-300"
+                                className="w-full bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden group hover:shadow-md transition-all duration-300"
                             >
                                 {/* Image Container */}
                                 <div className="relative h-48 w-full bg-gray-100">
