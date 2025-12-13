@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import {
     UserCircle2, BellDot, LogOut, Heart, Star, Map as MapIcon, MessageCircle,
-    Building, Building2, HomeIcon, Briefcase, MapPin, Search, BedDouble, Wifi, Droplets
+    Building, Building2, HomeIcon, Briefcase, MapPin, Search, BedDouble, Wifi, Droplets, BadgeCheck
 } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { NEPAL_LOCATIONS } from '../data/locations';
@@ -100,9 +100,10 @@ const ExploreView = ({
 
                                     {/* Badges */}
                                     <div className="absolute top-3 left-3 flex gap-2">
-                                        <span className="bg-[#00A8E8] text-white text-[10px] font-bold px-2 py-0.5 rounded-sm uppercase tracking-wide">New</span>
-                                        <span className="bg-white/90 text-gray-800 text-[10px] font-bold px-2 py-0.5 rounded-sm flex items-center gap-1">
-                                            <span className="w-1.5 h-1.5 bg-blue-500 rounded-full"></span> Verified
+                                        <span className="bg-[#00A8E8] text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wide shadow-sm">New</span>
+                                        <span className="bg-white/95 backdrop-blur-sm text-gray-800 text-[10px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1 shadow-sm">
+                                            <BadgeCheck size={12} className="text-[#00A8E8] fill-sky-100" />
+                                            Verified
                                         </span>
                                     </div>
 
