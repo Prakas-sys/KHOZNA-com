@@ -1,8 +1,5 @@
 import React, { useState } from 'react';
 import { Menu, User, X } from 'lucide-react';
-import SearchIcon from '../icons/SearchIcon';
-import MessageIcon from '../icons/MessageIcon';
-import '../styles/navbar.css';
 
 const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySelect, selectedCategory }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -17,21 +14,13 @@ const Navbar = ({ user, onPostProperty, onProfileClick, onNavigate, onCategorySe
                             <span className="text-xl font-black text-[#00A8E8] tracking-wider uppercase">KHOZNA</span>
                         </div>
 
-                        <div className="flex items-center gap-2">
-                            <button className="nav-btn">
-                                <SearchIcon />
-                            </button>
-                            <button className="nav-btn">
-                                <MessageIcon />
-                            </button>
-                            {/* Mobile Menu Button - Right Aligned as per screenshot */}
-                            <button
-                                className="p-2 rounded-full hover:bg-gray-100 text-gray-700"
-                                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                            >
-                                {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-                            </button>
-                        </div>
+                        {/* Mobile Menu Button - Right Aligned as per screenshot */}
+                        <button
+                            className="p-2 rounded-full hover:bg-gray-100 text-gray-700"
+                            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                        >
+                            {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+                        </button>
                     </div>
 
                     {/* Mobile Menu Dropdown */}

@@ -1,12 +1,14 @@
 import React from 'react';
-import { PlayCircle, Plus, CircleUser, Search, Send } from 'lucide-react';
+import { PlayCircle, Plus, CircleUser } from 'lucide-react';
+import SearchIcon from '../icons/SearchIcon';
+import MessageIcon from '../icons/MessageIcon';
 
 const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
     const navItems = [
-        { id: 'explore', label: 'Explore', icon: Search },
+        { id: 'explore', label: 'Explore', icon: SearchIcon },
         { id: 'reels', label: 'Reels', icon: PlayCircle },
         { id: 'add', label: '', type: 'special', icon: Plus },
-        { id: 'messages', label: 'Message', icon: Send },
+        { id: 'messages', label: 'Message', icon: MessageIcon },
         { id: 'profile', label: 'Profile', icon: CircleUser }
     ];
 
@@ -44,8 +46,7 @@ const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
                             <item.icon
                                 size={26} // Requested 26px size
                                 strokeWidth={isActive ? 2.5 : 2}
-                                color={isActive ? activeColor : inactiveColor}
-                                className="transition-all duration-200 group-hover:scale-110 group-hover:text-gray-600"
+                                className={`transition-all duration-200 group-hover:scale-110 ${isActive ? 'text-[#00A8E8]' : 'text-gray-400 group-hover:text-gray-600'}`}
                             />
                             <span className={`text-[10px] font-medium tracking-wide transition-colors duration-200 ${isActive ? 'text-[#00A8E8]' : 'text-gray-400 group-hover:text-gray-600'
                                 }`}>
