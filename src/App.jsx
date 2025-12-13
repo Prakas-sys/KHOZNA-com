@@ -390,9 +390,9 @@ function RentEaseAppContent() {
             return;
         }
 
-        // Check if user is verified (explicit check for true)
-        if (user.is_verified !== true) {
-            console.log('User not verified, showing KYCModal');
+        // Check if user is verified (accept any truthy value to avoid strict type issues)
+        if (!user.is_verified) {
+            console.log('User not verified (or flag not truthy), showing KYCModal');
             setShowKYCModal(true);
             return;
         }

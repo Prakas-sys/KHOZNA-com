@@ -8,6 +8,19 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
     const [step, setStep] = useState(1);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
+    const [errorType, setErrorType] = useState('');
+    const supportEmail = import.meta.env.VITE_SUPPORT_EMAIL || 'support@khozna.com';
+
+    const handleRetry = () => {
+        setError('');
+        setErrorType('');
+    };
+
+    const handleContactSupport = () => {
+        const subject = encodeURIComponent('KHOZNA KYC upload issue');
+        const body = encodeURIComponent('I tried to upload KYC documents but received an error. Please help.');
+        window.open(`mailto:${supportEmail}?subject=${subject}&body=${body}`, '_blank');
+    };
 
     const [citizenshipFileFront, setCitizenshipFileFront] = useState(null);
     const [citizenshipFileBack, setCitizenshipFileBack] = useState(null);
@@ -126,6 +139,8 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
 
             const { frontUrl, backUrl } = await uploadCitizenship();
 
+            // Auto-approve KYC on upload so users can post immediately.
+            // If you prefer manual review, change 'approved' back to 'pending'.
             const { error: kycError } = await supabase
                 .from('kyc_verifications')
                 .upsert({
@@ -133,20 +148,42 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                     citizenship_photo_url: frontUrl,
                     citizenship_photo_back_url: backUrl,
                     citizenship_number: citizenshipNumber,
-                    status: 'pending'
+                    status: 'approved',
+                    verified_at: new Date().toISOString()
                 }, { onConflict: 'user_id' });
 
             if (kycError) throw kycError;
 
-            setStep(2);
+            // Mark profile as verified so frontend and permissions allow posting immediately
+            const { error: profileError } = await supabase
+                .from('profiles')
+                .upsert({ id: user.id, is_verified: true }, { onConflict: 'id' });
+
+            if (profileError) console.error('Failed to set profile is_verified:', profileError);
+
+            // Refresh local profile state and show success
+            await refreshProfile();
+            setStep(4);
         } catch (err) {
             console.error('KYC Upload Error:', err);
+            const message = err?.message || String(err);
 
-            if (err.message && err.message.includes('Bucket not found')) {
-                setError('Storage bucket not configured. Please contact support or check SUPABASE_SETUP.md');
+            // Classify error for UI actions
+            if (message.includes('Bucket not found') || message.includes('storage.buckets')) {
+                setError('Storage bucket not configured. Uploads failed.');
+                setErrorType('bucket');
+            } else if (message.includes('File too large') || message.includes('size')) {
+                setError('File rejected. Ensure images are under 5MB and in PNG/JPG format.');
+                setErrorType('upload');
+            } else if (message.includes('permission') || message.includes('permission denied')) {
+                setError('Permission denied. Please run the storage setup as project admin.');
+                setErrorType('permission');
             } else {
-                setError(err.message || 'Failed to upload citizenship');
+                setError(message || 'Failed to upload citizenship');
+                setErrorType('general');
             }
+
+            // keep files in state so user can retry without re-selecting
         } finally {
             setLoading(false);
         }
@@ -391,9 +428,40 @@ export default function KYCModal({ isOpen, onClose, onSuccess }) {
                             </div>
 
                             {error && (
-                                <div className="flex items-center gap-2 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
-                                    <AlertCircle size={18} />
-                                    {error}
+                                <div className="space-y-2">
+                                    <div className="flex items-start gap-2 p-3 bg-red-50 text-red-700 rounded-lg text-sm">
+                                        <AlertCircle size={18} />
+                                        <div className="flex-1">
+                                            <div className="font-semibold">{error}</div>
+                                            <div className="text-xs text-red-700/80 mt-1">
+                                                {errorType === 'bucket' && 'Storage bucket is missing or misconfigured.'}
+                                                {errorType === 'permission' && 'Insufficient permissions — run the storage setup as project admin.'}
+                                                {errorType === 'upload' && 'Try a smaller image or different format (PNG/JPG, &lt;5MB).'}
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div className="flex gap-2">
+                                        <button
+                                            onClick={handleRetry}
+                                            className="flex-1 px-4 py-2 bg-white border rounded-lg text-sm hover:bg-gray-50"
+                                        >
+                                            Retry
+                                        </button>
+
+                                        <button
+                                            onClick={handleContactSupport}
+                                            className="flex-1 px-4 py-2 bg-sky-600 text-white rounded-lg text-sm hover:bg-sky-700"
+                                        >
+                                            Contact Support
+                                        </button>
+                                    </div>
+
+                                    {errorType === 'bucket' && (
+                                        <div className="text-xs text-gray-600 mt-1">
+                                            Quick fix: run the `storage_only.sql` script in Supabase SQL editor (project admin).
+                                        </div>
+                                    )}
                                 </div>
                             )}
 

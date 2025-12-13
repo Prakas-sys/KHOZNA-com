@@ -90,15 +90,17 @@ export default async function handler(req, res) {
     });
 
     // Create notification in database
-    await supabase
+    const { error: notifError } = await supabase
       .from('notifications')
       .insert({
         user_id: userId,
         title: 'KYC Edit Request Submitted',
         message: 'Your edit request has been sent to admin. You will be notified via email once reviewed.',
         type: 'info',
-        read: false,
+        is_read: false,
       });
+
+    if (notifError) console.warn('Failed to create notification:', notifError.message || notifError);
 
     // Also log the request in a requests table for tracking
     await supabase

@@ -342,9 +342,7 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                         <h3 className="font-semibold text-gray-900">
                             {sellerProfile?.full_name || 'Seller'}
                         </h3>
-                        <p className="text-xs text-gray-500">
-                            {listing?.title || 'Property Chat'}
-                        </p>
+                        {/* Removed listing title to show only the person's name in header */}
                     </div>
                 </div>
             </div>
@@ -376,6 +374,12 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                                     )}
 
                                     <div className="relative group">
+                                        {/* Sender name for incoming messages */}
+                                        {!isOwn && (
+                                            <div className="text-xs font-medium text-gray-700 mb-1">
+                                                {msg.sender_name || msg.sender_full_name || sellerProfile?.full_name || 'User'}
+                                            </div>
+                                        )}
                                         {/* Message bubble */}
                                         <div
                                             className={`px-4 py-2 rounded-2xl ${isOwn
@@ -383,7 +387,9 @@ export default function ChatView({ listing, sellerId, initialConversation, onBac
                                                 : 'bg-white text-gray-900 rounded-tl-none border border-gray-100 shadow-sm'
                                                 }`}
                                         >
-                                            <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                                            <p className="text-sm whitespace-pre-wrap break-words">
+                                                {msg.content || msg.body || msg.text || ''}
+                                            </p>
                                             {msg.edited_at && (
                                                 <span className="text-xs opacity-70 block mt-1">(edited)</span>
                                             )}

@@ -18,7 +18,11 @@ export const AuthProvider = ({ children }) => {
                 .single();
 
             if (!error && data) {
-                setUser(prev => ({ ...prev, ...data }));
+                // Normalize profile values to avoid frontend strict checks
+                const normalized = { ...data, is_verified: Boolean(data.is_verified) };
+                // Avoid adding undefined/null username that might break index usage
+                if (normalized.username === null) delete normalized.username;
+                setUser(prev => ({ ...prev, ...normalized }));
             }
         } catch (error) {
             console.error('Error fetching profile:', error);
