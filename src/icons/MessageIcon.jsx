@@ -1,17 +1,18 @@
 const MessageIcon = (props) => {
     return (
         <svg
-            viewBox="0 0 15 15"
+            viewBox="0 0 24 24"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
             aria-hidden="true"
             stroke="currentColor"
-            strokeWidth="1.5" /* Adjusted to match the delicate 15px grid, or can be overridden */
+            strokeWidth={props.strokeWidth || 1.5}
             strokeLinecap="round"
             strokeLinejoin="round"
             {...props}
         >
-            <path d="M5.5 11.493L7.5 14.491L9.5 11.493H13.5C13.7652 11.493 14.0196 11.3876 14.2071 11.2001C14.3946 11.0125 14.5 10.7582 14.5 10.493V1.49998C14.4997 1.23493 14.3943 0.980836 14.2068 0.793516C14.0192 0.606196 13.765 0.500976 13.5 0.500977H1.5C1.23478 0.500977 0.98043 0.606333 0.792893 0.79387C0.605357 0.981406 0.5 1.23576 0.5 1.50098V10.495C0.5 11.047 0.947 11.494 1.5 11.494L5.5 11.493Z" />
+            {/* Rounded Message Bubble with Tail */}
+            <path d="M21 11.5C21 15.6421 17.6421 19 13.5 19C12.3789 19 11.317 18.756 10.3546 18.3188L5 20.5L6.68537 15.7744C5.62629 14.6146 5 13.1255 5 11.5C5 7.35786 8.35786 4 12.5 4C16.6421 4 21 7.35786 21 11.5Z" />
         </svg>
     );
 };
