@@ -100,8 +100,8 @@ const ExploreView = ({
 
                                     {/* Badges */}
                                     <div className="absolute top-3 left-3 flex gap-2">
-                                        <span className="bg-[#00A8E8] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-sm">New</span>
-                                        <span className="bg-white/95 backdrop-blur-sm text-gray-800 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                        <span className="bg-[#00A8E8] text-white text-[10px] font-bold px-2.5 py-1 rounded-[3px] uppercase tracking-wide shadow-sm">New</span>
+                                        <span className="bg-white/95 backdrop-blur-sm text-gray-800 text-[10px] font-bold px-2.5 py-1 rounded-[3px] flex items-center gap-1 shadow-sm">
                                             <BadgeCheck size={14} className="fill-[#00A8E8] text-white" />
                                             Verified
                                         </span>
@@ -114,7 +114,7 @@ const ExploreView = ({
                                     >
                                         <Heart
                                             size={24}
-                                            className={`${favorites.includes(listing.id) ? "fill-[#FF385C] text-[#FF385C]" : "text-white"} drop-shadow-md`}
+                                            className={`${favorites.includes(listing.id) ? "fill-[#00A8E8] text-[#00A8E8]" : "text-white fill-black/50"} drop-shadow-sm`}
                                             strokeWidth={2}
                                         />
                                     </button>
