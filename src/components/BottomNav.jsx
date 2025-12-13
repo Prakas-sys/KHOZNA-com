@@ -5,10 +5,10 @@ import MessageIcon from '../icons/MessageIcon';
 
 const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
     const navItems = [
-        { id: 'explore', label: 'Explore', icon: SearchIcon },
+        { id: 'explore', label: 'Explore', icon: SearchIcon, iconSize: 22 }, // Visually align with Lucide icons
         { id: 'reels', label: 'Reels', icon: PlayCircle },
         { id: 'add', label: '', type: 'special', icon: Plus },
-        { id: 'messages', label: 'Message', icon: MessageIcon },
+        { id: 'messages', label: 'Message', icon: MessageIcon, iconSize: 22 }, // Visually align with Lucide icons
         { id: 'profile', label: 'Profile', icon: CircleUser }
     ];
 
@@ -37,6 +37,8 @@ const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
                     }
 
                     // Standard Icons (Explore, Reels, Message, Profile)
+                    const iconSize = item.iconSize || 26;
+
                     return (
                         <button
                             key={item.id}
@@ -44,7 +46,9 @@ const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
                             className="flex flex-col items-center justify-center gap-1 min-w-[60px] h-full pt-2 group"
                         >
                             <item.icon
-                                size={26} // Requested 26px size
+                                size={iconSize}
+                                width={iconSize}
+                                height={iconSize}
                                 strokeWidth={isActive ? 2.5 : 2}
                                 className={`transition-all duration-200 group-hover:scale-110 ${isActive ? 'text-[#00A8E8]' : 'text-gray-400 group-hover:text-gray-600'}`}
                             />
