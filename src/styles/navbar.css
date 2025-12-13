@@ -1,0 +1,40 @@
+.navbar {
+  display: flex;
+  gap: 16px;
+  padding: 12px 24px;
+  align-items: center;
+  background-color: #fff;
+  /* Ensure background is defined */
+  border-bottom: 1px solid #f0f0f0;
+  /* Add subtle border */
+}
+
+.nav-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #222;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px;
+  transition: color 0.2s ease;
+}
+
+.nav-btn:hover {
+  color: #ff385c;
+}
+
+.nav-btn svg {
+  width: 20px;
+  height: 20px;
+  transition: all 0.2s ease;
+  stroke-width: 2px;
+}
+
+@media (min-width: 1024px) {
+  .nav-btn svg {
+    width: 24px;
+    height: 24px;
+  }
+}
