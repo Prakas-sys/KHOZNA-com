@@ -100,9 +100,9 @@ const ExploreView = ({
 
                                     {/* Badges */}
                                     <div className="absolute top-3 left-3 flex gap-2">
-                                        <span className="bg-[#00A8E8] text-white text-[10px] font-bold px-2.5 py-1 rounded-md uppercase tracking-wide shadow-sm">New</span>
-                                        <span className="bg-white/95 backdrop-blur-sm text-gray-800 text-[10px] font-bold px-2.5 py-1 rounded-md flex items-center gap-1 shadow-sm">
-                                            <BadgeCheck size={12} className="text-[#00A8E8] fill-sky-100" />
+                                        <span className="bg-[#00A8E8] text-white text-[10px] font-bold px-2.5 py-1 rounded-full uppercase tracking-wide shadow-sm">New</span>
+                                        <span className="bg-white/95 backdrop-blur-sm text-gray-800 text-[10px] font-bold px-2.5 py-1 rounded-full flex items-center gap-1 shadow-sm">
+                                            <BadgeCheck size={14} className="fill-[#00A8E8] text-white" />
                                             Verified
                                         </span>
                                     </div>
@@ -110,11 +110,12 @@ const ExploreView = ({
                                     {/* Heart Icon */}
                                     <button
                                         onClick={(e) => toggleFavorite(e, listing.id)}
-                                        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-black/20 backdrop-blur-sm flex items-center justify-center hover:bg-white transition-colors group-heart"
+                                        className="absolute top-3 right-3 p-2 hover:scale-110 transition-transform active:scale-95"
                                     >
                                         <Heart
-                                            size={16}
-                                            className={favorites.includes(listing.id) ? "fill-white text-white" : "text-white group-heart-hover:text-red-500"}
+                                            size={24}
+                                            className={`${favorites.includes(listing.id) ? "fill-[#FF385C] text-[#FF385C]" : "text-white"} drop-shadow-md`}
+                                            strokeWidth={2}
                                         />
                                     </button>
                                 </div>
