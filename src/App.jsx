@@ -785,8 +785,8 @@ function RentEaseAppContent() {
                         {/* Personal Info */}
                         <div className="flex items-center justify-between py-4 cursor-pointer hover:bg-gray-100 active:scale-[0.98] active:bg-gray-200 -mx-2 px-4 rounded-xl transition-all duration-200 group" onClick={() => setEditMode(true)}>
                             <div className="flex items-center gap-4">
-                                <div className="p-2 bg-gray-50 rounded-full group-hover:bg-white transition-colors">
-                                    <User size={20} className="text-gray-600 group-hover:text-gray-900" />
+                                <div className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-full group-hover:bg-white transition-colors">
+                                    <img src="/personal information icon card.png" alt="Personal Info" className="w-6 h-6 object-contain" />
                                 </div>
                                 <span className="text-gray-700 font-medium group-hover:text-gray-900">Personal Information</span>
                             </div>
@@ -799,8 +799,8 @@ function RentEaseAppContent() {
                             onClick={() => setShowMyListings(true)}
                         >
                             <div className="flex items-center gap-4">
-                                <div className="p-2 bg-gray-50 rounded-full group-hover:bg-white transition-colors">
-                                    <HomeIcon size={20} className="text-gray-600 group-hover:text-gray-900" />
+                                <div className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-full group-hover:bg-white transition-colors">
+                                    <img src="/realestate house.png" alt="My Listings" className="w-6 h-6 object-contain" />
                                 </div>
                                 <span className="text-gray-700 font-medium group-hover:text-gray-900">My Listings</span>
                             </div>
@@ -818,8 +818,8 @@ function RentEaseAppContent() {
                             onClick={() => myKYC ? setShowKYCDetails(true) : setShowKYCModal(true)}
                         >
                             <div className="flex items-center gap-4">
-                                <div className="p-2 bg-gray-50 rounded-full group-hover:bg-white transition-colors">
-                                    <Shield size={20} className="text-gray-600 group-hover:text-gray-900" />
+                                <div className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-full group-hover:bg-white transition-colors">
+                                    <img src="/identiverification.png" alt="Identity Verification" className="w-6 h-6 object-contain" />
                                 </div>
                                 <span className="text-gray-700 font-medium group-hover:text-gray-900">Identity Verification</span>
                             </div>
@@ -854,19 +854,24 @@ function RentEaseAppContent() {
                             </div>
                             <ChevronRight size={20} className="text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all" />
                         </div>
+
+                        {/* Divider */}
+                        <div className="h-px bg-gray-200 w-full my-6"></div>
+
+                        {/* 4. Logout (Minimal) */}
+                        <div
+                            onClick={signOut}
+                            className="flex items-center justify-between py-4 cursor-pointer hover:bg-gray-100 active:scale-[0.98] active:bg-gray-200 -mx-2 px-4 rounded-xl transition-all duration-200 group"
+                        >
+                            <div className="flex items-center gap-4">
+                                <div className="w-10 h-10 flex items-center justify-center bg-gray-50 rounded-full group-hover:bg-white transition-colors">
+                                    <img src="/logout image.png" alt="Log Out" className="w-6 h-6 object-contain" />
+                                </div>
+                                <span className="text-gray-700 font-medium group-hover:text-gray-900">Log Out</span>
+                            </div>
+                            <ChevronRight size={20} className="text-gray-400 group-hover:text-gray-600 group-hover:translate-x-1 transition-all" />
+                        </div>
                     </div>
-
-                    {/* Divider */}
-                    <div className="h-px bg-gray-200 w-full my-6"></div>
-
-                    {/* 4. Logout */}
-                    <button
-                        onClick={signOut}
-                        className="w-full py-3 border border-gray-900 rounded-lg font-semibold text-gray-900 hover:bg-gray-50 transition-colors flex items-center justify-center gap-2"
-                    >
-                        <LogoutIcon size={18} />
-                        Log Out
-                    </button>
                 </div>
 
                 {/* Edit Profile Modal */}
