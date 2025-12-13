@@ -49,7 +49,7 @@ const BottomNav = ({ currentView, onNavigate, onPostProperty }) => {
                                 size={iconSize}
                                 width={iconSize}
                                 height={iconSize}
-                                strokeWidth={isActive ? 2.5 : 2}
+                                strokeWidth={isActive ? 2 : 1.5} // Airbnb-style minimalistic strokes
                                 className={`transition-all duration-200 group-hover:scale-110 ${isActive ? 'text-[#00A8E8]' : 'text-gray-400 group-hover:text-gray-600'}`}
                             />
                             <span className={`text-[10px] font-medium tracking-wide transition-colors duration-200 ${isActive ? 'text-[#00A8E8]' : 'text-gray-400 group-hover:text-gray-600'
